@@ -1,9 +1,10 @@
 <template>
   <div class="layout-container">
     <aside class="sidebar" :class="{ 'sidebar-collapsed': isCollapsed }">
-      <div class="logo-section">
-        <div class="logo"></div>
-        <span v-show="!isCollapsed" class="logo-text">民匠有约管理系统</span>
+      <div class="sidebar-logo-container" :class="{ collapse: isCollapsed }" style="background-color: #304156;">
+        <a href="#/" class="sidebar-logo-link">
+          <img src="/static/img/logo1.png" class="sidebar-logo" />
+        </a>
       </div>
       <el-scrollbar class="menu-scrollbar">
         <el-menu
@@ -226,7 +227,37 @@
           </el-breadcrumb>
         </div>
         <div class="header-right">
-          <el-button icon="Bell" circle />
+          <el-popover placement="bottom" width="320" trigger="click" v-model="messageVisible">
+            <template #reference>
+              <el-badge :value="unreadCount" :hidden="unreadCount === 0" class="message-badge">
+                <el-button icon="Bell" circle />
+              </el-badge>
+            </template>
+            <div class="message-popover">
+              <div class="message-header">
+                <span>站内信</span>
+                <el-link type="primary" @click="handleReadAll">全部已读</el-link>
+              </div>
+              <el-divider style="margin: 8px 0;" />
+              <div class="message-list">
+                <div 
+                  v-for="item in messages" 
+                  :key="item.id" 
+                  class="message-item"
+                  :class="{ unread: !item.read }"
+                  @click="handleMessageClick(item)"
+                >
+                  <div class="message-title">{{ item.title }}</div>
+                  <div class="message-content">{{ item.content }}</div>
+                  <div class="message-time">{{ item.time }}</div>
+                </div>
+              </div>
+              <el-divider style="margin: 8px 0;" />
+              <div class="message-footer">
+                <el-link type="primary" @click="handleViewAll">查看全部</el-link>
+              </div>
+            </div>
+          </el-popover>
           <el-dropdown>
             <span class="user-info">
               <el-icon><User /></el-icon>
@@ -262,6 +293,29 @@ const router = useRouter()
 const route = useRoute()
 const isCollapsed = ref(false)
 const username = ref(localStorage.getItem('username') || '用户')
+const messageVisible = ref(false)
+const messages = ref([
+  { id: 1, title: '系统通知', content: '欢迎使用民匠有约管理系统', time: '2026-07-03 10:00:00', read: false },
+  { id: 2, title: '任务提醒', content: '您有新的任务待处理', time: '2026-07-03 09:30:00', read: false },
+  { id: 3, title: '培训通知', content: '新增培训课程已上线', time: '2026-07-02 15:00:00', read: true }
+])
+
+const unreadCount = computed(() => messages.value.filter(m => !m.read).length)
+
+const handleReadAll = () => {
+  messages.value.forEach(m => m.read = true)
+  ElMessage.success('已全部标记为已读')
+}
+
+const handleMessageClick = (item) => {
+  item.read = true
+  ElMessage.info('查看消息: ' + item.title)
+}
+
+const handleViewAll = () => {
+  ElMessage.info('跳转到全部消息页面')
+  messageVisible.value = false
+}
 
 const activeMenu = computed(() => route.path)
 
@@ -430,42 +484,32 @@ const handleLogout = () => {
   width: 64px;
 }
 
-.logo-section {
+.sidebar-logo-container {
   height: 60px;
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  justify-content: center;
   border-bottom: 1px solid #263445;
   flex-shrink: 0;
 }
 
-.logo {
+.sidebar-logo-container.collapse {
+  padding: 0;
+}
+
+.sidebar-logo-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+.sidebar-logo {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #7171C6 0%, #9B59B6 100%);
-  border-radius: 6px;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.logo::before {
-  content: 'M';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 18px;
-  font-weight: bold;
-  color: #fff;
-}
-
-.logo-text {
-  margin-left: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
+  object-fit: contain;
 }
 
 .menu-scrollbar {
@@ -523,6 +567,69 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   gap: 20px;
+}
+
+.message-badge {
+  cursor: pointer;
+}
+
+.message-popover {
+  padding: 4px 0;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.message-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.message-item {
+  padding: 10px 0;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f7fa;
+}
+
+.message-item:last-child {
+  border-bottom: none;
+}
+
+.message-item.unread {
+  background: #ecf5ff;
+  margin: 0 -12px;
+  padding: 10px 12px;
+}
+
+.message-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #303133;
+  margin-bottom: 4px;
+}
+
+.message-content {
+  font-size: 12px;
+  color: #606266;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.message-time {
+  font-size: 11px;
+  color: #909399;
+}
+
+.message-footer {
+  text-align: center;
+  font-size: 13px;
 }
 
 .user-info {

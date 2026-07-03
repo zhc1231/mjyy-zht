@@ -1,55 +1,24 @@
 <template>
   <div class="page-container">
-    <el-row :gutter="20">
-      <el-col :span="8">
-        <el-card>
-          <template #header>
-            <span>企业收支明细报表</span>
-          </template>
-          <el-form :model="form1" label-width="100px">
-            <el-form-item label="时间范围">
-              <el-date-picker v-model="form1.dateRange" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
-            </el-form-item>
-            <el-form-item label="企业名称">
-              <el-input v-model="form1.companyName" placeholder="请输入企业名称" />
-            </el-form-item>
-          </el-form>
-          <el-button type="primary" @click="handleExport1">导出</el-button>
-        </el-card>
-      </el-col>
-      <el-col :span="8">
-        <el-card>
-          <template #header>
-            <span>企业结算明细报表</span>
-          </template>
-          <el-form :model="form2" label-width="100px">
-            <el-form-item label="时间范围">
-              <el-date-picker v-model="form2.dateRange" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
-            </el-form-item>
-            <el-form-item label="企业名称">
-              <el-input v-model="form2.companyName" placeholder="请输入企业名称" />
-            </el-form-item>
-          </el-form>
-          <el-button type="primary" @click="handleExport2">导出</el-button>
-        </el-card>
-      </el-col>
-      <el-col :span="8">
-        <el-card>
-          <template #header>
-            <span>项目收支明细导出</span>
-          </template>
-          <el-form :model="form3" label-width="100px">
-            <el-form-item label="时间范围">
-              <el-date-picker v-model="form3.dateRange" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
-            </el-form-item>
-            <el-form-item label="项目名称">
-              <el-input v-model="form3.projectName" placeholder="请输入项目名称" />
-            </el-form-item>
-          </el-form>
-          <el-button type="primary" @click="handleExport3">导出</el-button>
-        </el-card>
-      </el-col>
-    </el-row>
+    <el-card class="report-card" v-for="(item, index) in reports" :key="index">
+      <h4 style="margin-bottom: 16px;">
+        <span style="color: #F56C6C;">*</span>
+        <span>{{ item.title }}</span>
+      </h4>
+      <el-form :model="item.form" :inline="true">
+        <el-form-item label="时间">
+          <el-date-picker v-model="item.form.startDate" type="date" placeholder="选择日期" style="width: 160px;" />
+          <span style="margin: 0 8px;">~</span>
+          <el-date-picker v-model="item.form.endDate" type="date" placeholder="选择日期" style="width: 160px;" />
+        </el-form-item>
+        <el-form-item :label="item.fieldLabel">
+          <el-input v-model="item.form.name" :placeholder="item.placeholder" style="width: 200px;" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleExport(index)">导出</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
   </div>
 </template>
 
@@ -57,15 +26,42 @@
 import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 
-const form1 = reactive({ dateRange: [], companyName: '' })
-const form2 = reactive({ dateRange: [], companyName: '' })
-const form3 = reactive({ dateRange: [], projectName: '' })
+const reports = reactive([
+  {
+    title: '企业收支明细报表',
+    fieldLabel: '企业名称',
+    placeholder: '请输入企业名称',
+    form: { startDate: '', endDate: '', name: '' }
+  },
+  {
+    title: '企业结算明细报表',
+    fieldLabel: '企业名称',
+    placeholder: '请输入企业名称',
+    form: { startDate: '', endDate: '', name: '' }
+  },
+  {
+    title: '项目收支明细导出',
+    fieldLabel: '项目名称',
+    placeholder: '选择项目名称',
+    form: { startDate: '', endDate: '', name: '' }
+  }
+])
 
-const handleExport1 = () => { ElMessage.success('企业收支明细报表导出成功') }
-const handleExport2 = () => { ElMessage.success('企业结算明细报表导出成功') }
-const handleExport3 = () => { ElMessage.success('项目收支明细导出成功') }
+const handleExport = (index) => {
+  ElMessage.success(reports[index].title + '导出成功')
+}
 </script>
 
 <style scoped>
-.page-container { padding: 10px; }
+.page-container {
+  padding: 10px;
+}
+
+.report-card {
+  margin-bottom: 16px;
+}
+
+.report-card :deep(.el-card__body) {
+  padding: 20px;
+}
 </style>

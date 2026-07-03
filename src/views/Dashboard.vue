@@ -1,184 +1,191 @@
 <template>
   <div class="dashboard">
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-title">累计用户数(人)</div>
-        <div class="stat-body">
-          <div class="stat-icon light-blue user-icon">
-            <svg viewBox="0 0 1024 1024">
-              <path d="M512 512a192 192 0 1 0 0-384 192 192 0 0 0 0 384zm0 64c-188.37 0-352 97.93-352 224v48a48 48 0 0 0 48 48h608a48 48 0 0 0 48-48v-48c0-126.07-163.63-224-352-224z"/>
-              <circle cx="760" cy="320" r="120" fill="none" stroke="currentColor" stroke-width="64"/>
-              <path d="M700 380h120" stroke="currentColor" stroke-width="64" stroke-linecap="round"/>
-              <path d="M760 320v120" stroke="currentColor" stroke-width="64" stroke-linecap="round"/>
-            </svg>
+    <el-row :gutter="16" class="stats-row">
+      <el-col :span="6">
+        <el-card shadow="always" class="stat-card">
+          <div class="stat-title">累计用户数(人)</div>
+          <div class="stat-body">
+            <div class="stat-icon">
+              <svg viewBox="0 0 1024 1024" class="icon-user">
+                <path d="M512 512a192 192 0 1 0 0-384 192 192 0 0 0 0 384zm0 64c-188.37 0-352 97.93-352 224v48a48 48 0 0 0 48 48h608a48 48 0 0 0 48-48v-48c0-126.07-163.63-224-352-224z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="stat-value">{{ stats.totalUsers }}</div>
           </div>
-          <div class="stat-value">{{ stats.totalUsers }}</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">入驻会员(人)</div>
-        <div class="stat-body">
-          <div class="stat-icon light-blue member-icon">
-            <svg viewBox="0 0 1024 1024">
-              <path d="M800 320H224a64 64 0 0 0-64 64v384a64 64 0 0 0 64 64h576a64 64 0 0 0 64-64V384a64 64 0 0 0-64-64zm-288 416H352v-64h160v64zm192 0H544v-64h160v64zm0-128H352v-64h352v64z"/>
-              <path d="M512 128c-79.53 0-145.6 57.92-158.66 133.33h317.32C657.6 185.92 591.47 128 512 128z"/>
-            </svg>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="always" class="stat-card">
+          <div class="stat-title">入驻会员(人)</div>
+          <div class="stat-body">
+            <div class="stat-icon">
+              <svg viewBox="0 0 1024 1024" class="icon-member">
+                <path d="M512 128c-79.53 0-145.6 57.92-158.66 133.33h317.32C657.6 185.92 591.47 128 512 128zM800 320H224a64 64 0 0 0-64 64v384a64 64 0 0 0 64 64h576a64 64 0 0 0 64-64V384a64 64 0 0 0-64-64z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="stat-value">{{ stats.members }}</div>
           </div>
-          <div class="stat-value">{{ stats.members }}</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">邀约入驻企业(家)</div>
-        <div class="stat-body">
-          <div class="stat-icon light-blue enterprise-icon">
-            <svg viewBox="0 0 1024 1024">
-              <path d="M832 832V320l-256-128H192v640H128v64h768v-64h-64zM448 192h128v128H448V192zm-128 0h128v128H320V192z m384 512H384v-64h320v64zm0-128H384v-64h320v64z"/>
-            </svg>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="always" class="stat-card">
+          <div class="stat-title">邀约入驻企业(家)</div>
+          <div class="stat-body">
+            <div class="stat-icon">
+              <svg viewBox="0 0 1024 1024" class="icon-enterprise">
+                <path d="M832 832V320l-256-128H192v640H128v64h768v-64h-64zM448 192h128v128H448V192zm-128 0h128v128H320V192z m384 512H384v-64h320v64zm0-128H384v-64h320v64z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="stat-value">{{ stats.enterprises }}</div>
           </div>
-          <div class="stat-value">{{ stats.enterprises }}</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">累计培训报名</div>
-        <div class="stat-body">
-          <div class="stat-icon light-blue training-icon">
-            <svg viewBox="0 0 1024 1024">
-              <path d="M832 320v-64H192v64h-64v448a64 64 0 0 0 64 64h640a64 64 0 0 0 64-64V320h-64zM512 704c-88.37 0-160-71.63-160-160s71.63-160 160-160 160 71.63 160 160-71.63 160-160 160z"/>
-              <circle cx="512" cy="544" r="80" fill="none" stroke="currentColor" stroke-width="64"/>
-              <path d="M512 504v80" stroke="currentColor" stroke-width="48" stroke-linecap="round"/>
-              <path d="M472 544h80" stroke="currentColor" stroke-width="48" stroke-linecap="round"/>
-            </svg>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="always" class="stat-card multi-stat">
+          <div class="multi-stat-item">
+            <span class="stat-value-sm">{{ stats.taskComplete }}</span>
+            <span class="stat-label">累计培训报名</span>
           </div>
-          <div class="stat-value">{{ stats.training }}</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">累计发布任务量</div>
-        <div class="stat-body">
-          <div class="stat-icon light-blue task-icon">
-            <svg viewBox="0 0 1024 1024">
-              <path d="M128 192h768v64H128zM128 416h512v64H128zM128 640h320v64H128z"/>
-              <circle cx="800" cy="672" r="96" fill="none" stroke="currentColor" stroke-width="64"/>
-              <path d="M752 672l48 48 80-80" fill="none" stroke="currentColor" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+          <div class="multi-stat-item">
+            <span class="stat-value-sm">{{ stats.training }}</span>
+            <span class="stat-label">累计发布任务量</span>
           </div>
-          <div class="stat-value">{{ stats.taskPublish }}</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">累计完成任务量</div>
-        <div class="stat-body">
-          <div class="stat-icon light-blue complete-icon">
-            <svg viewBox="0 0 1024 1024">
-              <path d="M832 832V320l-256-128H192v640H128v64h768v-64h-64zM448 192h128v128H448V192zm-128 0h128v128H320V192z m384 512H384v-64h320v64zm0-128H384v-64h320v64z"/>
-              <circle cx="800" cy="224" r="80" fill="#67C23A"/>
-              <path d="M760 224l28 28 52-52" fill="none" stroke="#fff" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+          <div class="multi-stat-item">
+            <span class="stat-value-sm">{{ stats.taskPublish }}</span>
+            <span class="stat-label">累计完成任务量</span>
           </div>
-          <div class="stat-value">{{ stats.taskComplete }}</div>
-        </div>
-      </div>
-    </div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-header">
-          <span>培训报名人数</span>
-          <div class="chart-tabs">
-            <el-radio v-model="trainingTab" label="day">天</el-radio>
-            <el-radio v-model="trainingTab" label="month">月</el-radio>
+        </el-card>
+      </el-col>
+    </el-row>
+    <el-row :gutter="16" class="charts-row">
+      <el-col :span="12">
+        <el-card shadow="always" class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">培训报名人数</span>
+            <span class="chart-date">{{ currentDate }}</span>
+            <el-radio-group v-model="trainingTab" size="small">
+              <el-radio-button label="day">天</el-radio-button>
+              <el-radio-button label="month">月</el-radio-button>
+            </el-radio-group>
           </div>
-          <span class="chart-date">{{ currentDate }}</span>
-        </div>
-        <div class="chart-placeholder">
-          <div class="area-chart">
-            <svg viewBox="0 0 400 200" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style="stop-color:#409EFF;stop-opacity:0.3"/>
-                  <stop offset="100%" style="stop-color:#409EFF;stop-opacity:0"/>
-                </linearGradient>
-              </defs>
-              <path d="M0,160 Q40,150 80,120 T160,80 T240,100 T320,40 T400,60 L400,200 L0,200 Z" fill="url(#grad1)"/>
-              <path d="M0,160 Q40,150 80,120 T160,80 T240,100 T320,40 T400,60" fill="none" stroke="#409EFF" stroke-width="3"/>
-            </svg>
+          <div class="chart-body">
+            <div class="area-chart">
+              <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#409EFF;stop-opacity:0.3"/>
+                    <stop offset="100%" style="stop-color:#409EFF;stop-opacity:0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,150 Q40,145 80,130 T160,60 T240,80 T320,40 T400,60 L400,200 L0,200 Z" fill="url(#grad1)"/>
+                <path d="M0,150 Q40,145 80,130 T160,60 T240,80 T320,40 T400,60" fill="none" stroke="#409EFF" stroke-width="2"/>
+                <circle cx="0" cy="150" r="4" fill="#409EFF"/>
+                <circle cx="80" cy="130" r="4" fill="#409EFF"/>
+                <circle cx="160" cy="60" r="4" fill="#409EFF"/>
+                <circle cx="240" cy="80" r="4" fill="#409EFF"/>
+                <circle cx="320" cy="40" r="4" fill="#409EFF"/>
+                <circle cx="400" cy="60" r="4" fill="#409EFF"/>
+              </svg>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-header">
-          <span>任务发布量</span>
-          <div class="chart-tabs">
-            <el-radio v-model="taskTab" label="day">天</el-radio>
-            <el-radio v-model="taskTab" label="month">月</el-radio>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card shadow="always" class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">任务发布量</span>
+            <span class="chart-date">{{ currentDate }}</span>
+            <el-radio-group v-model="taskTab" size="small">
+              <el-radio-button label="day">天</el-radio-button>
+              <el-radio-button label="month">月</el-radio-button>
+            </el-radio-group>
           </div>
-          <span class="chart-date">{{ currentDate }}</span>
-        </div>
-        <div class="chart-placeholder">
-          <div class="area-chart">
-            <svg viewBox="0 0 400 200" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style="stop-color:#409EFF;stop-opacity:0.3"/>
-                  <stop offset="100%" style="stop-color:#409EFF;stop-opacity:0"/>
-                </linearGradient>
-              </defs>
-              <path d="M0,180 Q50,170 100,140 T200,60 T300,80 T400,20 L400,200 L0,200 Z" fill="url(#grad2)"/>
-              <path d="M0,180 Q50,170 100,140 T200,60 T300,80 T400,20" fill="none" stroke="#409EFF" stroke-width="3"/>
-            </svg>
+          <div class="chart-body">
+            <div class="area-chart">
+              <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#409EFF;stop-opacity:0.3"/>
+                    <stop offset="100%" style="stop-color:#409EFF;stop-opacity:0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,180 Q50,175 100,160 T200,50 T300,70 T400,30 L400,200 L0,200 Z" fill="url(#grad2)"/>
+                <path d="M0,180 Q50,175 100,160 T200,50 T300,70 T400,30" fill="none" stroke="#409EFF" stroke-width="2"/>
+                <circle cx="0" cy="180" r="4" fill="#409EFF"/>
+                <circle cx="100" cy="160" r="4" fill="#409EFF"/>
+                <circle cx="200" cy="50" r="4" fill="#409EFF"/>
+                <circle cx="300" cy="70" r="4" fill="#409EFF"/>
+                <circle cx="400" cy="30" r="4" fill="#409EFF"/>
+              </svg>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-header">
-          <span>用户量</span>
-          <div class="chart-tabs">
-            <el-radio v-model="userTab" label="day">天</el-radio>
-            <el-radio v-model="userTab" label="month">月</el-radio>
+        </el-card>
+      </el-col>
+    </el-row>
+    <el-row :gutter="16" class="charts-row">
+      <el-col :span="12">
+        <el-card shadow="always" class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">用户量</span>
+            <span class="chart-date">{{ currentDate }}</span>
+            <el-radio-group v-model="userTab" size="small">
+              <el-radio-button label="day">天</el-radio-button>
+              <el-radio-button label="month">月</el-radio-button>
+            </el-radio-group>
           </div>
-          <span class="chart-date">{{ currentDate }}</span>
-        </div>
-        <div class="chart-placeholder">
-          <div class="area-chart">
-            <svg viewBox="0 0 400 200" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="grad3" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style="stop-color:#409EFF;stop-opacity:0.3"/>
-                  <stop offset="100%" style="stop-color:#409EFF;stop-opacity:0"/>
-                </linearGradient>
-              </defs>
-              <path d="M0,170 Q60,160 120,130 T240,90 T360,50 T400,70 L400,200 L0,200 Z" fill="url(#grad3)"/>
-              <path d="M0,170 Q60,160 120,130 T240,90 T360,50 T400,70" fill="none" stroke="#409EFF" stroke-width="3"/>
-            </svg>
+          <div class="chart-body">
+            <div class="area-chart">
+              <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="grad3" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#409EFF;stop-opacity:0.3"/>
+                    <stop offset="100%" style="stop-color:#409EFF;stop-opacity:0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,40 Q60,35 120,50 T240,120 T360,130 T400,120 L400,200 L0,200 Z" fill="url(#grad3)"/>
+                <path d="M0,40 Q60,35 120,50 T240,120 T360,130 T400,120" fill="none" stroke="#409EFF" stroke-width="2"/>
+                <circle cx="0" cy="40" r="4" fill="#409EFF"/>
+                <circle cx="120" cy="50" r="4" fill="#409EFF"/>
+                <circle cx="240" cy="120" r="4" fill="#409EFF"/>
+                <circle cx="360" cy="130" r="4" fill="#409EFF"/>
+                <circle cx="400" cy="120" r="4" fill="#409EFF"/>
+              </svg>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-header">
-          <span>任务完成人数</span>
-          <div class="chart-tabs">
-            <el-radio v-model="completeTab" label="day">天</el-radio>
-            <el-radio v-model="completeTab" label="month">月</el-radio>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card shadow="always" class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">任务完成人数</span>
+            <span class="chart-date">{{ currentDate }}</span>
+            <el-radio-group v-model="completeTab" size="small">
+              <el-radio-button label="day">天</el-radio-button>
+              <el-radio-button label="month">月</el-radio-button>
+            </el-radio-group>
           </div>
-          <span class="chart-date">{{ currentDate }}</span>
-        </div>
-        <div class="chart-placeholder">
-          <div class="area-chart">
-            <svg viewBox="0 0 400 200" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="grad4" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style="stop-color:#409EFF;stop-opacity:0.3"/>
-                  <stop offset="100%" style="stop-color:#409EFF;stop-opacity:0"/>
-                </linearGradient>
-              </defs>
-              <path d="M0,190 Q80,180 160,140 T280,100 T400,60 L400,200 L0,200 Z" fill="url(#grad4)"/>
-              <path d="M0,190 Q80,180 160,140 T280,100 T400,60" fill="none" stroke="#409EFF" stroke-width="3"/>
-            </svg>
+          <div class="chart-body">
+            <div class="area-chart">
+              <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="grad4" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#409EFF;stop-opacity:0.3"/>
+                    <stop offset="100%" style="stop-color:#409EFF;stop-opacity:0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,30 Q50,25 100,50 T200,160 T300,180 T400,170 L400,200 L0,200 Z" fill="url(#grad4)"/>
+                <path d="M0,30 Q50,25 100,50 T200,160 T300,180 T400,170" fill="none" stroke="#409EFF" stroke-width="2"/>
+                <circle cx="0" cy="30" r="4" fill="#409EFF"/>
+                <circle cx="100" cy="50" r="4" fill="#409EFF"/>
+                <circle cx="200" cy="160" r="4" fill="#409EFF"/>
+                <circle cx="300" cy="180" r="4" fill="#409EFF"/>
+                <circle cx="400" cy="170" r="4" fill="#409EFF"/>
+              </svg>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -188,12 +195,12 @@ import { ref, reactive } from 'vue'
 const currentDate = ref('2026年07月03日')
 
 const stats = reactive({
-  totalUsers: '86001',
-  members: '79336',
+  totalUsers: '86013',
+  members: '79348',
   enterprises: '6665',
   training: '1015486',
   taskPublish: '965200',
-  taskComplete: '40908'
+  taskComplete: '40924'
 })
 
 const trainingTab = ref('day')
@@ -204,29 +211,25 @@ const completeTab = ref('day')
 
 <style scoped>
 .dashboard {
-  padding: 10px;
+  padding: 0;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+.stats-row {
+  margin-bottom: 16px;
 }
 
 .stat-card {
-  background: #fff;
-  border-radius: 8px;
+  height: 100%;
+}
+
+.stat-card :deep(.el-card__body) {
   padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  min-height: 140px;
 }
 
 .stat-title {
   font-size: 14px;
   color: #303133;
-  margin-bottom: 20px;
-  font-weight: 500;
+  margin-bottom: 16px;
 }
 
 .stat-body {
@@ -236,9 +239,8 @@ const completeTab = ref('day')
 }
 
 .stat-icon {
-  width: 50px;
-  height: 50px;
-  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
 }
 
 .stat-icon svg {
@@ -246,56 +248,73 @@ const completeTab = ref('day')
   height: 100%;
 }
 
-.light-blue {
+.icon-user,
+.icon-member,
+.icon-enterprise {
   color: #409EFF;
 }
 
 .stat-value {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 700;
   color: #303133;
-  font-family: 'Microsoft YaHei', sans-serif;
+}
+
+.multi-stat :deep(.el-card__body) {
+  padding: 16px 20px;
+}
+
+.multi-stat-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.stat-value-sm {
+  font-size: 24px;
+  font-weight: 700;
+  color: #303133;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #606266;
 }
 
 .charts-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .chart-card {
-  background: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  height: 100%;
+}
+
+.chart-card :deep(.el-card__body) {
+  padding: 16px 20px;
 }
 
 .chart-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #606266;
+  margin-bottom: 12px;
 }
 
-.chart-tabs {
-  display: flex;
-  gap: 10px;
+.chart-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #303133;
+  margin-right: auto;
 }
 
 .chart-date {
   font-size: 12px;
   color: #909399;
+  margin-right: 12px;
 }
 
-.chart-placeholder {
-  height: 200px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+.chart-body {
+  height: 220px;
 }
 
 .area-chart {
