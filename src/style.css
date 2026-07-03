@@ -1,0 +1,34 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  font-family: 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body {
+  background: #f0f2f5;
+}
+
+.el-menu-item, .el-sub-menu__title {
+  font-size: 14px;
+}
+
+.el-table {
+  font-size: 14px;
+}
+
+.el-form-item__label {
+  font-size: 14px;
+}
+
+.el-dialog__title {
+  font-size: 18px;
+}
+
+.el-pagination {
+  font-size: 14px;
+}
