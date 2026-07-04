@@ -70,6 +70,27 @@ const routes = [
         meta: { title: path.split('/').pop() }
       }))
     ]
+  },
+  {
+    path: '/agentv2/login',
+    name: 'AgentV2Login',
+    component: () => import('../views/AgentV2/Login.vue'),
+    meta: { title: '登录' }
+  },
+  {
+    path: '/agentv2',
+    name: 'AgentV2Layout',
+    component: () => import('../layout/AgentV2Layout.vue'),
+    redirect: '/agentv2/home',
+    children: [
+      { path: 'home', name: 'AgentV2Home', component: () => import('../views/AgentV2/Home.vue'), meta: { title: '企业信息' } },
+      { path: 'personal', name: 'AgentV2Personal', component: () => import('../views/AgentV2/Personal.vue'), meta: { title: '个人代理' } },
+      { path: 'personal/add', name: 'AgentV2PersonalAdd', component: () => import('../views/AgentV2/Personal.vue'), meta: { title: '新增业务员' } },
+      { path: 'enterprise', name: 'AgentV2Enterprise', component: () => import('../views/AgentV2/Enterprise.vue'), meta: { title: '企业列表' } },
+      { path: 'purchase', name: 'AgentV2Purchase', component: () => import('../views/AgentV2/Purchase.vue'), meta: { title: '购买明细' } },
+      { path: 'settlement', name: 'AgentV2Settlement', component: () => import('../views/AgentV2/Settlement.vue'), meta: { title: '结算明细' } },
+      { path: 'incentive', name: 'AgentV2Incentive', component: () => import('../views/AgentV2/Incentive.vue'), meta: { title: '激励奖励' } }
+    ]
   }
 ]
 
@@ -81,15 +102,23 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   if (to.meta.title) {
-    document.title = to.meta.title + ' - 民匠有约管理系统'
+    if (to.path.startsWith('/agentv2')) {
+      document.title = to.meta.title + ' - 城市服务商系统'
+    } else {
+      document.title = to.meta.title + ' - 民匠有约管理系统'
+    }
   }
-  if (to.path === '/login') {
+  if (to.path === '/login' || to.path === '/agentv2/login') {
     next()
   } else {
     if (token) {
       next()
     } else {
-      next('/login')
+      if (to.path.startsWith('/agentv2')) {
+        next('/agentv2/login')
+      } else {
+        next('/login')
+      }
     }
   }
 })
