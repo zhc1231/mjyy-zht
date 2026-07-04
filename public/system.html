@@ -223,6 +223,23 @@
     border: 1px solid #67C23A;
   }
   .enter-btn.test:hover { background: #67C23A; color: #fff; }
+  .enter-btn.log {
+    background: #fff;
+    color: #9B59B6;
+    border: 1px solid #9B59B6;
+  }
+  .enter-btn.log:hover { background: #9B59B6; color: #fff; }
+  .card-footer.triple {
+    flex-wrap: wrap;
+  }
+  .card-footer.triple .enter-btn {
+    flex: 1 1 calc(50% - 5px);
+    font-size: 13px;
+    padding: 9px 8px;
+  }
+  .card-footer.triple .enter-btn:last-child {
+    flex: 1 1 100%;
+  }
 
   /* 弹窗 */
   .modal-mask {
@@ -407,9 +424,10 @@
           </div>
         </div>
       </div>
-      <div class="card-footer">
+      <div class="card-footer triple">
         <a class="enter-btn prod" href="https://sys.minjiangyouyue.com" target="_blank" rel="noopener">🚀 进入生产</a>
         <a class="enter-btn test" href="http://121.199.7.40:9092" target="_blank" rel="noopener">🧪 进入测试</a>
+        <a class="enter-btn log" href="./changelog.html">📜 产品更新日志</a>
       </div>
     </div>
 
