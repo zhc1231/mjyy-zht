@@ -60,7 +60,7 @@
   /* 入口卡片 */
   .entries {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 18px;
     padding: 40px 50px;
     align-items: stretch;
@@ -98,9 +98,10 @@
     top: 0; left: 0; right: 0;
     height: 4px;
   }
-  .entry-card.system::before  { background: linear-gradient(90deg, #67C23A, #5cb85c); }
-  .entry-card.enterprise::before { background: linear-gradient(90deg, #E6A23C, #f0ad4e); }
-  .entry-card.finance::before { background: linear-gradient(90deg, #F56C6C, #ff8a80); }
+  .entry-card.manual::before { background: linear-gradient(90deg, #409EFF, #5b6cff); }
+  .entry-card.prd::before    { background: linear-gradient(90deg, #67C23A, #5cb85c); }
+  .entry-card.flow::before   { background: linear-gradient(90deg, #F56C6C, #ff8a80); }
+  .entry-card.proto::before  { background: linear-gradient(90deg, #E6A23C, #f0ad4e); }
   .entry-icon {
     width: 64px;
     height: 64px;
@@ -112,9 +113,10 @@
     font-size: 28px;
     color: #fff;
   }
-  .entry-card.system .entry-icon  { background: linear-gradient(135deg, #67C23A, #5cb85c); }
-  .entry-card.enterprise .entry-icon { background: linear-gradient(135deg, #E6A23C, #f0ad4e); }
-  .entry-card.finance .entry-icon { background: linear-gradient(135deg, #F56C6C, #ff8a80); }
+  .entry-card.manual .entry-icon { background: linear-gradient(135deg, #409EFF, #5b6cff); }
+  .entry-card.prd .entry-icon    { background: linear-gradient(135deg, #67C23A, #5cb85c); }
+  .entry-card.flow .entry-icon   { background: linear-gradient(135deg, #F56C6C, #ff8a80); }
+  .entry-card.proto .entry-icon  { background: linear-gradient(135deg, #E6A23C, #f0ad4e); }
   .entry-card h3 {
     font-size: 18px;
     color: #303133;
@@ -133,9 +135,10 @@
     font-size: 13px;
     color: #fff;
   }
-  .entry-card.system .entry-btn  { background: #67C23A; }
-  .entry-card.enterprise .entry-btn { background: #E6A23C; }
-  .entry-card.finance .entry-btn { background: #F56C6C; }
+  .entry-card.manual .entry-btn { background: #409EFF; }
+  .entry-card.prd .entry-btn    { background: #67C23A; }
+  .entry-card.flow .entry-btn   { background: #F56C6C; }
+  .entry-card.proto .entry-btn  { background: #E6A23C; }
 
   /* 更新日志 */
   .content {
@@ -279,25 +282,31 @@
     <a href="./system.html" class="back-link">← 返回平台登陆入口</a>
   </div>
 
-  <!-- 三个功能入口 -->
+  <!-- 四个入口 -->
   <div class="entries">
-    <a href="#enterprise" class="entry-card enterprise">
-      <div class="entry-icon">🏢</div>
-      <h3>企业管理</h3>
-      <p>企业信息、个人代理、企业列表管理</p>
-      <span class="entry-btn">查看详情</span>
+    <a href="./manual-agentv2.html" class="entry-card manual">
+      <div class="entry-icon">📖</div>
+      <h3>产品使用手册</h3>
+      <p>代理商2.0功能操作指南与使用说明</p>
+      <span class="entry-btn">查看手册</span>
     </a>
-    <a href="#finance" class="entry-card finance">
-      <div class="entry-icon">💰</div>
-      <h3>财务管理</h3>
-      <p>购买明细、结算明细、激励奖励</p>
-      <span class="entry-btn">查看详情</span>
+    <a href="./prd-agentv2.html" class="entry-card prd">
+      <div class="entry-icon">📋</div>
+      <h3>产品需求文档</h3>
+      <p>完整PRD，含功能需求、设计规范、上线标准</p>
+      <span class="entry-btn">查看文档</span>
     </a>
-    <a href="#system" class="entry-card system">
-      <div class="entry-icon">⚙️</div>
-      <h3>系统功能</h3>
-      <p>登录系统、个人中心、密码管理</p>
-      <span class="entry-btn">查看详情</span>
+    <a href="./flowchart-agentv2.html" class="entry-card flow">
+      <div class="entry-icon">🔄</div>
+      <h3>产品流程图</h3>
+      <p>核心业务流程，含登录、企业管理、结算等</p>
+      <span class="entry-btn">查看流程图</span>
+    </a>
+    <a href="http://agentv2.zjmjyy.com/" target="_blank" rel="noopener" class="entry-card proto">
+      <div class="entry-icon">🖥️</div>
+      <h3>产品原型</h3>
+      <p>完整系统原型，含全部页面与交互体验</p>
+      <span class="entry-btn">进入原型</span>
     </a>
   </div>
 
