@@ -1,66 +1,86 @@
 <template>
-  <div class="login-container">
-    <div class="login-bg"></div>
-    <div class="login-box">
-      <div class="logo-wrapper">
-        <div class="logo"></div>
-      </div>
-      <h2 class="login-title">欢迎登录</h2>
-      <h4 class="login-subtitle">民匠有约管理系统</h4>
-      <el-form :model="form" ref="formRef" class="login-form" @submit.prevent="handleLogin">
-        <el-form-item>
+  <div class="login">
+    <div class="login-image">
+      <img class="logo" :src="logoImg" alt="Logo" />
+    </div>
+    <div class="login-right">
+      <el-form ref="loginFormRef" class="login-form" :model="loginForm" :rules="loginRules">
+        <h2 class="title">欢迎登录</h2>
+        <h4 class="title" style="font-weight: 600">民匠有约管理系统</h4>
+        <el-form-item prop="username">
           <el-input
-            v-model="form.username"
+            v-model="loginForm.username"
+            type="text"
+            autocomplete="off"
             placeholder="账号"
-            prefix-icon="User"
-            size="large"
-            :class="{'input-focus': focusFields.username}"
-            @focus="focusFields.username = true"
-            @blur="focusFields.username = false"
-          />
+          >
+            <template #prefix>
+              <el-icon class="input-icon"><User /></el-icon>
+            </template>
+          </el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="password">
           <el-input
-            v-model="form.password"
-            type="password"
+            v-model="loginForm.password"
+            :type="passwordVisible ? 'text' : 'password'"
+            autocomplete="off"
             placeholder="密码"
-            prefix-icon="Lock"
-            size="large"
-            :class="{'input-focus': focusFields.password}"
-            @focus="focusFields.password = true"
-            @blur="focusFields.password = false"
-          />
+            @keyup.enter="handleLogin"
+          >
+            <template #prefix>
+              <el-icon class="input-icon"><Lock /></el-icon>
+            </template>
+            <template #suffix>
+              <span
+                class="password-eye-wrap"
+                :title="passwordVisible ? '点击隐藏密码' : '点击显示密码'"
+                @click="passwordVisible = !passwordVisible"
+              >
+                <el-icon v-if="!passwordVisible" class="password-eye-icon"><Hide /></el-icon>
+                <el-icon v-else class="password-eye-icon is-open"><View /></el-icon>
+              </span>
+            </template>
+          </el-input>
         </el-form-item>
-        <el-form-item class="captcha-item">
+        <el-form-item prop="code" class="login-code-item">
           <el-input
-            v-model="form.captcha"
+            v-model="loginForm.code"
+            class="login-code-input"
+            autocomplete="off"
             placeholder="验证码"
-            prefix-icon="Key"
-            size="large"
-            :class="{'input-focus': focusFields.captcha}"
-            @focus="focusFields.captcha = true"
-            @blur="focusFields.captcha = false"
-            style="width: 58%;"
-          />
-          <el-button size="large" style="width: 38%;" @click="getCaptcha">
-            {{ captchaBtnText }}
+            @keyup.enter="handleLogin"
+          >
+            <template #prefix>
+              <el-icon class="input-icon"><Key /></el-icon>
+            </template>
+          </el-input>
+          <el-button
+            class="login-code-btn"
+            type="primary"
+            plain
+            :disabled="codeCountdown > 0"
+            @click="getDynamicCode"
+          >
+            {{ codeCountdown > 0 ? `${codeCountdown}s 后重试` : '获取验证码' }}
           </el-button>
         </el-form-item>
-        <el-form-item class="remember-item">
-          <el-checkbox v-model="form.remember">记住密码</el-checkbox>
-        </el-form-item>
-        <el-form-item>
+        <el-checkbox v-model="loginForm.rememberMe" style="margin: 0px 0px 25px 0px">记住密码</el-checkbox>
+        <el-form-item style="width: 100%">
           <el-button
-            type="primary"
-            size="large"
-            style="width: 100%;"
             :loading="loading"
+            size="default"
+            type="primary"
+            style="width: 100%"
             @click="handleLogin"
           >
-            登 录
+            <span v-if="loading">登 录 中...</span>
+            <span v-else>登 录</span>
           </el-button>
         </el-form-item>
       </el-form>
+      <div class="beian-footer">
+        <a class="beian-link" href="https://beian.miit.gov.cn/" target="_blank">{{ record }}</a>
+      </div>
     </div>
   </div>
 </template>
@@ -69,196 +89,180 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { User, Lock, Key, View, Hide } from '@element-plus/icons-vue'
+import logoImg from '@/assets/login/logo.png'
 
 const router = useRouter()
-const formRef = ref(null)
+const loginFormRef = ref(null)
 const loading = ref(false)
-const captchaBtnText = ref('获取验证码')
-const form = reactive({
+const passwordVisible = ref(false)
+const codeCountdown = ref(0)
+const record = ref('蜀ICP备20240xxxx号-1')
+
+const loginForm = reactive({
   username: '',
   password: '',
-  captcha: '',
-  remember: false
-})
-const focusFields = reactive({
-  username: false,
-  password: false,
-  captcha: false
+  rememberMe: false,
+  code: ''
 })
 
-const handleLogin = () => {
-  if (!form.username) {
-    ElMessage.warning('请输入账号')
-    return
-  }
-  if (!form.password) {
-    ElMessage.warning('请输入密码')
-    return
-  }
-  if (!form.captcha) {
-    ElMessage.warning('请输入验证码')
-    return
-  }
-  loading.value = true
-  setTimeout(() => {
-    loading.value = false
-    localStorage.setItem('token', 'fake_token')
-    localStorage.setItem('username', form.username)
-    if (form.remember) {
-      localStorage.setItem('remember', 'true')
-      localStorage.setItem('savedUsername', form.username)
-      localStorage.setItem('savedPassword', form.password)
-    } else {
-      localStorage.removeItem('remember')
-      localStorage.removeItem('savedUsername')
-      localStorage.removeItem('savedPassword')
-    }
-    ElMessage.success('登录成功')
-    router.push('/dashboard')
-  }, 1500)
+const loginRules = {
+  username: [{ required: true, trigger: 'blur', message: '请输入您的账号' }],
+  password: [{ required: true, trigger: 'blur', message: '请输入您的密码' }],
+  code: [{ required: true, trigger: 'change', message: '请输入验证码' }]
 }
 
-const getCaptcha = () => {
-  if (!form.username) {
+const getDynamicCode = () => {
+  const username = (loginForm.username || '').trim()
+  if (!username) {
     ElMessage.warning('请先输入账号')
     return
   }
-  let count = 60
-  captchaBtnText.value = `${count}s`
+  ElMessage.success('验证码已发送，请查收短信')
+  codeCountdown.value = 60
   const timer = setInterval(() => {
-    count--
-    captchaBtnText.value = `${count}s`
-    if (count <= 0) {
-      clearInterval(timer)
-      captchaBtnText.value = '获取验证码'
-    }
+    codeCountdown.value--
+    if (codeCountdown.value <= 0) clearInterval(timer)
   }, 1000)
+}
+
+const handleLogin = () => {
+  loginFormRef.value.validate((valid) => {
+    if (valid) {
+      loading.value = true
+      setTimeout(() => {
+        loading.value = false
+        localStorage.setItem('token', 'fake_token')
+        localStorage.setItem('username', loginForm.username)
+        ElMessage.success('登录成功')
+        router.push('/dashboard')
+      }, 1500)
+    }
+  })
 }
 </script>
 
 <style scoped>
-.login-container {
-  position: fixed;
-  top: 0;
-  left: 0;
+.login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
+  height: 100vh;
+}
+
+.login-image {
+  position: relative;
+  flex: 0 0 60%;
   height: 100%;
-  overflow: hidden;
-}
-
-.login-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #7171C6 0%, #9B59B6 50%, #8E44AD 100%);
-}
-
-.login-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-
-.login-box {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 360px;
-  padding: 40px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  text-align: center;
-}
-
-.logo-wrapper {
-  margin-bottom: 20px;
+  background-image: url('@/assets/login/login-bg.png');
+  background-size: cover;
+  background-position: 0;
+  background-repeat: no-repeat;
 }
 
 .logo {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto;
-  background: linear-gradient(135deg, #7171C6 0%, #9B59B6 100%);
-  border-radius: 12px;
-  position: relative;
-}
-
-.logo::before {
-  content: 'M';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 40px;
-  font-weight: bold;
-  color: #fff;
-  font-family: 'Microsoft YaHei', sans-serif;
+  top: 1.1rem;
+  left: 2rem;
+  max-width: 100%;
+  height: auto;
 }
 
-.login-title {
-  font-size: 24px;
+.login-right {
+  flex: 1;
+  padding: 2rem;
+  box-sizing: border-box;
+  margin-left: 5rem;
+}
+
+.title {
+  margin: 0 auto 1.5rem auto;
+  text-align: left;
+  color: #141414;
   font-weight: 600;
-  color: #303133;
-  margin: 0 0 8px 0;
 }
 
-.login-subtitle {
-  font-size: 14px;
-  color: #909399;
-  margin: 0 0 30px 0;
+h2.title {
+  font-size: 28px;
+}
+
+h4.title {
+  font-size: 18px;
 }
 
 .login-form {
-  margin-top: 20px;
+  border-radius: 6px;
+  background: #fff;
+  width: 400px;
+  padding: 5px 5px 5px 5px;
 }
 
-.login-form .el-form-item {
-  margin-bottom: 20px;
+.login-form :deep(.el-input),
+.login-form :deep(.el-input input) {
+  height: 38px;
 }
 
-.login-form .el-input {
-  border-radius: 8px;
+.login-form :deep(.input-icon) {
+  height: 39px;
+  width: 14px;
+  margin-left: 2px;
 }
 
-.login-form .el-input__wrapper {
-  border-radius: 8px;
-  box-shadow: none;
+.password-eye-wrap {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+  color: #909399;
 }
 
-.login-form .el-input__wrapper.is-focus {
-  box-shadow: 0 0 0 2px rgba(113, 113, 198, 0.3);
+.password-eye-wrap:hover {
+  color: #409eff;
 }
 
-.captcha-item {
+.password-eye-icon {
+  width: 16px !important;
+  height: 16px !important;
+  vertical-align: middle;
+}
+
+.password-eye-icon.is-open {
+  color: #409eff;
+}
+
+.login-code-item :deep(.el-form-item__content) {
   display: flex;
-  gap: 8px;
+  align-items: center;
 }
 
-.captcha-item .el-button {
-  border-radius: 8px;
+.login-code-item :deep(.el-form-item__content) .login-code-input {
+  flex: 1;
+  min-width: 0;
 }
 
-.remember-item {
-  text-align: left;
+.login-code-item :deep(.el-form-item__content) .login-code-btn {
+  flex-shrink: 0;
+  width: 130px;
+  height: 38px;
+  margin-left: 12px;
 }
 
-.login-form .el-button--primary {
-  background: linear-gradient(135deg, #7171C6 0%, #9B59B6 100%);
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
+.beian-footer {
+  margin-top: 30px;
+  text-align: center;
 }
 
-.login-form .el-button--primary:hover {
-  opacity: 0.9;
+.beian-link {
+  color: #000;
+  text-decoration: none;
+  font-family: Arial;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.beian-link:hover {
+  color: #409eff;
 }
 </style>
