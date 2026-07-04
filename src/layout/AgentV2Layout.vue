@@ -4,32 +4,73 @@
       <el-header class="header">
         <div class="nav-top">
           <div class="left">
-            <div class="wavy">
-              <span :style="{ '--i': 1 }">城</span>
-              <span :style="{ '--i': 2 }">市</span>
-              <span :style="{ '--i': 3 }">服</span>
-              <span :style="{ '--i': 4 }">务</span>
-              <span :style="{ '--i': 5 }">商</span>
-              <span :style="{ '--i': 6 }">系</span>
-              <span :style="{ '--i': 7 }">统</span>
+            <div class="logo-wrapper">
+              <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="#5077e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <polyline points="9,22 9,12 15,12 15,22" stroke="#5077e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="logo-text">
+                <div class="logo-title">城市服务商系统</div>
+                <div class="logo-subtitle">City Service Provider</div>
+              </div>
             </div>
           </div>
           <div class="right">
-            <div class="head-search-form">
-              <input type="text" placeholder="搜索..." />
-              <button>搜索</button>
+            <div class="search-box">
+              <el-input 
+                v-model="searchKeyword"
+                placeholder="搜索功能菜单..." 
+                clearable
+                class="search-input"
+                @keyup.enter="handleSearch"
+              >
+                <template #prefix>
+                  <el-icon><Search /></el-icon>
+                </template>
+              </el-input>
             </div>
-            <el-dropdown trigger="click">
-              <span class="shop-name cursor-pointer">
-                <span class="shop-image-wrapper">
-                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%235077e8'/%3E%3Ctext x='50' y='58' text-anchor='middle' fill='white' font-size='40'%3E%E6%9C%8D%3C/text%3E%3C/svg%3E" class="shop-image" />
-                </span>
-                <span class="shop-name-text">{{ username }}</span>
+            <div class="header-actions">
+              <el-tooltip content="消息通知" placement="bottom">
+                <el-badge :value="3" class="notification-badge">
+                  <el-button circle size="small" class="action-btn">
+                    <el-icon><Bell /></el-icon>
+                  </el-button>
+                </el-badge>
+              </el-tooltip>
+              <el-tooltip content="帮助中心" placement="bottom">
+                <el-button circle size="small" class="action-btn">
+                  <el-icon><QuestionFilled /></el-icon>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip content="全屏" placement="bottom">
+                <el-button circle size="small" class="action-btn" @click="toggleFullscreen">
+                  <el-icon><FullScreen /></el-icon>
+                </el-button>
+              </el-tooltip>
+            </div>
+            <el-dropdown trigger="click" class="user-dropdown">
+              <span class="user-info">
+                <el-avatar :size="36" class="user-avatar">
+                  服
+                </el-avatar>
+                <div class="user-detail">
+                  <div class="user-name">{{ username }}</div>
+                  <div class="user-role">服务商管理员</div>
+                </div>
+                <el-icon class="arrow-icon"><ArrowDown /></el-icon>
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item @click="handlePassword">修改密码</el-dropdown-item>
-                  <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
+                  <el-dropdown-item @click="handlePassword">
+                    <el-icon><Lock /></el-icon>
+                    修改密码
+                  </el-dropdown-item>
+                  <el-dropdown-item divided @click="handleLogout">
+                    <el-icon><SwitchButton /></el-icon>
+                    退出登录
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -38,32 +79,42 @@
       </el-header>
       <el-container class="main-container">
         <div class="navBar">
-          <div 
-            v-for="menu in menuList" 
-            :key="menu.id" 
-            class="menu-item"
-          >
+          <div class="menu-list">
             <div 
-              class="navTitle"
-              :class="{ 'spanAct': activeMenu === menu.id }"
-              @click="toggleMenu(menu.id)"
-            >
-              <img :src="menu.icon" class="navImage" />
-              <span>{{ menu.name }}</span>
-            </div>
-            <div 
-              v-if="menu.children && menu.children.length > 0 && expandedMenus.includes(menu.id)"
-              class="nav-item-group"
+              v-for="menu in menuList" 
+              :key="menu.id" 
+              class="menu-item"
             >
               <div 
-                v-for="child in menu.children" 
-                :key="child.id"
-                class="nav-item-text"
-                :class="{ 'spanAct': activeMenu === child.id }"
-                @click="handleMenuClick(child.path)"
+                class="navTitle"
+                :class="{ 'spanAct': activeMenu === menu.id }"
+                @click="toggleMenu(menu.id)"
               >
-                {{ child.name }}
+                <div class="nav-icon">
+                  <img :src="menu.icon" />
+                </div>
+                <span class="nav-text">{{ menu.name }}</span>
+                <el-icon class="nav-arrow" v-if="menu.children && menu.children.length > 0">
+                  <ArrowDown />
+                </el-icon>
               </div>
+              <transition name="slide">
+                <div 
+                  v-if="menu.children && menu.children.length > 0 && expandedMenus.includes(menu.id)"
+                  class="nav-item-group"
+                >
+                  <div 
+                    v-for="child in menu.children" 
+                    :key="child.id"
+                    class="nav-item-text"
+                    :class="{ 'spanAct': isChildActive(child.path) }"
+                    @click="handleMenuClick(child.path)"
+                  >
+                    <span class="child-dot"></span>
+                    <span>{{ child.name }}</span>
+                  </div>
+                </div>
+              </transition>
             </div>
           </div>
         </div>
@@ -98,6 +149,7 @@
 import { ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { Search, Bell, QuestionFilled, FullScreen, Lock, SwitchButton, ArrowDown } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -105,6 +157,7 @@ const username = ref(localStorage.getItem('username') || '服务商')
 const passwordVisible = ref(false)
 const expandedMenus = ref(['home', 'finance'])
 const passwordForm = reactive({ oldPassword: '', newPassword: '', confirmPassword: '' })
+const searchKeyword = ref('')
 
 const menuList = [
   { id: 'home', name: '企业信息', icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%235077e8\' stroke-width=\'2\'%3E%3Cpath d=\'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\'/%3E%3Ccircle cx=\'12\' cy=\'7\' r=\'4\'/%3E%3C/svg%3E', path: '/agentv2/home', children: [] },
@@ -152,6 +205,10 @@ const activeMenu = computed(() => {
   return menuMap[path] || 'home'
 })
 
+const isChildActive = (path) => {
+  return route.path === path
+}
+
 const toggleMenu = (id) => {
   const menu = menuList.find(m => m.id === id)
   if (menu && menu.children && menu.children.length > 0) {
@@ -168,6 +225,18 @@ const toggleMenu = (id) => {
 
 const handleMenuClick = (path) => {
   router.push(path)
+}
+
+const handleSearch = () => {
+  ElMessage.info('搜索: ' + searchKeyword.value)
+}
+
+const toggleFullscreen = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen()
+  } else {
+    document.exitFullscreen()
+  }
 }
 
 const handlePassword = () => {
@@ -205,6 +274,9 @@ const handleLogout = () => {
 <style scoped>
 .agentv2-layout {
   height: 100%;
+  --primary-color: #5077e8;
+  --primary-light: #6c8cff;
+  --primary-bg: #f0f4ff;
 }
 
 .layout-container {
@@ -213,14 +285,15 @@ const handleLogout = () => {
 
 .header {
   padding: 0;
-  height: 80px;
+  height: 64px;
   background: #fff;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8ecf1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .nav-top {
   height: 100%;
-  padding: 0 20px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -232,166 +305,349 @@ const handleLogout = () => {
   align-items: center;
 }
 
-.wavy {
-  position: relative;
-  padding-left: 12px;
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.wavy span {
-  position: relative;
-  display: inline-block;
-  color: #5077e8;
-  font-size: 26px;
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #5077e8, #6c8cff);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(80, 119, 232, 0.3);
+}
+
+.logo-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.logo-icon svg path,
+.logo-icon svg polyline {
+  stroke: #fff !important;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-title {
+  font-size: 18px;
   font-weight: 700;
-  animation: animate 2s ease-in-out infinite;
-  animation-delay: calc(.2s * var(--i));
-  padding-right: 2px;
+  color: #1a1a2e;
+  line-height: 1.2;
 }
 
-@keyframes animate {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+.logo-subtitle {
+  font-size: 11px;
+  color: #909399;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
 }
 
 .right {
   display: flex;
   align-items: center;
+  gap: 20px;
 }
 
-.head-search-form {
-  position: relative;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
+.search-box {
+  width: 280px;
 }
 
-.head-search-form input {
-  box-sizing: border-box;
-  float: left;
-  width: 300px;
-  height: 32px;
-  padding: 0 41px 0 10px;
-  border-style: solid;
-  border-color: #5077e8;
-  border-width: 2px 0 2px 2px;
-  border-radius: 8px 0 0 8px;
+.search-input :deep(.el-input__wrapper) {
+  border-radius: 8px;
+  background: #f5f7fa;
+  box-shadow: none;
+  transition: all 0.3s;
+}
+
+.search-input :deep(.el-input__wrapper:hover),
+.search-input :deep(.el-input__wrapper.is-focus) {
   background: #fff;
-  outline: none;
+  box-shadow: 0 0 0 2px rgba(80, 119, 232, 0.1);
 }
 
-.head-search-form button {
-  float: left;
-  width: 58px;
-  height: 32px;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 0 8px 8px 0;
-  color: #fff;
-  cursor: pointer;
-  background-color: #5077e8;
+.search-input :deep(.el-input__inner) {
+  font-size: 13px;
 }
 
-.shop-name {
+.header-actions {
   display: flex;
   align-items: center;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 36px !important;
+  height: 36px !important;
+  background: #f5f7fa !important;
+  border: none !important;
+  color: #606266 !important;
+  transition: all 0.3s !important;
+}
+
+.action-btn:hover {
+  background: #e8ecf1 !important;
+  color: #5077e8 !important;
+  transform: translateY(-1px);
+}
+
+.notification-badge {
   cursor: pointer;
 }
 
-.shop-image-wrapper {
-  margin-right: 8px;
+.user-dropdown {
+  cursor: pointer;
 }
 
-.shop-image {
-  width: 30px;
-  height: 30px;
-  border-radius: 15px;
-  object-fit: cover;
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 24px;
+  background: #f5f7fa;
+  transition: all 0.3s;
 }
 
-.shop-name-text {
-  font-size: 14px;
-  color: #333;
+.user-info:hover {
+  background: #eef2ff;
+}
+
+.user-avatar {
+  background: linear-gradient(135deg, #5077e8, #6c8cff) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+.user-detail {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.user-role {
+  font-size: 11px;
+  color: #909399;
+  margin-top: 2px;
+}
+
+.arrow-icon {
+  font-size: 12px;
+  color: #909399;
+  margin-left: 4px;
 }
 
 .main-container {
-  height: calc(100vh - 80px);
+  height: calc(100vh - 64px);
 }
 
 .navBar {
   height: 100%;
-  width: 230px;
-  padding: 16px;
-  padding-top: 5px;
+  width: 240px;
+  padding: 16px 12px;
   overflow: hidden;
   overflow-y: auto;
-  cursor: pointer;
   background: #fff;
+  border-right: 1px solid #e8ecf1;
 }
 
 .navBar::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+  width: 4px;
+}
+
+.navBar::-webkit-scrollbar-thumb {
+  background: #dcdfe6;
+  border-radius: 2px;
+}
+
+.navBar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menu-item {
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .navTitle {
   font-size: 14px;
-  line-height: 34px;
+  line-height: 1.5;
   display: flex;
   align-items: center;
-  font-weight: 700;
-  color: #030217;
-  transition: color 0.3s;
-  padding-left: 8px;
+  gap: 12px;
+  font-weight: 500;
+  color: #4a5568;
+  transition: all 0.25s;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
 }
 
 .navTitle:hover {
+  background: #f0f4ff;
   color: #5077e8;
 }
 
-.navImage {
-  width: 16px;
-  height: 16px;
-  margin-right: 6px;
+.navTitle.spanAct {
+  background: linear-gradient(90deg, rgba(80, 119, 232, 0.1), rgba(80, 119, 232, 0.05));
+  color: #5077e8;
+  font-weight: 600;
+}
+
+.navTitle.spanAct::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: linear-gradient(180deg, #5077e8, #6c8cff);
+  border-radius: 0 3px 3px 0;
+}
+
+.nav-icon {
+  width: 36px;
+  height: 36px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  transition: all 0.25s;
+}
+
+.navTitle:hover .nav-icon,
+.navTitle.spanAct .nav-icon {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(80, 119, 232, 0.2);
+}
+
+.nav-icon img {
+  width: 18px;
+  height: 18px;
+}
+
+.nav-text {
+  flex: 1;
+  font-size: 14px;
+}
+
+.nav-arrow {
+  font-size: 12px;
+  color: #909399;
+  transition: transform 0.25s;
+}
+
+.navTitle.spanAct .nav-arrow {
+  transform: rotate(180deg);
+  color: #5077e8;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+
+.slide-enter-to,
+.slide-leave-from {
+  opacity: 1;
+  max-height: 200px;
 }
 
 .nav-item-group {
-  margin: 6px 0;
-  font-size: 14px;
-  padding-left: 22px;
   display: flex;
-  flex-wrap: wrap;
-  color: #666;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 8px 14px;
+  margin-left: 24px;
+  border-left: 1px dashed #e0e4eb;
 }
 
 .nav-item-text {
-  width: 100%;
-  line-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
   font-weight: 400;
   cursor: pointer;
-  transition: color 0.3s;
+  border-radius: 6px;
+  color: #606266;
+  transition: all 0.25s;
 }
 
 .nav-item-text:hover {
+  background: #f0f4ff;
   color: #5077e8;
 }
 
-.spanAct {
-  color: #5077e8 !important;
+.nav-item-text.spanAct {
+  background: #e8f0ff;
+  color: #5077e8;
   font-weight: 500;
 }
 
+.child-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c0c4cc;
+  flex-shrink: 0;
+  transition: all 0.25s;
+}
+
+.nav-item-text:hover .child-dot,
+.nav-item-text.spanAct .child-dot {
+  background: #5077e8;
+  box-shadow: 0 0 6px rgba(80, 119, 232, 0.5);
+}
+
 .main-content {
-  background-color: #eff0f4;
-  width: calc(100% - 230px);
+  background-color: #f5f7fa;
+  width: calc(100% - 240px);
   padding: 0;
-  border-top-right-radius: 30px;
+  border-top-left-radius: 20px;
   overflow: auto;
 }
 
 .content-inner {
   padding: 20px;
+}
+
+:deep(.el-dropdown-menu__item) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 13px !important;
 }
 </style>
