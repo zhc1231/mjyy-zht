@@ -45,8 +45,8 @@
   /* 入口卡片 */
   .entries {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
     padding: 40px 50px;
     align-items: stretch;
   }
@@ -87,6 +87,7 @@
   .entry-card.prd::before    { background: linear-gradient(90deg, #67C23A, #5cb85c); }
   .entry-card.proto::before  { background: linear-gradient(90deg, #E6A23C, #f0ad4e); }
   .entry-card.flow::before   { background: linear-gradient(90deg, #F56C6C, #ff8a80); }
+  .entry-card.system::before { background: linear-gradient(90deg, #9B59B6, #b987d8); }
   .entry-icon {
     width: 64px;
     height: 64px;
@@ -102,6 +103,7 @@
   .entry-card.prd .entry-icon    { background: linear-gradient(135deg, #67C23A, #5cb85c); }
   .entry-card.proto .entry-icon  { background: linear-gradient(135deg, #E6A23C, #f0ad4e); }
   .entry-card.flow .entry-icon   { background: linear-gradient(135deg, #F56C6C, #ff8a80); }
+  .entry-card.system .entry-icon { background: linear-gradient(135deg, #9B59B6, #b987d8); }
   .entry-card h3 {
     font-size: 18px;
     color: #303133;
@@ -124,6 +126,7 @@
   .entry-card.prd .entry-btn    { background: #67C23A; }
   .entry-card.proto .entry-btn  { background: #E6A23C; }
   .entry-card.flow .entry-btn   { background: #F56C6C; }
+  .entry-card.system .entry-btn { background: #9B59B6; }
 
   /* 更新日志 */
   .content {
@@ -675,6 +678,12 @@
       <h3>产品原型</h3>
       <p>完整系统原型，含全部页面与交互体验</p>
       <span class="entry-btn">进入原型</span>
+    </a>
+    <a href="./system.html" class="entry-card system">
+      <div class="entry-icon">🚪</div>
+      <h3>民匠有约管理</h3>
+      <p>7个平台登录入口（总台/企业/财务等）</p>
+      <span class="entry-btn">进入管理</span>
     </a>
   </div>
 
