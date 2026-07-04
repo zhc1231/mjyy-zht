@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>民匠有约管理系统 - 产品更新日志</title>
+<title>民匠有约主管理系统 - 产品更新日志</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -60,7 +60,7 @@
   /* 入口卡片 */
   .entries {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 18px;
     padding: 40px 50px;
     align-items: stretch;
@@ -102,7 +102,6 @@
   .entry-card.prd::before    { background: linear-gradient(90deg, #67C23A, #5cb85c); }
   .entry-card.proto::before  { background: linear-gradient(90deg, #E6A23C, #f0ad4e); }
   .entry-card.flow::before   { background: linear-gradient(90deg, #F56C6C, #ff8a80); }
-  .entry-card.system::before { background: linear-gradient(90deg, #9B59B6, #b987d8); }
   .entry-icon {
     width: 64px;
     height: 64px;
@@ -118,7 +117,6 @@
   .entry-card.prd .entry-icon    { background: linear-gradient(135deg, #67C23A, #5cb85c); }
   .entry-card.proto .entry-icon  { background: linear-gradient(135deg, #E6A23C, #f0ad4e); }
   .entry-card.flow .entry-icon   { background: linear-gradient(135deg, #F56C6C, #ff8a80); }
-  .entry-card.system .entry-icon { background: linear-gradient(135deg, #9B59B6, #b987d8); }
   .entry-card h3 {
     font-size: 18px;
     color: #303133;
@@ -141,7 +139,6 @@
   .entry-card.prd .entry-btn    { background: #67C23A; }
   .entry-card.proto .entry-btn  { background: #E6A23C; }
   .entry-card.flow .entry-btn   { background: #F56C6C; }
-  .entry-card.system .entry-btn { background: #9B59B6; }
 
   /* 更新日志 */
   .content {
@@ -274,399 +271,15 @@
     border-top: 1px solid #ebeef5;
     margin-top: 20px;
   }
-
-  /* 环境地址区块 */
-  .env-section {
-    padding: 0 50px 20px;
-  }
-  .env-section h2 {
-    font-size: 24px;
-    color: #303133;
-    margin: 20px 0 24px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #ebeef5;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .env-section h2 .icon { color: #67C23A; }
-  .env-table-wrap {
-    overflow-x: auto;
-    border: 1px solid #ebeef5;
-    border-radius: 8px;
-  }
-  .env-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    background: #fff;
-  }
-  .env-table th,
-  .env-table td {
-    padding: 14px 16px;
-    text-align: left;
-    border-bottom: 1px solid #ebeef5;
-    vertical-align: middle;
-  }
-  .env-table th {
-    background: #f5f7fa;
-    color: #303133;
-    font-weight: 600;
-    font-size: 13px;
-  }
-  .env-table tr:last-child td {
-    border-bottom: none;
-  }
-  .env-table tr:hover td {
-    background: #fafbfc;
-  }
-  .env-table .env-name {
-    font-weight: 600;
-    color: #303133;
-    white-space: nowrap;
-  }
-  .env-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: #409EFF;
-    text-decoration: none;
-    font-family: Consolas, Monaco, monospace;
-    font-size: 13px;
-    word-break: break-all;
-    transition: color 0.2s;
-  }
-  .env-link:hover {
-    color: #66b1ff;
-  }
-  .env-link .copy-icon {
-    font-size: 12px;
-    opacity: 0.6;
-  }
-  .env-empty {
-    color: #c0c4cc;
-    font-size: 13px;
-    text-align: center;
-  }
-  .env-account {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .env-account .account-text {
-    font-family: Consolas, Monaco, monospace;
-    font-size: 13px;
-    color: #606266;
-  }
-  .env-account .view-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    background: #ecf5ff;
-    color: #409EFF;
-    border: 1px solid #d9ecff;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .env-account .view-btn:hover {
-    background: #409EFF;
-    color: #fff;
-    border-color: #409EFF;
-  }
-  .env-tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 3px;
-    font-size: 12px;
-    font-weight: 500;
-    margin-right: 4px;
-  }
-  .env-tag.test { background: #fdf6ec; color: #E6A23C; }
-  .env-tag.prod { background: #f0f9eb; color: #67C23A; }
-
-  /* 弹窗 */
-  .modal-mask {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
-  .modal-mask.show {
-    display: flex;
-  }
-  .modal-box {
-    background: #fff;
-    border-radius: 10px;
-    width: 460px;
-    max-width: 90vw;
-    max-height: 85vh;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-    animation: modalIn 0.25s ease;
-  }
-  @keyframes modalIn {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 24px;
-    border-bottom: 1px solid #ebeef5;
-    background: linear-gradient(135deg, #409EFF 0%, #5b6cff 100%);
-    color: #fff;
-  }
-  .modal-header h3 {
-    font-size: 17px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .modal-close {
-    cursor: pointer;
-    font-size: 22px;
-    line-height: 1;
-    color: #fff;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-    background: none;
-    border: none;
-    padding: 0;
-  }
-  .modal-close:hover { opacity: 1; }
-  .modal-body {
-    padding: 24px;
-  }
-  .account-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: #f8f9fc;
-    border-radius: 6px;
-    margin-bottom: 12px;
-  }
-  .account-row:last-child { margin-bottom: 0; }
-  .account-label {
-    color: #909399;
-    font-size: 13px;
-    margin-right: 12px;
-    flex-shrink: 0;
-  }
-  .account-value {
-    font-family: Consolas, Monaco, monospace;
-    font-size: 14px;
-    color: #303133;
-    font-weight: 600;
-    flex: 1;
-    text-align: right;
-    word-break: break-all;
-  }
-  .account-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 18px;
-  }
-  .modal-btn {
-    flex: 1;
-    padding: 10px;
-    border-radius: 6px;
-    border: none;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-  .modal-btn-primary {
-    background: #409EFF;
-    color: #fff;
-  }
-  .modal-btn-primary:hover { background: #66b1ff; }
-  .modal-btn-default {
-    background: #f5f7fa;
-    color: #606266;
-    border: 1px solid #dcdfe6;
-  }
-  .modal-btn-default:hover {
-    background: #ecf5ff;
-    color: #409EFF;
-    border-color: #c6e2ff;
-  }
-  .copy-tip {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(103, 194, 58, 0.95);
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 14px;
-    z-index: 10000;
-    display: none;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-  .copy-tip.show {
-    display: flex;
-    animation: tipIn 0.3s ease;
-  }
-  @keyframes tipIn {
-    from { transform: translateX(-50%) translateY(-10px); opacity: 0; }
-    to { transform: translateX(-50%) translateY(0); opacity: 1; }
-  }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <h1 id="top">民匠有约管理系统</h1>
+    <h1 id="top">民匠有约主管理系统</h1>
     <div class="subtitle">产品更新日志</div>
     <div class="version">版本 V1.0 · 2026-07-04</div>
     <a href="./system.html" class="back-link">← 返回各平台入口</a>
-  </div>
-
-  <!-- 环境地址 -->
-  <div class="env-section">
-    <h2><span class="icon">🌐</span> 环境地址</h2>
-    <div class="env-table-wrap">
-      <table class="env-table">
-        <thead>
-          <tr>
-            <th style="width:14%">名称</th>
-            <th style="width:34%">生产环境</th>
-            <th style="width:28%">测试环境</th>
-            <th style="width:24%">测试账号</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="env-name">总台</td>
-            <td>
-              <a class="env-link" href="https://sys.minjiangyouyue.com" target="_blank" rel="noopener">
-                https://sys.minjiangyouyue.com <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td>
-              <a class="env-link" href="http://121.199.7.40:9092" target="_blank" rel="noopener">
-                http://121.199.7.40:9092 <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td>
-              <div class="env-account">
-                <span class="account-text">admin/1Qaz2Wsx</span>
-                <button class="view-btn" onclick="openAccountModal('总台', 'admin', '1Qaz2Wsx', '634786')">👁️ 查看</button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="env-name">企业后台</td>
-            <td>
-              <a class="env-link" href="https://company.minjiangyouyue.com" target="_blank" rel="noopener">
-                https://company.minjiangyouyue.com <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td>
-              <a class="env-link" href="http://121.199.7.40:9093" target="_blank" rel="noopener">
-                http://121.199.7.40:9093 <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td><span class="env-empty">—</span></td>
-          </tr>
-          <tr>
-            <td class="env-name">财务后台</td>
-            <td>
-              <a class="env-link" href="https://finance.minjiangyouyue.com" target="_blank" rel="noopener">
-                https://finance.minjiangyouyue.com <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td>
-              <a class="env-link" href="http://121.199.7.40:9095" target="_blank" rel="noopener">
-                http://121.199.7.40:9095 <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td>
-              <div class="env-account">
-                <span class="account-text">admin/1Qaz2Wsx</span>
-                <button class="view-btn" onclick="openAccountModal('财务后台', 'admin', '1Qaz2Wsx', '634786')">👁️ 查看</button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="env-name">代理商1.0</td>
-            <td>
-              <a class="env-link" href="https://agent.minjiangyouyue.com" target="_blank" rel="noopener">
-                https://agent.minjiangyouyue.com <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td>
-              <a class="env-link" href="http://121.199.7.40:9094" target="_blank" rel="noopener">
-                http://121.199.7.40:9094 <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td><span class="env-empty">—</span></td>
-          </tr>
-          <tr>
-            <td class="env-name">代理商2.0</td>
-            <td>
-              <a class="env-link" href="https://agentv2.minjiangyouyue.com" target="_blank" rel="noopener">
-                https://agentv2.minjiangyouyue.com <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td>
-              <a class="env-link" href="http://agentv2.zjmjyy.com" target="_blank" rel="noopener">
-                http://agentv2.zjmjyy.com <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td><span class="env-empty">—</span></td>
-          </tr>
-          <tr>
-            <td class="env-name">安心云</td>
-            <td>
-              <a class="env-link" href="https://axy.minjiangyouyue.com" target="_blank" rel="noopener">
-                https://axy.minjiangyouyue.com <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td>
-              <a class="env-link" href="http://121.199.7.40:9086" target="_blank" rel="noopener">
-                http://121.199.7.40:9086 <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td><span class="env-empty">—</span></td>
-          </tr>
-          <tr>
-            <td class="env-name">官网</td>
-            <td>
-              <a class="env-link" href="https://www.minjiangyouyue.com" target="_blank" rel="noopener">
-                https://www.minjiangyouyue.com <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td>
-              <a class="env-link" href="http://testwww.zjmjyy.com" target="_blank" rel="noopener">
-                http://testwww.zjmjyy.com <span class="copy-icon">🔗</span>
-              </a>
-            </td>
-            <td><span class="env-empty">/</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 
   <!-- 四个入口 -->
@@ -694,12 +307,6 @@
       <h3>产品原型</h3>
       <p>完整系统原型，含全部页面与交互体验</p>
       <span class="entry-btn">进入原型</span>
-    </a>
-    <a href="./system.html" class="entry-card system">
-      <div class="entry-icon">🚪</div>
-      <h3>民匠有约管理</h3>
-      <p>7个平台登录入口（总台/企业/财务等）</p>
-      <span class="entry-btn">进入管理</span>
     </a>
   </div>
 
@@ -824,130 +431,5 @@
   </div>
 </div>
 
-<!-- 测试账号弹窗 -->
-<div class="modal-mask" id="accountModal" onclick="closeModalOnMask(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <h3>🔑 <span id="modalTitle">测试账号</span></h3>
-      <button class="modal-close" onclick="closeAccountModal()" aria-label="关闭">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="account-row">
-        <span class="account-label">账号</span>
-        <span class="account-value" id="modalAccount">—</span>
-      </div>
-      <div class="account-row">
-        <span class="account-label">密码</span>
-        <span class="account-value" id="modalPassword">—</span>
-      </div>
-      <div class="account-row">
-        <span class="account-label">通用验证码</span>
-        <span class="account-value" id="modalCode">—</span>
-      </div>
-      <div class="account-actions">
-        <button class="modal-btn modal-btn-primary" onclick="copyAllAccount()">
-          📋 一键复制全部
-        </button>
-        <button class="modal-btn modal-btn-default" onclick="closeAccountModal()">
-          关闭
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 复制提示 -->
-<div class="copy-tip" id="copyTip">✓ 已复制到剪贴板</div>
-
-<script>
-  // 当前账号数据
-  var currentAccount = { name: '', username: '', password: '', code: '' };
-
-  // 打开账号弹窗
-  function openAccountModal(name, username, password, code) {
-    currentAccount = { name: name, username: username, password: password, code: code };
-    document.getElementById('modalTitle').textContent = name + ' · 测试账号';
-    document.getElementById('modalAccount').textContent = username;
-    document.getElementById('modalPassword').textContent = password;
-    document.getElementById('modalCode').textContent = code;
-    document.getElementById('accountModal').classList.add('show');
-  }
-
-  // 关闭弹窗
-  function closeAccountModal() {
-    document.getElementById('accountModal').classList.remove('show');
-  }
-
-  // 点击遮罩关闭
-  function closeModalOnMask(event) {
-    if (event.target.id === 'accountModal') {
-      closeAccountModal();
-    }
-  }
-
-  // ESC 关闭
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeAccountModal();
-  });
-
-  // 复制链接（阻止默认跳转，仅复制）
-  function copyLink(event, url) {
-    event.preventDefault();
-    copyText(url, '已复制链接：' + url);
-  }
-
-  // 一键复制全部账号信息
-  function copyAllAccount() {
-    var text = '系统：' + currentAccount.name + '\n'
-             + '账号：' + currentAccount.username + '\n'
-             + '密码：' + currentAccount.password + '\n'
-             + '通用验证码：' + currentAccount.code;
-    copyText(text, '已复制账号信息');
-  }
-
-  // 通用复制函数（兼容多浏览器）
-  function copyText(text, tip) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function () {
-        showCopyTip(tip);
-      }).catch(function () {
-        fallbackCopy(text, tip);
-      });
-    } else {
-      fallbackCopy(text, tip);
-    }
-  }
-
-  // 降级复制方案
-  function fallbackCopy(text, tip) {
-    var textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.top = '-9999px';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-      var ok = document.execCommand('copy');
-      document.body.removeChild(textarea);
-      showCopyTip(ok ? tip : '复制失败，请手动复制');
-    } catch (e) {
-      document.body.removeChild(textarea);
-      showCopyTip('复制失败，请手动复制');
-    }
-  }
-
-  // 显示复制提示
-  var copyTipTimer = null;
-  function showCopyTip(text) {
-    var tip = document.getElementById('copyTip');
-    tip.textContent = '✓ ' + text;
-    tip.classList.add('show');
-    if (copyTipTimer) clearTimeout(copyTipTimer);
-    copyTipTimer = setTimeout(function () {
-      tip.classList.remove('show');
-    }, 2000);
-  }
-</script>
 </body>
 </html>
