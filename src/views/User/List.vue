@@ -105,11 +105,27 @@
         <el-button type="primary" @click="handleSubmit">确定</el-button>
       </template>
     </el-dialog>
+    <el-dialog v-model="importVisible" title="导入用户" width="400px">
+      <div style="text-align: center; padding: 20px;">
+        <el-button type="primary" size="large" @click="handleImportFile">
+          <el-icon><Upload /></el-icon>
+          选择文件
+        </el-button>
+        <p style="margin-top: 16px; color: #909399;">
+          <el-link type="primary" @click="handleDownloadTemplate">下载导入模板</el-link>
+        </p>
+      </div>
+      <template #footer>
+        <el-button @click="importVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleImportConfirm">确定导入</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
+import { Upload } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const deptTree = ref([
@@ -135,20 +151,25 @@ const dialogTitle = ref('新增用户')
 const form = reactive({ username: '', nickname: '', phone: '', email: '', deptId: '', status: '正常' })
 const selectedRows = ref([])
 
+const importVisible = ref(false)
+
 const handleSearch = () => { ElMessage.info('搜索') }
 const handleReset = () => { Object.assign(searchForm, { username: '', phone: '', status: '', dateRange: [] }) }
 const handleAdd = () => { dialogTitle.value = '新增用户'; Object.assign(form, { username: '', nickname: '', phone: '', email: '', deptId: '', status: '正常' }); dialogVisible.value = true }
 const handleEdit = (row) => { dialogTitle.value = '编辑用户'; Object.assign(form, row); dialogVisible.value = true }
 const handleDelete = (row) => { ElMessageBox.confirm('确认删除?', '提示', { type: 'warning' }).then(() => ElMessage.success('删除成功')) }
 const handleResetPwd = (row) => { ElMessageBox.confirm('确认重置密码?', '提示', { type: 'warning' }).then(() => ElMessage.success('重置成功')) }
-const handleImport = () => { ElMessage.info('导入用户') }
-const handleExport = () => { ElMessage.info('导出用户') }
+const handleImport = () => { importVisible.value = true }
+const handleExport = () => { ElMessage.success('导出成功') }
 const handleDeptClick = (data) => { ElMessage.info('选择部门: ' + data.name) }
 const handleStatusChange = (row, val) => { ElMessage.success('状态更新为: ' + val) }
 const handleSelectionChange = (val) => { selectedRows.value = val }
 const handleSubmit = () => { dialogVisible.value = false; ElMessage.success('保存成功') }
 const handleSizeChange = (size) => { pageSize.value = size }
 const handleCurrentChange = (page) => { currentPage.value = page }
+const handleImportFile = () => { ElMessage.info('选择文件') }
+const handleDownloadTemplate = () => { ElMessage.success('模板下载成功') }
+const handleImportConfirm = () => { importVisible.value = false; ElMessage.success('导入成功') }
 </script>
 
 <style scoped>

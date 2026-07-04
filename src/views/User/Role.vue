@@ -83,6 +83,26 @@
         <el-button type="primary" @click="handleSubmit">确定</el-button>
       </template>
     </el-dialog>
+    <el-dialog v-model="dataPermVisible" title="数据权限设置" width="500px">
+      <el-form :model="dataPermForm" label-width="120px">
+        <el-form-item label="数据范围">
+          <el-radio-group v-model="dataPermForm.scope">
+            <el-radio label="全部数据">全部数据</el-radio>
+            <el-radio label="本部门数据">本部门数据</el-radio>
+            <el-radio label="本部门及以下">本部门及以下</el-radio>
+            <el-radio label="仅本人数据">仅本人数据</el-radio>
+            <el-radio label="自定义数据">自定义数据</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="dataPermForm.scope === '自定义数据'" label="授权部门">
+          <el-tree :data="deptTree" show-checkbox :props="{ label: 'name', children: 'children' }" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dataPermVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleDataPermSubmit">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -115,18 +135,31 @@ const menuTree = ref([
   ]}
 ])
 
+const dataPermVisible = ref(false)
+const dataPermForm = reactive({ scope: '全部数据' })
+const deptTree = ref([
+  { name: '国通', children: [
+    { name: '技术部' },
+    { name: '财务部' }
+  ]},
+  { name: '良巧匠', children: [
+    { name: '运营部' }
+  ]}
+])
+
 const handleSearch = () => { ElMessage.info('搜索') }
 const handleReset = () => { Object.assign(searchForm, { name: '', key: '', status: '' }) }
 const handleAdd = () => { dialogTitle.value = '新增角色'; Object.assign(form, { name: '', key: '', sort: 0, status: '正常' }); dialogVisible.value = true }
 const handleEdit = (row) => { dialogTitle.value = '修改角色'; Object.assign(form, row); dialogVisible.value = true }
 const handleDelete = (row) => { ElMessageBox.confirm('确认删除?', '提示', { type: 'warning' }).then(() => ElMessage.success('删除成功')) }
-const handleDataPerm = (row) => { ElMessage.info('设置数据权限: ' + row.name) }
-const handleExport = () => { ElMessage.info('导出角色') }
+const handleDataPerm = (row) => { dataPermForm.scope = '全部数据'; dataPermVisible.value = true }
+const handleExport = () => { ElMessage.success('导出成功') }
 const handleStatusChange = (row, val) => { ElMessage.success('状态更新为: ' + val) }
 const handleSelectionChange = (val) => { selectedRows.value = val }
 const handleSubmit = () => { dialogVisible.value = false; ElMessage.success('保存成功') }
 const handleSizeChange = (size) => { pageSize.value = size }
 const handleCurrentChange = (page) => { currentPage.value = page }
+const handleDataPermSubmit = () => { dataPermVisible.value = false; ElMessage.success('数据权限设置成功') }
 </script>
 
 <style scoped>

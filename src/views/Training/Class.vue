@@ -99,6 +99,33 @@
         <el-button type="primary" @click="handleSubmit">确定</el-button>
       </template>
     </el-dialog>
+    <el-dialog v-model="detailVisible" title="班级详情" width="600px">
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="班级名称">{{ detailForm.name }}</el-descriptions-item>
+        <el-descriptions-item label="证书名称">{{ detailForm.certName }}</el-descriptions-item>
+        <el-descriptions-item label="班主任">{{ detailForm.teacher }}</el-descriptions-item>
+        <el-descriptions-item label="联系方式">{{ detailForm.phone }}</el-descriptions-item>
+        <el-descriptions-item label="报名人数">{{ detailForm.count }}</el-descriptions-item>
+        <el-descriptions-item label="显示状态">{{ detailForm.status }}</el-descriptions-item>
+        <el-descriptions-item label="报名截止">{{ detailForm.deadline }}</el-descriptions-item>
+        <el-descriptions-item label="培训时间">{{ detailForm.trainTime }}</el-descriptions-item>
+        <el-descriptions-item label="考试时间">{{ detailForm.examTime }}</el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button @click="detailVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="shareVisible" title="分享二维码" width="400px">
+      <div style="text-align: center; padding: 20px;">
+        <div style="width: 200px; height: 200px; background: #f5f5f5; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+          <span style="color: #909399;">二维码图片</span>
+        </div>
+        <p style="margin-top: 16px;">扫码报名</p>
+      </div>
+      <template #footer>
+        <el-button @click="shareVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -118,13 +145,18 @@ const dialogVisible = ref(false)
 const dialogTitle = ref('新增班级')
 const form = reactive({ name: '', certName: '', teacher: '', phone: '', deadline: '', trainTime: '', examTime: '', status: '显示' })
 
+const detailVisible = ref(false)
+const detailForm = reactive({ name: '', certName: '', teacher: '', phone: '', count: 0, status: '', deadline: '', trainTime: '', examTime: '' })
+
+const shareVisible = ref(false)
+
 const handleSearch = () => { ElMessage.info('搜索') }
 const handleReset = () => { Object.assign(searchForm, { name: '', phone: '', status: '' }) }
 const handleAdd = () => { dialogTitle.value = '新增班级'; Object.assign(form, { name: '', certName: '', teacher: '', phone: '', deadline: '', trainTime: '', examTime: '', status: '显示' }); dialogVisible.value = true }
 const handleEdit = (row) => { dialogTitle.value = '编辑班级'; Object.assign(form, row); dialogVisible.value = true }
 const handleDelete = (row) => { ElMessageBox.confirm('确认删除?', '提示', { type: 'warning' }).then(() => ElMessage.success('删除成功')) }
-const handleDetail = (row) => { ElMessage.info('查看详情') }
-const handleShare = () => { ElMessage.info('分享二维码') }
+const handleDetail = (row) => { Object.assign(detailForm, row); detailVisible.value = true }
+const handleShare = () => { shareVisible.value = true }
 const handleSubmit = () => { dialogVisible.value = false; ElMessage.success('保存成功') }
 const handleSizeChange = (size) => { pageSize.value = size }
 const handleCurrentChange = (page) => { currentPage.value = page }

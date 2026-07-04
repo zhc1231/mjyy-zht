@@ -28,8 +28,7 @@ const commonRoutes = [
   '/operation/merchant', '/operation/service',
   '/order',
   '/enterprise/audit', '/enterprise/user',
-  '/city-service/bank-config',
-  '/cockpit'
+  '/city-service/bank-config'
 ]
 
 const routes = [
@@ -45,10 +44,12 @@ const routes = [
     redirect: '/dashboard',
     children: [
       { path: 'dashboard', name: 'Dashboard', component: () => import('../views/Dashboard.vue') },
+      { path: 'cockpit', name: 'Cockpit', component: () => import('../views/Cockpit.vue') },
       { path: 'training/verify', name: 'TrainingVerify', component: () => import('../views/Training/Verify.vue') },
       { path: '401', name: 'Error401', component: () => import('../views/Error401.vue') },
       // 系统管理
       { path: 'system/dict', name: 'SystemDict', component: () => import('../views/System/Dict.vue') },
+      { path: 'system/message', name: 'SystemMessage', component: () => import('../views/System/Message.vue') },
       { path: 'system/icon', name: 'SystemIcon', component: () => import('../views/System/Icon.vue') },
       { path: 'system/params', name: 'SystemParams', component: () => import('../views/System/Params.vue') },
       { path: 'system/menu', name: 'SystemMenu', component: () => import('../views/System/Menu.vue') },

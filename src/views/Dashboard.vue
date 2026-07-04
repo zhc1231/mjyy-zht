@@ -190,7 +190,8 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 
 const currentDate = ref('2026年07月03日')
 
@@ -203,10 +204,48 @@ const stats = reactive({
   taskComplete: '40924'
 })
 
+const dayStats = {
+  totalUsers: '86013',
+  members: '79348',
+  enterprises: '6665',
+  training: '1015486',
+  taskPublish: '965200',
+  taskComplete: '40924'
+}
+
+const monthStats = {
+  totalUsers: '86500',
+  members: '79800',
+  enterprises: '6700',
+  training: '30000000',
+  taskPublish: '28000000',
+  taskComplete: '1200000'
+}
+
 const trainingTab = ref('day')
 const taskTab = ref('day')
 const userTab = ref('day')
 const completeTab = ref('day')
+
+const chartLoading = reactive({
+  training: false,
+  task: false,
+  user: false,
+  complete: false
+})
+
+const handleTabChange = (chartName) => {
+  chartLoading[chartName] = true
+  setTimeout(() => {
+    chartLoading[chartName] = false
+    ElMessage.success('数据已更新')
+  }, 500)
+}
+
+watch(trainingTab, () => handleTabChange('training'))
+watch(taskTab, () => handleTabChange('task'))
+watch(userTab, () => handleTabChange('user'))
+watch(completeTab, () => handleTabChange('complete'))
 </script>
 
 <style scoped>

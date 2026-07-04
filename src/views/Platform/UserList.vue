@@ -53,6 +53,19 @@
         />
       </div>
     </el-card>
+    <el-dialog v-model="detailVisible" title="用户详情" width="500px">
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="账号">{{ detailForm.account }}</el-descriptions-item>
+        <el-descriptions-item label="姓名">{{ detailForm.name }}</el-descriptions-item>
+        <el-descriptions-item label="手机号">{{ detailForm.phone }}</el-descriptions-item>
+        <el-descriptions-item label="用户类型">{{ detailForm.type }}</el-descriptions-item>
+        <el-descriptions-item label="状态">{{ detailForm.status }}</el-descriptions-item>
+        <el-descriptions-item label="注册时间">{{ detailForm.createTime }}</el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button @click="detailVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -70,9 +83,12 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(3)
 
+const detailVisible = ref(false)
+const detailForm = reactive({ account: '', name: '', phone: '', type: '', status: '', createTime: '' })
+
 const handleSearch = () => { ElMessage.info('搜索') }
 const handleReset = () => { Object.assign(searchForm, { account: '', name: '', phone: '' }) }
-const handleDetail = (row) => { ElMessage.info('查看详情') }
+const handleDetail = (row) => { Object.assign(detailForm, row); detailVisible.value = true }
 const handleDelete = (row) => { ElMessageBox.confirm('确认删除?', '提示', { type: 'warning' }).then(() => ElMessage.success('删除成功')) }
 const handleSizeChange = (size) => { pageSize.value = size }
 const handleCurrentChange = (page) => { currentPage.value = page }

@@ -81,6 +81,66 @@
         />
       </div>
     </el-card>
+    <el-dialog v-model="detailVisible" title="任务详情" width="700px">
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="任务编号">{{ detailForm.taskNo }}</el-descriptions-item>
+        <el-descriptions-item label="平台类型">{{ detailForm.platformType }}</el-descriptions-item>
+        <el-descriptions-item label="区域">{{ detailForm.region }}</el-descriptions-item>
+        <el-descriptions-item label="任务发布者">{{ detailForm.publisher }}</el-descriptions-item>
+        <el-descriptions-item label="子账号">{{ detailForm.subAccount }}</el-descriptions-item>
+        <el-descriptions-item label="项目名称">{{ detailForm.projectName }}</el-descriptions-item>
+        <el-descriptions-item label="任务周期">{{ detailForm.taskPeriod }}</el-descriptions-item>
+        <el-descriptions-item label="作业时间">{{ detailForm.workTime }}</el-descriptions-item>
+        <el-descriptions-item label="作业量">{{ detailForm.workAmount }}</el-descriptions-item>
+        <el-descriptions-item label="任务工种">{{ detailForm.workType }}</el-descriptions-item>
+        <el-descriptions-item label="联系电话">{{ detailForm.contactPhone }}</el-descriptions-item>
+        <el-descriptions-item label="年龄范围">{{ detailForm.ageRange }}</el-descriptions-item>
+        <el-descriptions-item label="任务状态">{{ detailForm.status }}</el-descriptions-item>
+        <el-descriptions-item label="任务类型">{{ detailForm.taskType }}</el-descriptions-item>
+        <el-descriptions-item label="总金额">{{ detailForm.totalAmount }}</el-descriptions-item>
+        <el-descriptions-item label="需要人数">{{ detailForm.needCount }}</el-descriptions-item>
+        <el-descriptions-item label="报名人数">{{ detailForm.applyCount }}</el-descriptions-item>
+        <el-descriptions-item label="佣金标准">{{ detailForm.commission }}</el-descriptions-item>
+        <el-descriptions-item label="税率">{{ detailForm.taxRate }}</el-descriptions-item>
+        <el-descriptions-item label="税费">{{ detailForm.taxAmount }}</el-descriptions-item>
+        <el-descriptions-item label="服务费率">{{ detailForm.serviceRate }}</el-descriptions-item>
+        <el-descriptions-item label="服务费">{{ detailForm.serviceFee }}</el-descriptions-item>
+        <el-descriptions-item label="发布者类型">{{ detailForm.publisherType }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ detailForm.createTime }}</el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button @click="detailVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="editVisible" :title="editTitle" width="600px">
+      <el-form :model="editForm" label-width="120px">
+        <el-form-item label="任务编号">
+          <el-input v-model="editForm.taskNo" disabled />
+        </el-form-item>
+        <el-form-item label="项目名称">
+          <el-input v-model="editForm.projectName" />
+        </el-form-item>
+        <el-form-item label="任务周期">
+          <el-date-picker v-model="editForm.taskPeriod" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" />
+        </el-form-item>
+        <el-form-item label="作业时间">
+          <el-input v-model="editForm.workTime" />
+        </el-form-item>
+        <el-form-item label="需要人数">
+          <el-input-number v-model="editForm.needCount" :min="1" />
+        </el-form-item>
+        <el-form-item label="总金额">
+          <el-input-number v-model="editForm.totalAmount" :min="0" />
+        </el-form-item>
+        <el-form-item label="佣金标准">
+          <el-input v-model="editForm.commission" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="editVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleEditSubmit">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -98,6 +158,20 @@ const pageSize = ref(10)
 const total = ref(13135)
 const selectedRows = ref([])
 
+const detailVisible = ref(false)
+const detailForm = reactive({
+  taskNo: '', platformType: '', region: '', publisher: '', subAccount: '', projectName: '',
+  taskPeriod: '', workTime: '', workAmount: '', workType: '', contactPhone: '', ageRange: '',
+  status: '', taskType: '', totalAmount: 0, needCount: 0, applyCount: 0, commission: '',
+  taxRate: '', taxAmount: 0, serviceRate: '', serviceFee: 0, publisherType: '', createTime: ''
+})
+
+const editVisible = ref(false)
+const editTitle = ref('编辑任务')
+const editForm = reactive({
+  taskNo: '', projectName: '', taskPeriod: [], workTime: '', needCount: 1, totalAmount: 0, commission: ''
+})
+
 const getStatusType = (status) => {
   const map = { '待发布': 'info', '进行中': 'primary', '已完成': 'success', '已取消': 'danger' }
   return map[status] || 'info'
@@ -105,15 +179,16 @@ const getStatusType = (status) => {
 
 const handleSearch = () => { ElMessage.info('搜索') }
 const handleReset = () => { Object.assign(searchForm, { taskNo: '', publisher: '', projectName: '', status: '' }) }
-const handleExport = () => { ElMessage.info('批量导出打卡') }
-const handleDetail = (row) => { ElMessage.info('查看详情') }
-const handleEdit = (row) => { ElMessage.info('编辑任务') }
-const handleExportClock = (row) => { ElMessage.info('导出打卡') }
+const handleExport = () => { ElMessage.success('批量导出打卡成功') }
+const handleDetail = (row) => { Object.assign(detailForm, row); detailVisible.value = true }
+const handleEdit = (row) => { editTitle.value = '编辑任务'; Object.assign(editForm, { taskNo: row.taskNo, projectName: row.projectName, workTime: row.workTime, needCount: row.needCount, totalAmount: row.totalAmount, commission: row.commission }); editVisible.value = true }
+const handleExportClock = (row) => { ElMessage.success('导出打卡成功') }
 const handleCancel = (row) => { ElMessageBox.confirm('确认取消该任务?', '提示', { type: 'warning' }).then(() => ElMessage.success('任务已取消')) }
-const handleSubmit = (row) => { ElMessage.success('提交成功') }
+const handleSubmit = (row) => { ElMessageBox.confirm('确认提交该任务?', '提示', { type: 'warning' }).then(() => ElMessage.success('提交成功')) }
 const handleSelectionChange = (val) => { selectedRows.value = val }
 const handleSizeChange = (size) => { pageSize.value = size }
 const handleCurrentChange = (page) => { currentPage.value = page }
+const handleEditSubmit = () => { editVisible.value = false; ElMessage.success('保存成功') }
 </script>
 
 <style scoped>

@@ -86,6 +86,58 @@
         <el-button type="primary" @click="handleSubmit">确定</el-button>
       </template>
     </el-dialog>
+    <el-dialog v-model="dictDataVisible" :title="dictDataTitle" width="700px">
+      <el-card>
+        <el-table :data="dictData" border>
+          <el-table-column type="index" label="序号" width="60" />
+          <el-table-column prop="label" label="字典标签" min-width="150" />
+          <el-table-column prop="value" label="字典键值" min-width="150" />
+          <el-table-column prop="sort" label="排序" width="100" />
+          <el-table-column prop="status" label="状态" width="100">
+            <template #default="scope">
+              <el-tag :type="scope.row.status === '正常' ? 'success' : 'info'">{{ scope.row.status }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="remark" label="备注" min-width="200" />
+          <el-table-column label="操作" width="150">
+            <template #default="scope">
+              <el-button size="small" @click="handleDictEdit(scope.row)">修改</el-button>
+              <el-button size="small" type="danger" @click="handleDictDelete(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
+      <template #footer>
+        <el-button type="success" @click="handleDictAdd">新增</el-button>
+        <el-button @click="dictDataVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="dictFormVisible" :title="dictFormTitle" width="500px">
+      <el-form :model="dictForm" label-width="100px">
+        <el-form-item label="字典标签">
+          <el-input v-model="dictForm.label" placeholder="请输入字典标签" />
+        </el-form-item>
+        <el-form-item label="字典键值">
+          <el-input v-model="dictForm.value" placeholder="请输入字典键值" />
+        </el-form-item>
+        <el-form-item label="排序">
+          <el-input-number v-model="dictForm.sort" :min="0" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-radio-group v-model="dictForm.status">
+            <el-radio label="正常">正常</el-radio>
+            <el-radio label="停用">停用</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="dictForm.remark" type="textarea" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dictFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleDictSubmit">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -107,17 +159,33 @@ const dialogTitle = ref('新增字典')
 const form = reactive({ name: '', type: '', status: '正常', remark: '' })
 const selectedRows = ref([])
 
+const dictDataVisible = ref(false)
+const dictDataTitle = ref('字典数据')
+const dictData = ref([
+  { id: 1, label: '男', value: '0', sort: 1, status: '正常', remark: '男性' },
+  { id: 2, label: '女', value: '1', sort: 2, status: '正常', remark: '女性' }
+])
+
+const dictFormVisible = ref(false)
+const dictFormTitle = ref('新增字典数据')
+const dictForm = reactive({ label: '', value: '', sort: 0, status: '正常', remark: '' })
+
 const handleSearch = () => { ElMessage.info('搜索') }
 const handleReset = () => { Object.assign(searchForm, { name: '', type: '', status: '', dateRange: [] }) }
 const handleAdd = () => { dialogTitle.value = '新增字典'; Object.assign(form, { name: '', type: '', status: '正常', remark: '' }); dialogVisible.value = true }
 const handleEdit = (row) => { dialogTitle.value = '修改字典'; Object.assign(form, row); dialogVisible.value = true }
 const handleDelete = (row) => { ElMessageBox.confirm('确认删除该字典吗？', '提示', { type: 'warning' }).then(() => ElMessage.success('删除成功')) }
-const handleTypeClick = (row) => { ElMessage.info('查看字典数据: ' + row.type) }
+const handleTypeClick = (row) => { dictDataTitle.value = row.type + ' - 字典数据'; dictDataVisible.value = true }
 const handleRefresh = () => { ElMessage.success('缓存刷新成功') }
 const handleSelectionChange = (val) => { selectedRows.value = val }
 const handleSubmit = () => { dialogVisible.value = false; ElMessage.success('保存成功') }
 const handleSizeChange = (size) => { pageSize.value = size }
 const handleCurrentChange = (page) => { currentPage.value = page }
+
+const handleDictAdd = () => { dictFormTitle.value = '新增字典数据'; Object.assign(dictForm, { label: '', value: '', sort: 0, status: '正常', remark: '' }); dictFormVisible.value = true }
+const handleDictEdit = (row) => { dictFormTitle.value = '修改字典数据'; Object.assign(dictForm, row); dictFormVisible.value = true }
+const handleDictDelete = (row) => { ElMessageBox.confirm('确认删除该字典数据吗？', '提示', { type: 'warning' }).then(() => ElMessage.success('删除成功')) }
+const handleDictSubmit = () => { dictFormVisible.value = false; ElMessage.success('保存成功') }
 </script>
 
 <style scoped>

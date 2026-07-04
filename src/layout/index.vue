@@ -230,7 +230,9 @@
           <el-popover placement="bottom" width="320" trigger="click" v-model="messageVisible">
             <template #reference>
               <el-badge :value="unreadCount" :hidden="unreadCount === 0" class="message-badge">
-                <el-button icon="Bell" circle />
+                <el-button circle>
+                  <el-icon><Bell /></el-icon>
+                </el-button>
               </el-badge>
             </template>
             <div class="message-popover">
@@ -265,8 +267,8 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>个人中心</el-dropdown-item>
-                <el-dropdown-item>修改密码</el-dropdown-item>
+                <el-dropdown-item @click="profileVisible = true">个人中心</el-dropdown-item>
+                <el-dropdown-item @click="passwordVisible = true">修改密码</el-dropdown-item>
                 <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -277,15 +279,47 @@
         <router-view />
       </div>
     </main>
+    <el-dialog v-model="profileVisible" title="个人中心" width="500px">
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="用户名">{{ username }}</el-descriptions-item>
+        <el-descriptions-item label="昵称">赵宏程</el-descriptions-item>
+        <el-descriptions-item label="手机号">13800138000</el-descriptions-item>
+        <el-descriptions-item label="邮箱">admin@example.com</el-descriptions-item>
+        <el-descriptions-item label="部门">技术部</el-descriptions-item>
+        <el-descriptions-item label="角色">管理员</el-descriptions-item>
+        <el-descriptions-item label="创建时间">2025-01-01 10:00:00</el-descriptions-item>
+        <el-descriptions-item label="最后登录">2026-07-03 09:00:00</el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button @click="profileVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="passwordVisible" title="修改密码" width="400px">
+      <el-form :model="passwordForm" label-width="100px">
+        <el-form-item label="旧密码">
+          <el-input v-model="passwordForm.oldPassword" type="password" placeholder="请输入旧密码" show-password />
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="passwordForm.newPassword" type="password" placeholder="请输入新密码" show-password />
+        </el-form-item>
+        <el-form-item label="确认密码">
+          <el-input v-model="passwordForm.confirmPassword" type="password" placeholder="请再次输入新密码" show-password />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="passwordVisible = false">取消</el-button>
+        <el-button type="primary" @click="handlePasswordSubmit">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { 
   HomeFilled, Setting, Monitor, Notebook, Wallet, List, User, 
-  Location, SetUp, EditPen, PieChart, Promotion, ShoppingCart, OfficeBuilding, MapLocation 
+  Location, SetUp, EditPen, PieChart, Promotion, ShoppingCart, OfficeBuilding, MapLocation, Bell
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
@@ -294,6 +328,9 @@ const route = useRoute()
 const isCollapsed = ref(false)
 const username = ref(localStorage.getItem('username') || '用户')
 const messageVisible = ref(false)
+const profileVisible = ref(false)
+const passwordVisible = ref(false)
+const passwordForm = reactive({ oldPassword: '', newPassword: '', confirmPassword: '' })
 const messages = ref([
   { id: 1, title: '系统通知', content: '欢迎使用民匠有约管理系统', time: '2026-07-03 10:00:00', read: false },
   { id: 2, title: '任务提醒', content: '您有新的任务待处理', time: '2026-07-03 09:30:00', read: false },
@@ -313,8 +350,8 @@ const handleMessageClick = (item) => {
 }
 
 const handleViewAll = () => {
-  ElMessage.info('跳转到全部消息页面')
   messageVisible.value = false
+  router.push('/system/message')
 }
 
 const activeMenu = computed(() => route.path)
@@ -363,6 +400,7 @@ const getMenuName = (path) => {
     '/dashboard': '首页',
     '/cockpit': '驾驶舱',
     '/system/dict': '字典管理',
+    '/system/message': '站内信',
     '/system/icon': '图标库',
     '/system/params': '参数设置',
     '/system/menu': '菜单管理',
@@ -460,6 +498,26 @@ const handleLogout = () => {
   localStorage.removeItem('username')
   ElMessage.success('退出成功')
   router.push('/login')
+}
+
+const handlePasswordSubmit = () => {
+  if (!passwordForm.oldPassword) {
+    ElMessage.warning('请输入旧密码')
+    return
+  }
+  if (!passwordForm.newPassword) {
+    ElMessage.warning('请输入新密码')
+    return
+  }
+  if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+    ElMessage.warning('两次输入的密码不一致')
+    return
+  }
+  passwordVisible.value = false
+  passwordForm.oldPassword = ''
+  passwordForm.newPassword = ''
+  passwordForm.confirmPassword = ''
+  ElMessage.success('密码修改成功')
 }
 </script>
 
@@ -574,7 +632,7 @@ const handleLogout = () => {
 }
 
 .message-popover {
-  padding: 4px 0;
+  padding: 0;
 }
 
 .message-header {
@@ -583,17 +641,19 @@ const handleLogout = () => {
   align-items: center;
   font-size: 14px;
   font-weight: 500;
+  padding: 12px 16px 8px;
 }
 
 .message-list {
-  max-height: 300px;
+  max-height: 320px;
   overflow-y: auto;
+  padding: 0 16px;
 }
 
 .message-item {
-  padding: 10px 0;
+  padding: 12px 0;
   cursor: pointer;
-  border-bottom: 1px solid #f5f7fa;
+  border-bottom: 1px solid #f0f2f5;
 }
 
 .message-item:last-child {
@@ -601,22 +661,33 @@ const handleLogout = () => {
 }
 
 .message-item.unread {
-  background: #ecf5ff;
-  margin: 0 -12px;
-  padding: 10px 12px;
+  position: relative;
+}
+
+.message-item.unread .message-title::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #f56c6c;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 .message-title {
   font-size: 13px;
   font-weight: 500;
   color: #303133;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  line-height: 1.4;
 }
 
 .message-content {
   font-size: 12px;
   color: #606266;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  line-height: 1.5;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -630,6 +701,7 @@ const handleLogout = () => {
 .message-footer {
   text-align: center;
   font-size: 13px;
+  padding: 8px 16px 12px;
 }
 
 .user-info {

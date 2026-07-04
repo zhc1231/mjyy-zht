@@ -15,7 +15,7 @@
           <el-input v-model="item.form.name" :placeholder="item.placeholder" style="width: 200px;" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleExport(index)">导出</el-button>
+          <el-button type="primary" :loading="exporting[index]" @click="handleExport(index)">导出</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -47,8 +47,23 @@ const reports = reactive([
   }
 ])
 
+const exporting = reactive([false, false, false])
+
 const handleExport = (index) => {
-  ElMessage.success(reports[index].title + '导出成功')
+  const report = reports[index]
+  if (!report.form.startDate || !report.form.endDate) {
+    ElMessage.warning('请选择开始和结束日期')
+    return
+  }
+  if (report.form.startDate > report.form.endDate) {
+    ElMessage.warning('开始日期不能大于结束日期')
+    return
+  }
+  exporting[index] = true
+  setTimeout(() => {
+    exporting[index] = false
+    ElMessage.success(report.title + '导出成功')
+  }, 1000)
 }
 </script>
 

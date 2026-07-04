@@ -2,8 +2,12 @@
   <div class="common-page">
     <el-card class="search-card">
       <el-form :inline="true" :model="searchForm" class="search-form">
-        <el-form-item label="关键词">
-          <el-input v-model="searchForm.keyword" placeholder="请输入关键词" />
+        <el-form-item v-for="field in searchFields" :key="field.prop" :label="field.label">
+          <el-input v-if="field.type === 'input'" v-model="searchForm[field.prop]" :placeholder="field.placeholder" />
+          <el-select v-else-if="field.type === 'select'" v-model="searchForm[field.prop]" :placeholder="field.placeholder">
+            <el-option v-for="opt in field.options" :key="opt.value" :label="opt.label" :value="opt.value" />
+          </el-select>
+          <el-date-picker v-else-if="field.type === 'daterange'" v-model="searchForm[field.prop]" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">
@@ -14,28 +18,33 @@
             <el-icon><RefreshLeft /></el-icon>
             重置
           </el-button>
-          <el-button type="success" @click="handleAdd">
+          <el-button v-if="showAddBtn" type="success" @click="handleAdd">
             <el-icon><Plus /></el-icon>
             新增
           </el-button>
+          <el-button v-if="showExportBtn" @click="handleExport">导出</el-button>
+          <el-button v-if="showRefreshBtn" type="warning" @click="handleRefresh">刷新缓存</el-button>
         </el-form-item>
       </el-form>
     </el-card>
     <el-card class="table-card">
       <el-table :data="tableData" border>
-        <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="name" label="名称" min-width="120" />
-        <el-table-column prop="code" label="编码" min-width="120" />
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="scope">
-            <el-tag :type="scope.row.status === '启用' || scope.row.status === '成功' || scope.row.status === '正常' ? 'success' : 'info'">{{ scope.row.status }}</el-tag>
+        <el-table-column v-if="showSelection" type="selection" width="55" />
+        <el-table-column v-if="showIndex" type="index" label="序号" width="60" />
+        <el-table-column v-for="col in tableColumns" :key="col.prop" :prop="col.prop" :label="col.label" :width="col.width" :min-width="col.minWidth">
+          <template v-if="col.type === 'tag'" #default="scope">
+            <el-tag :type="getTagType(scope.row[col.prop])">{{ scope.row[col.prop] }}</el-tag>
+          </template>
+          <template v-else-if="col.type === 'link'" #default="scope">
+            <el-link type="primary" @click="handleLinkClick(scope.row)">{{ scope.row[col.prop] }}</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="170" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column v-if="showOperation" label="操作" :width="operationWidth" fixed="right">
           <template #default="scope">
-            <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            <el-button v-if="showViewBtn" size="small" @click="handleView(scope.row)">查看</el-button>
+            <el-button v-if="showEditBtn" size="small" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button v-if="showDeleteBtn" size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            <el-button v-if="showAuditBtn" size="small" type="primary" @click="handleAudit(scope.row)">审核</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -52,24 +61,35 @@
         />
       </div>
     </el-card>
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="名称">
-          <el-input v-model="form.name" />
-        </el-form-item>
-        <el-form-item label="编码">
-          <el-input v-model="form.code" />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-radio-group v-model="form.status">
-            <el-radio label="启用">启用</el-radio>
-            <el-radio label="禁用">禁用</el-radio>
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" :width="dialogWidth">
+      <el-form :model="form" label-width="100px">
+        <el-form-item v-for="field in formFields" :key="field.prop" :label="field.label">
+          <el-input v-if="field.type === 'input'" v-model="form[field.prop]" :placeholder="field.placeholder" />
+          <el-input v-else-if="field.type === 'textarea'" v-model="form[field.prop]" type="textarea" :rows="4" />
+          <el-select v-else-if="field.type === 'select'" v-model="form[field.prop]" :placeholder="field.placeholder">
+            <el-option v-for="opt in field.options" :key="opt.value" :label="opt.label" :value="opt.value" />
+          </el-select>
+          <el-radio-group v-else-if="field.type === 'radio'" v-model="form[field.prop]">
+            <el-radio v-for="opt in field.options" :key="opt.value" :label="opt.value">{{ opt.label }}</el-radio>
           </el-radio-group>
+          <el-input-number v-else-if="field.type === 'number'" v-model="form[field.prop]" :min="field.min || 0" />
+          <el-date-picker v-else-if="field.type === 'date'" v-model="form[field.prop]" type="date" placeholder="选择日期" />
+          <el-date-picker v-else-if="field.type === 'datetime'" v-model="form[field.prop]" type="datetime" placeholder="选择日期时间" />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="handleSubmit">确定</el-button>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="viewVisible" title="详情" width="600px">
+      <el-descriptions :column="2" border>
+        <el-descriptions-item v-for="col in tableColumns" :key="col.prop" :label="col.label">
+          {{ viewData[col.prop] }}
+        </el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button @click="viewVisible = false">关闭</el-button>
       </template>
     </el-dialog>
   </div>
@@ -83,143 +103,1927 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 
 const route = useRoute()
 
-const titles = {
-  '/system/dict': '字典',
-  '/system/icon': '图标',
-  '/system/params': '参数',
-  '/system/menu': '菜单',
-  '/system/post': '岗位',
-  '/system/config-type': '配置类型',
-  '/system/config-table': '配置表',
-  '/system/notice': '公告',
-  '/system/log': '日志',
-  '/system/login-log': '登录日志',
-  '/system/online': '在线用户',
-  '/system/schedule': '定时任务',
-  '/system/data-monitor': '数据监控',
-  '/system/service-monitor': '服务监控',
-  '/system/cache-monitor': '缓存监控',
-  '/system/cache-list': '缓存',
-  '/system/form-build': '表单',
-  '/system/code-gen': '代码',
-  '/system/api': '接口',
-  '/region/local': '当地数据',
-  '/region/sort': '地区',
-  '/user/list': '用户',
-  '/user/role': '角色',
-  '/user/dept': '部门',
-  '/user/staff': '人员',
-  '/platform/user-list': '用户',
-  '/platform/person-list': '个人',
-  '/platform/enterprise-list': '企业',
-  '/platform/contract': '合同',
-  '/platform/aqian-contract': '爱签合同',
-  '/platform/person-register': '注册',
-  '/platform/enterprise-register': '企业注册',
-  '/platform/db-view': '数据',
-  '/platform/face-record': '人脸',
-  '/platform/face-base': '底片',
-  '/platform/company-config': '公司',
-  '/platform/insurance-price': '保险',
-  '/platform/work-type': '工种',
-  '/platform/sensitive-word': '敏感词',
-  '/platform/task-template': '模版',
-  '/platform/pay-later': '支付',
-  '/platform/attendance-config': '考勤',
-  '/platform/icc-enterprise': 'ICC',
-  '/training-platform/cert-list': '证书',
-  '/training-platform/cert-config': '配置',
-  '/training/class': '班级',
-  '/training/verify': '审核',
-  '/training/student': '学员',
-  '/training/payment': '缴费',
-  '/training/photo': '拍照',
-  '/training/base': '底片',
-  '/training/cert': '证书',
-  '/exercise/bank': '题库',
-  '/exercise/question': '题目',
-  '/finance/transaction': '流水',
-  '/finance/refund': '退款',
-  '/study/simulate': '模拟考',
-  '/study/summary': '汇总',
-  '/study/detail': '详情',
-  '/backend/store': '门店',
-  '/backend/archive': '档案',
-  '/salary/batch': '结算',
-  '/salary/detail': '明细',
-  '/salary/withdraw': '提现',
-  '/salary/transaction': '流水',
-  '/salary/balance': '余额',
-  '/task/list': '任务',
-  '/task/team': '团队',
-  '/task/salary-config': '薪酬',
-  '/task/seats': '席位',
-  '/task/settlement': '结算',
-  '/task/finance-report': '报表',
-  '/task/message': '消息',
-  '/task/white-list': '白名单',
-  '/task/insurance': '保险',
-  '/statistics/overview': '总览',
-  '/statistics/reconciliation': '对账',
-  '/statistics/report': '账单',
-  '/statistics/detail': '明细',
-  '/statistics/invoice': '开票',
-  '/operation/merchant': '商户',
-  '/operation/service': '服务商',
-  '/order': '订单',
-  '/enterprise/audit': '审核',
-  '/enterprise/user': '用户',
-  '/city-service/bank-config': '银行',
-  '/cockpit': '驾驶舱'
+const pageConfig = {
+  '/system/config-type': {
+    title: '配置类型管理',
+    searchFields: [
+      { prop: 'name', label: '类型名称', type: 'input', placeholder: '请输入类型名称' },
+      { prop: 'code', label: '类型编码', type: 'input', placeholder: '请输入类型编码' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '类型编号', width: '100' },
+      { prop: 'name', label: '类型名称', minWidth: '150' },
+      { prop: 'code', label: '类型编码', minWidth: '150' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'remark', label: '备注', minWidth: '200' },
+      { prop: 'createTime', label: '创建时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'name', label: '类型名称', type: 'input' },
+      { prop: 'code', label: '类型编码', type: 'input' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '正常', value: '正常' }, { label: '停用', value: '停用' }] },
+      { prop: 'remark', label: '备注', type: 'textarea' }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 1, name: '证书类型', code: 'cert_type', status: '正常', remark: '证书类型配置', createTime: '2025-01-01 10:00:00' },
+      { id: 2, name: '工种类型', code: 'work_type', status: '正常', remark: '工种类型配置', createTime: '2025-01-02 10:00:00' },
+      { id: 3, name: '行业类型', code: 'industry_type', status: '正常', remark: '行业类型配置', createTime: '2025-01-03 10:00:00' }
+    ],
+    total: 12
+  },
+  '/system/notice': {
+    title: '通知公告',
+    searchFields: [
+      { prop: 'title', label: '公告标题', type: 'input', placeholder: '请输入公告标题' },
+      { prop: 'type', label: '公告类型', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '通知', value: '通知' }, { label: '公告', value: '公告' }] },
+      { prop: 'dateRange', label: '创建时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '公告编号', width: '100' },
+      { prop: 'title', label: '公告标题', minWidth: '200', type: 'link' },
+      { prop: 'type', label: '公告类型', width: '100', type: 'tag' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'createBy', label: '创建者', width: '120' },
+      { prop: 'createTime', label: '创建时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'title', label: '公告标题', type: 'input' },
+      { prop: 'type', label: '公告类型', type: 'radio', options: [{ label: '通知', value: '通知' }, { label: '公告', value: '公告' }] },
+      { prop: 'content', label: '公告内容', type: 'textarea' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '正常', value: '正常' }, { label: '关闭', value: '关闭' }] }
+    ],
+    dialogWidth: '600px',
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 1, title: '系统升级通知', type: '通知', status: '正常', createBy: 'admin', createTime: '2025-01-01 10:00:00', content: '系统将于今晚升级' },
+      { id: 2, title: '新功能上线公告', type: '公告', status: '正常', createBy: 'admin', createTime: '2025-01-02 10:00:00', content: '新功能已上线' },
+      { id: 3, title: '维护通知', type: '通知', status: '关闭', createBy: 'admin', createTime: '2025-01-03 10:00:00', content: '系统维护完成' }
+    ],
+    total: 8
+  },
+  '/system/log': {
+    title: '操作日志',
+    searchFields: [
+      { prop: 'module', label: '系统模块', type: 'input', placeholder: '请输入模块名称' },
+      { prop: 'type', label: '操作类型', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '新增', value: '新增' }, { label: '修改', value: '修改' }, { label: '删除', value: '删除' }] },
+      { prop: 'operator', label: '操作人员', type: 'input', placeholder: '请输入操作人员' },
+      { prop: 'dateRange', label: '操作时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '日志编号', width: '100' },
+      { prop: 'module', label: '系统模块', minWidth: '120' },
+      { prop: 'type', label: '操作类型', width: '100', type: 'tag' },
+      { prop: 'description', label: '操作描述', minWidth: '200' },
+      { prop: 'operator', label: '操作人员', width: '120' },
+      { prop: 'ip', label: '主机地址', width: '140' },
+      { prop: 'status', label: '操作状态', width: '100', type: 'tag' },
+      { prop: 'costTime', label: '消耗时间', width: '100' },
+      { prop: 'createTime', label: '操作时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: true, showViewBtn: true, showSelection: true, showIndex: false,
+    operationWidth: '180',
+    sampleData: [
+      { id: 1, module: '用户管理', type: '新增', description: '新增用户', operator: 'admin', ip: '192.168.1.1', status: '成功', costTime: '10ms', createTime: '2025-01-01 10:00:00' },
+      { id: 2, module: '字典管理', type: '修改', description: '修改字典', operator: 'admin', ip: '192.168.1.1', status: '成功', costTime: '15ms', createTime: '2025-01-02 10:00:00' },
+      { id: 3, module: '角色管理', type: '删除', description: '删除角色', operator: 'admin', ip: '192.168.1.1', status: '失败', costTime: '5ms', createTime: '2025-01-03 10:00:00' }
+    ],
+    total: 1024
+  },
+  '/system/login-log': {
+    title: '登录日志',
+    searchFields: [
+      { prop: 'username', label: '用户名称', type: 'input', placeholder: '请输入用户名称' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '成功', value: '成功' }, { label: '失败', value: '失败' }] },
+      { prop: 'ip', label: '登录地址', type: 'input', placeholder: '请输入IP地址' },
+      { prop: 'dateRange', label: '登录时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '日志编号', width: '100' },
+      { prop: 'username', label: '用户名称', minWidth: '120' },
+      { prop: 'ip', label: '登录IP地址', width: '140' },
+      { prop: 'location', label: '登录地点', minWidth: '150' },
+      { prop: 'browser', label: '浏览器', width: '120' },
+      { prop: 'os', label: '操作系统', width: '120' },
+      { prop: 'status', label: '登录状态', width: '100', type: 'tag' },
+      { prop: 'msg', label: '操作信息', minWidth: '150' },
+      { prop: 'loginTime', label: '登录时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 1, username: 'admin', ip: '192.168.1.1', location: '北京', browser: 'Chrome', os: 'Windows', status: '成功', msg: '登录成功', loginTime: '2025-01-01 10:00:00' },
+      { id: 2, username: 'test', ip: '192.168.1.2', location: '上海', browser: 'Firefox', os: 'Mac', status: '失败', msg: '密码错误', loginTime: '2025-01-02 10:00:00' },
+      { id: 3, username: 'admin', ip: '192.168.1.1', location: '北京', browser: 'Chrome', os: 'Windows', status: '成功', msg: '登录成功', loginTime: '2025-01-03 10:00:00' }
+    ],
+    total: 512
+  },
+  '/system/online': {
+    title: '在线用户',
+    searchFields: [
+      { prop: 'username', label: '登录名称', type: 'input', placeholder: '请输入登录名称' },
+      { prop: 'ip', label: '登录地址', type: 'input', placeholder: '请输入IP地址' }
+    ],
+    tableColumns: [
+      { prop: 'sessionId', label: '会话编号', minWidth: '200' },
+      { prop: 'username', label: '登录名称', minWidth: '120' },
+      { prop: 'name', label: '用户名称', minWidth: '120' },
+      { prop: 'dept', label: '所属部门', minWidth: '120' },
+      { prop: 'ip', label: '主机地址', width: '140' },
+      { prop: 'location', label: '登录地点', minWidth: '150' },
+      { prop: 'browser', label: '浏览器', width: '120' },
+      { prop: 'os', label: '操作系统', width: '120' },
+      { prop: 'loginTime', label: '登录时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { sessionId: 'sess_123456', username: 'admin', name: '管理员', dept: '技术部', ip: '192.168.1.1', location: '北京', browser: 'Chrome', os: 'Windows', loginTime: '2025-01-01 10:00:00' },
+      { sessionId: 'sess_789012', username: 'test', name: '测试用户', dept: '测试部', ip: '192.168.1.2', location: '上海', browser: 'Firefox', os: 'Mac', loginTime: '2025-01-02 10:00:00' }
+    ],
+    total: 3
+  },
+  '/system/schedule': {
+    title: '定时任务',
+    searchFields: [
+      { prop: 'name', label: '任务名称', type: 'input', placeholder: '请输入任务名称' },
+      { prop: 'target', label: '任务组名', type: 'input', placeholder: '请输入任务组名' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '正常', value: '正常' }, { label: '暂停', value: '暂停' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '任务编号', width: '100' },
+      { prop: 'name', label: '任务名称', minWidth: '150' },
+      { prop: 'target', label: '任务组名', minWidth: '150' },
+      { prop: 'cron', label: 'cron表达式', minWidth: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'remark', label: '备注', minWidth: '200' },
+      { prop: 'createTime', label: '创建时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'name', label: '任务名称', type: 'input' },
+      { prop: 'target', label: '任务组名', type: 'input' },
+      { prop: 'cron', label: 'cron表达式', type: 'input' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '正常', value: '正常' }, { label: '暂停', value: '暂停' }] },
+      { prop: 'remark', label: '备注', type: 'textarea' }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 1, name: '自动对账', target: 'FinanceTask', cron: '0 0 2 * * ?', status: '正常', remark: '每日凌晨2点自动对账', createTime: '2025-01-01 10:00:00' },
+      { id: 2, name: '数据备份', target: 'SystemTask', cron: '0 0 3 * * ?', status: '正常', remark: '每日凌晨3点备份数据', createTime: '2025-01-02 10:00:00' },
+      { id: 3, name: '清理日志', target: 'SystemTask', cron: '0 0 4 * * ?', status: '暂停', remark: '每日凌晨4点清理日志', createTime: '2025-01-03 10:00:00' }
+    ],
+    total: 15
+  },
+  '/finance/refund': {
+    title: '退款记录',
+    searchFields: [
+      { prop: 'refundNo', label: '退款单号', type: 'input', placeholder: '请输入退款单号' },
+      { prop: 'orderNo', label: '订单号', type: 'input', placeholder: '请输入订单号' },
+      { prop: 'status', label: '退款状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '待处理', value: '待处理' }, { label: '已退款', value: '已退款' }, { label: '已拒绝', value: '已拒绝' }] },
+      { prop: 'dateRange', label: '申请时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'refundNo', label: '退款单号', minWidth: '180' },
+      { prop: 'orderNo', label: '订单号', minWidth: '180' },
+      { prop: 'payer', label: '付款人', minWidth: '120' },
+      { prop: 'amount', label: '退款金额', width: '120' },
+      { prop: 'reason', label: '退款原因', minWidth: '200' },
+      { prop: 'status', label: '退款状态', width: '100', type: 'tag' },
+      { prop: 'applyTime', label: '申请时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showAuditBtn: true, showSelection: false, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { refundNo: 'REF202501010001', orderNo: 'ORD202501010001', payer: '张三', amount: -500.00, reason: '任务取消', status: '待处理', applyTime: '2025-01-01 10:00:00' },
+      { refundNo: 'REF202501020001', orderNo: 'ORD202501020001', payer: '李四', amount: -300.00, reason: '重复支付', status: '已退款', applyTime: '2025-01-02 10:00:00' },
+      { refundNo: 'REF202501030001', orderNo: 'ORD202501030001', payer: '王五', amount: -800.00, reason: '用户申请', status: '已拒绝', applyTime: '2025-01-03 10:00:00' }
+    ],
+    total: 56
+  },
+  '/task/team': {
+    title: '团队列表',
+    searchFields: [
+      { prop: 'teamName', label: '团队名称', type: 'input', placeholder: '请输入团队名称' },
+      { prop: 'leader', label: '团队负责人', type: 'input', placeholder: '请输入负责人' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '正常', value: '正常' }, { label: '停用', value: '停用' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '团队编号', width: '100' },
+      { prop: 'teamName', label: '团队名称', minWidth: '150' },
+      { prop: 'leader', label: '负责人', width: '120' },
+      { prop: 'phone', label: '联系电话', width: '140' },
+      { prop: 'memberCount', label: '成员数', width: '100' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'createTime', label: '创建时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'teamName', label: '团队名称', type: 'input' },
+      { prop: 'leader', label: '负责人', type: 'input' },
+      { prop: 'phone', label: '联系电话', type: 'input' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '正常', value: '正常' }, { label: '停用', value: '停用' }] },
+      { prop: 'remark', label: '备注', type: 'textarea' }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 1, teamName: '朝阳团队', leader: '张队', phone: '13800001111', memberCount: 25, status: '正常', createTime: '2025-01-01 10:00:00' },
+      { id: 2, teamName: '海淀团队', leader: '李队', phone: '13800002222', memberCount: 18, status: '正常', createTime: '2025-01-02 10:00:00' },
+      { id: 3, teamName: '丰台团队', leader: '王队', phone: '13800003333', memberCount: 30, status: '停用', createTime: '2025-01-03 10:00:00' }
+    ],
+    total: 12
+  },
+  '/task/white-list': {
+    title: '绑卡白名单',
+    searchFields: [
+      { prop: 'username', label: '用户名', type: 'input', placeholder: '请输入用户名' },
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'bank', label: '银行', type: 'input', placeholder: '请输入银行名称' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '100' },
+      { prop: 'username', label: '用户名', minWidth: '120' },
+      { prop: 'name', label: '姓名', minWidth: '120' },
+      { prop: 'bank', label: '开户银行', minWidth: '150' },
+      { prop: 'cardNo', label: '银行卡号', minWidth: '200' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'createTime', label: '添加时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'username', label: '用户名', type: 'input' },
+      { prop: 'name', label: '姓名', type: 'input' },
+      { prop: 'bank', label: '开户银行', type: 'input' },
+      { prop: 'cardNo', label: '银行卡号', type: 'input' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '正常', value: '正常' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 1, username: 'user001', name: '张三', bank: '工商银行', cardNo: '6222 **** **** 1234', status: '正常', createTime: '2025-01-01 10:00:00' },
+      { id: 2, username: 'user002', name: '李四', bank: '建设银行', cardNo: '6227 **** **** 5678', status: '正常', createTime: '2025-01-02 10:00:00' },
+      { id: 3, username: 'user003', name: '王五', bank: '农业银行', cardNo: '6228 **** **** 9012', status: '停用', createTime: '2025-01-03 10:00:00' }
+    ],
+    total: 28
+  },
+  '/task/insurance': {
+    title: '保险订单',
+    searchFields: [
+      { prop: 'orderNo', label: '订单号', type: 'input', placeholder: '请输入订单号' },
+      { prop: 'name', label: '被保险人', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '已投保', value: '已投保' }, { label: '已退保', value: '已退保' }] },
+      { prop: 'dateRange', label: '投保日期', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'orderNo', label: '订单号', minWidth: '180' },
+      { prop: 'name', label: '被保险人', minWidth: '120' },
+      { prop: 'idCard', label: '身份证号', minWidth: '200' },
+      { prop: 'insuranceType', label: '险种', minWidth: '120' },
+      { prop: 'amount', label: '保费', width: '100' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'startDate', label: '生效日期', width: '120' },
+      { prop: 'endDate', label: '到期日期', width: '120' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { orderNo: 'INS202501010001', name: '张三', idCard: '110101********1234', insuranceType: '意外险', amount: 50, status: '已投保', startDate: '2025-01-01', endDate: '2026-01-01' },
+      { orderNo: 'INS202501020001', name: '李四', idCard: '110101********5678', insuranceType: '医疗险', amount: 100, status: '已投保', startDate: '2025-01-02', endDate: '2026-01-02' },
+      { orderNo: 'INS202501030001', name: '王五', idCard: '110101********9012', insuranceType: '意外险', amount: 50, status: '已退保', startDate: '2025-01-03', endDate: '2026-01-03' }
+    ],
+    total: 156
+  },
+  '/statistics/overview': {
+    title: '财务总览',
+    searchFields: [
+      { prop: 'dateRange', label: '统计日期', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'item', label: '项目', minWidth: '150' },
+      { prop: 'income', label: '收入金额', width: '150' },
+      { prop: 'expense', label: '支出金额', width: '150' },
+      { prop: 'balance', label: '余额', width: '150' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showOperation: false, showSelection: false, showIndex: false,
+    sampleData: [
+      { item: '交易流水', income: 1258000, expense: 986500, balance: 271500 },
+      { item: '平台服务费', income: 86500, expense: 0, balance: 86500 },
+      { item: '保险收入', income: 12500, expense: 8500, balance: 4000 },
+      { item: '合计', income: 1357000, expense: 995000, balance: 362000 }
+    ],
+    total: 4
+  },
+  '/statistics/detail': {
+    title: '收支明细',
+    searchFields: [
+      { prop: 'type', label: '收支类型', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '收入', value: '收入' }, { label: '支出', value: '支出' }] },
+      { prop: 'dateRange', label: '日期范围', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'date', label: '日期', width: '120' },
+      { prop: 'type', label: '类型', width: '100', type: 'tag' },
+      { prop: 'category', label: '类别', minWidth: '150' },
+      { prop: 'amount', label: '金额', width: '120' },
+      { prop: 'remark', label: '备注', minWidth: '200' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showOperation: false, showSelection: false, showIndex: true,
+    sampleData: [
+      { date: '2025-01-01', type: '收入', category: '平台服务费', amount: 5000, remark: '1月1日服务费收入' },
+      { date: '2025-01-02', type: '支出', category: '系统维护费', amount: -2000, remark: '服务器维护费用' },
+      { date: '2025-01-03', type: '收入', category: '保险佣金', amount: 3000, remark: '保险业务佣金' }
+    ],
+    total: 365
+  },
+  '/order': {
+    title: '订单管理',
+    searchFields: [
+      { prop: 'orderNo', label: '订单号', type: 'input', placeholder: '请输入订单号' },
+      { prop: 'status', label: '订单状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '待支付', value: '待支付' }, { label: '已支付', value: '已支付' }, { label: '已完成', value: '已完成' }, { label: '已取消', value: '已取消' }] },
+      { prop: 'dateRange', label: '下单时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'orderNo', label: '订单号', minWidth: '180' },
+      { prop: 'productName', label: '商品名称', minWidth: '200' },
+      { prop: 'buyer', label: '购买人', minWidth: '120' },
+      { prop: 'amount', label: '订单金额', width: '120' },
+      { prop: 'status', label: '订单状态', width: '100', type: 'tag' },
+      { prop: 'payTime', label: '支付时间', width: '180' },
+      { prop: 'createTime', label: '下单时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { orderNo: 'ORD202501010001', productName: '建筑工人培训课程', buyer: '张三', amount: 299, status: '已完成', payTime: '2025-01-01 10:30:00', createTime: '2025-01-01 10:00:00' },
+      { orderNo: 'ORD202501020001', productName: '电工证考试报名', buyer: '李四', amount: 500, status: '已支付', payTime: '2025-01-02 14:00:00', createTime: '2025-01-02 13:30:00' },
+      { orderNo: 'ORD202501030001', productName: '焊工证考试报名', buyer: '王五', amount: 600, status: '待支付', payTime: '', createTime: '2025-01-03 09:00:00' }
+    ],
+    total: 256
+  },
+  '/enterprise/audit': {
+    title: '审核信息',
+    searchFields: [
+      { prop: 'name', label: '企业名称', type: 'input', placeholder: '请输入企业名称' },
+      { prop: 'status', label: '审核状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '待审核', value: '待审核' }, { label: '已通过', value: '已通过' }, { label: '已驳回', value: '已驳回' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '企业编号', width: '100' },
+      { prop: 'name', label: '企业名称', minWidth: '200' },
+      { prop: 'contact', label: '联系人', width: '120' },
+      { prop: 'phone', label: '联系电话', width: '140' },
+      { prop: 'status', label: '审核状态', width: '100', type: 'tag' },
+      { prop: 'applyTime', label: '申请时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showAuditBtn: true, showSelection: false, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { id: 1, name: '国通建筑有限公司', contact: '张总', phone: '13800001111', status: '待审核', applyTime: '2025-01-01 10:00:00' },
+      { id: 2, name: '良巧匠科技', contact: '李总', phone: '13800002222', status: '已通过', applyTime: '2025-01-02 10:00:00' },
+      { id: 3, name: '鑫达建筑工程', contact: '王总', phone: '13800003333', status: '已驳回', applyTime: '2025-01-03 10:00:00' }
+    ],
+    total: 36
+  },
+  '/exercise/bank': {
+    title: '题库列表',
+    searchFields: [
+      { prop: 'name', label: '题库名称', type: 'input', placeholder: '请输入题库名称' },
+      { prop: 'type', label: '题库类型', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '单选题', value: '单选题' }, { label: '多选题', value: '多选题' }, { label: '判断题', value: '判断题' }] },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '题库编号', width: '100' },
+      { prop: 'name', label: '题库名称', minWidth: '200' },
+      { prop: 'type', label: '题库类型', width: '100', type: 'tag' },
+      { prop: 'questionCount', label: '题目数量', width: '100' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'createTime', label: '创建时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'name', label: '题库名称', type: 'input' },
+      { prop: 'type', label: '题库类型', type: 'radio', options: [{ label: '单选题', value: '单选题' }, { label: '多选题', value: '多选题' }, { label: '判断题', value: '判断题' }] },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] },
+      { prop: 'remark', label: '备注', type: 'textarea' }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 1, name: '建筑施工安全', type: '单选题', questionCount: 500, status: '启用', createTime: '2025-01-01 10:00:00' },
+      { id: 2, name: '电工基础知识', type: '多选题', questionCount: 300, status: '启用', createTime: '2025-01-02 10:00:00' },
+      { id: 3, name: '焊工操作规范', type: '判断题', questionCount: 200, status: '停用', createTime: '2025-01-03 10:00:00' }
+    ],
+    total: 25
+  },
+  '/system/config-table': {
+    title: '配置表管理',
+    searchFields: [
+      { prop: 'name', label: '表名称', type: 'input', placeholder: '请输入表名称' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '表名称', minWidth: '150' },
+      { prop: 'desc', label: '描述', minWidth: '200' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'createTime', label: '创建时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'name', label: '表名称', type: 'input' },
+      { prop: 'desc', label: '描述', type: 'textarea' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: 'sys_config', desc: '系统配置表', status: '启用', createTime: '2025-01-01 10:00:00' },
+      { id: 2, name: 'sys_user', desc: '用户信息表', status: '启用', createTime: '2025-01-02 10:00:00' }
+    ],
+    total: 8
+  },
+  '/system/data-monitor': {
+    title: '数据监控',
+    searchFields: [{ prop: 'name', label: '数据源', type: 'input', placeholder: '请输入数据源名称' }],
+    tableColumns: [
+      { prop: 'name', label: '数据源名称', minWidth: '150' },
+      { prop: 'type', label: '数据库类型', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'connections', label: '连接数', width: '100' },
+      { prop: 'responseTime', label: '响应时间(ms)', width: '120' },
+      { prop: 'updateTime', label: '更新时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { name: '主库', type: 'MySQL', status: '正常', connections: 15, responseTime: 12, updateTime: '2025-07-03 10:00:00' },
+      { name: '从库', type: 'MySQL', status: '正常', connections: 8, responseTime: 15, updateTime: '2025-07-03 10:00:00' },
+      { name: 'Redis缓存', type: 'Redis', status: '正常', connections: 32, responseTime: 2, updateTime: '2025-07-03 10:00:00' }
+    ],
+    total: 3
+  },
+  '/system/service-monitor': {
+    title: '服务监控',
+    searchFields: [{ prop: 'name', label: '服务名称', type: 'input', placeholder: '请输入服务名称' }],
+    tableColumns: [
+      { prop: 'name', label: '服务名称', minWidth: '150' },
+      { prop: 'ip', label: 'IP地址', width: '140' },
+      { prop: 'port', label: '端口', width: '80' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'cpu', label: 'CPU使用率', width: '120' },
+      { prop: 'memory', label: '内存使用率', width: '120' },
+      { prop: 'uptime', label: '运行时长', width: '120' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { name: 'task-service', ip: '192.168.1.10', port: '8080', status: '正常', cpu: '35%', memory: '52%', uptime: '5天3小时' },
+      { name: 'finance-service', ip: '192.168.1.11', port: '8081', status: '正常', cpu: '28%', memory: '45%', uptime: '5天3小时' },
+      { name: 'user-service', ip: '192.168.1.12', port: '8082', status: '异常', cpu: '85%', memory: '78%', uptime: '2小时15分' }
+    ],
+    total: 3
+  },
+  '/system/cache-monitor': {
+    title: '缓存监控',
+    searchFields: [],
+    tableColumns: [
+      { prop: 'name', label: '缓存名称', minWidth: '150' },
+      { prop: 'keyCount', label: '键值数量', width: '120' },
+      { prop: 'size', label: '占用大小', width: '120' },
+      { prop: 'hitRate', label: '命中率', width: '100' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showOperation: false, showSelection: false, showIndex: true,
+    sampleData: [
+      { name: 'sys_config_cache', keyCount: 156, size: '2.5MB', hitRate: '98.5%', status: '正常' },
+      { name: 'user_token_cache', keyCount: 342, size: '5.8MB', hitRate: '95.2%', status: '正常' },
+      { name: 'dict_data_cache', keyCount: 89, size: '1.2MB', hitRate: '99.1%', status: '正常' }
+    ],
+    total: 3
+  },
+  '/system/cache-list': {
+    title: '缓存列表',
+    searchFields: [{ prop: 'name', label: '缓存名称', type: 'input', placeholder: '请输入缓存名称' }],
+    tableColumns: [
+      { prop: 'name', label: '缓存名称', minWidth: '200' },
+      { prop: 'type', label: '缓存类型', width: '120' },
+      { prop: 'expire', label: '过期时间(秒)', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'remark', label: '备注', minWidth: '200' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: true, showRefreshBtn: true, showOperation: true, showSelection: true, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { name: 'login_user_info', type: 'Redis', expire: 1800, status: '正常', remark: '登录用户信息缓存' },
+      { name: 'sys_dict_data', type: 'Redis', expire: 3600, status: '正常', remark: '字典数据缓存' },
+      { name: 'sys_config', type: 'Redis', expire: 7200, status: '正常', remark: '系统配置缓存' }
+    ],
+    total: 12
+  },
+  '/system/form-build': {
+    title: '表单构建',
+    searchFields: [{ prop: 'name', label: '表单名称', type: 'input', placeholder: '请输入表单名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '表单名称', minWidth: '200' },
+      { prop: 'desc', label: '表单描述', minWidth: '200' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'createTime', label: '创建时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'name', label: '表单名称', type: 'input' },
+      { prop: 'desc', label: '表单描述', type: 'textarea' }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '用户注册表单', desc: '新用户注册信息采集', status: '启用', createTime: '2025-01-01 10:00:00' },
+      { id: 2, name: '企业认证表单', desc: '企业资质认证信息', status: '启用', createTime: '2025-01-02 10:00:00' }
+    ],
+    total: 5
+  },
+  '/system/code-gen': {
+    title: '代码生成',
+    searchFields: [
+      { prop: 'tableName', label: '表名称', type: 'input', placeholder: '请输入表名称' }
+    ],
+    tableColumns: [
+      { prop: 'tableName', label: '表名称', minWidth: '150' },
+      { prop: 'tableComment', label: '表描述', minWidth: '150' },
+      { prop: 'className', label: '实体类名称', minWidth: '150' },
+      { prop: 'createTime', label: '创建时间', width: '180' },
+      { prop: 'updateTime', label: '更新时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: true, showDeleteBtn: true, showViewBtn: true, showOperation: true, showSelection: true, showIndex: true,
+    operationWidth: '200',
+    sampleData: [
+      { tableName: 'sys_user', tableComment: '用户信息表', className: 'SysUser', createTime: '2025-01-01 10:00:00', updateTime: '2025-07-01 10:00:00' },
+      { tableName: 'sys_role', tableComment: '角色信息表', className: 'SysRole', createTime: '2025-01-01 10:00:00', updateTime: '2025-06-15 10:00:00' },
+      { tableName: 'sys_menu', tableComment: '菜单权限表', className: 'SysMenu', createTime: '2025-01-01 10:00:00', updateTime: '2025-06-20 10:00:00' }
+    ],
+    total: 15
+  },
+  '/system/api': {
+    title: '系统接口',
+    searchFields: [{ prop: 'name', label: '接口名称', type: 'input', placeholder: '请输入接口名称' }],
+    tableColumns: [
+      { prop: 'method', label: '请求方式', width: '100', type: 'tag' },
+      { prop: 'path', label: '接口路径', minWidth: '250' },
+      { prop: 'desc', label: '接口描述', minWidth: '200' },
+      { prop: 'module', label: '所属模块', width: '120' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { method: 'GET', path: '/api/system/user/list', desc: '获取用户列表', module: '系统管理' },
+      { method: 'POST', path: '/api/system/user/add', desc: '新增用户', module: '系统管理' },
+      { method: 'PUT', path: '/api/system/user/update', desc: '修改用户', module: '系统管理' },
+      { method: 'DELETE', path: '/api/system/user/delete', desc: '删除用户', module: '系统管理' }
+    ],
+    total: 56
+  },
+  '/region/sort': {
+    title: '地区排序',
+    searchFields: [{ prop: 'name', label: '地区名称', type: 'input', placeholder: '请输入地区名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '地区名称', minWidth: '150' },
+      { prop: 'code', label: '地区编码', width: '120' },
+      { prop: 'sort', label: '排序', width: '80' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '地区名称', type: 'input' },
+      { prop: 'code', label: '地区编码', type: 'input' },
+      { prop: 'sort', label: '排序', type: 'number' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '北京市', code: '110000', sort: 1, status: '启用' },
+      { id: 2, name: '上海市', code: '310000', sort: 2, status: '启用' },
+      { id: 3, name: '广东省', code: '440000', sort: 3, status: '启用' },
+      { id: 4, name: '浙江省', code: '330000', sort: 4, status: '启用' }
+    ],
+    total: 34
+  },
+  '/user/staff': {
+    title: '人员管理',
+    searchFields: [
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'phone', label: '手机号', type: 'input', placeholder: '请输入手机号' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '在职', value: '在职' }, { label: '离职', value: '离职' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '工号', width: '100' },
+      { prop: 'name', label: '姓名', minWidth: '120' },
+      { prop: 'gender', label: '性别', width: '80' },
+      { prop: 'phone', label: '手机号', width: '140' },
+      { prop: 'dept', label: '部门', minWidth: '120' },
+      { prop: 'position', label: '职位', minWidth: '120' },
+      { prop: 'entryDate', label: '入职日期', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '姓名', type: 'input' },
+      { prop: 'gender', label: '性别', type: 'radio', options: [{ label: '男', value: '男' }, { label: '女', value: '女' }] },
+      { prop: 'phone', label: '手机号', type: 'input' },
+      { prop: 'dept', label: '部门', type: 'input' },
+      { prop: 'position', label: '职位', type: 'input' },
+      { prop: 'entryDate', label: '入职日期', type: 'date' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '在职', value: '在职' }, { label: '离职', value: '离职' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 'EMP001', name: '张三', gender: '男', phone: '13800138001', dept: '技术部', position: '前端工程师', entryDate: '2024-03-15', status: '在职' },
+      { id: 'EMP002', name: '李四', gender: '女', phone: '13800138002', dept: '运营部', position: '运营专员', entryDate: '2024-06-20', status: '在职' },
+      { id: 'EMP003', name: '王五', gender: '男', phone: '13800138003', dept: '财务部', position: '会计', entryDate: '2023-09-01', status: '离职' }
+    ],
+    total: 48
+  },
+  '/platform/person-list': {
+    title: '个人列表',
+    searchFields: [
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'phone', label: '手机号', type: 'input', placeholder: '请输入手机号' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '正常', value: '正常' }, { label: '禁用', value: '禁用' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '姓名', minWidth: '120' },
+      { prop: 'phone', label: '手机号', width: '140' },
+      { prop: 'idCard', label: '身份证号', minWidth: '180' },
+      { prop: 'registerTime', label: '注册时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { id: 1, name: '张三', phone: '13800138001', idCard: '110101********1234', registerTime: '2025-01-01 10:00:00', status: '正常' },
+      { id: 2, name: '李四', phone: '13800138002', idCard: '110101********5678', registerTime: '2025-01-02 10:00:00', status: '正常' },
+      { id: 3, name: '王五', phone: '13800138003', idCard: '110101********9012', registerTime: '2025-01-03 10:00:00', status: '禁用' }
+    ],
+    total: 256
+  },
+  '/platform/enterprise-list': {
+    title: '企业列表',
+    searchFields: [
+      { prop: 'name', label: '企业名称', type: 'input', placeholder: '请输入企业名称' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '正常', value: '正常' }, { label: '禁用', value: '禁用' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '企业名称', minWidth: '200' },
+      { prop: 'creditCode', label: '统一社会信用代码', minWidth: '180' },
+      { prop: 'contact', label: '联系人', width: '120' },
+      { prop: 'phone', label: '联系电话', width: '140' },
+      { prop: 'registerTime', label: '注册时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { id: 1, name: '北京某某科技有限公司', creditCode: '91110100MA01XXXX', contact: '张经理', phone: '010-12345678', registerTime: '2025-01-01 10:00:00', status: '正常' },
+      { id: 2, name: '上海某某服务有限公司', creditCode: '91310100MA01YYYY', contact: '李经理', phone: '021-87654321', registerTime: '2025-01-02 10:00:00', status: '正常' },
+      { id: 3, name: '广州某某建筑有限公司', creditCode: '91440100MA01ZZZZ', contact: '王经理', phone: '020-11112222', registerTime: '2025-01-03 10:00:00', status: '禁用' }
+    ],
+    total: 89
+  },
+  '/platform/contract': {
+    title: '用工合同',
+    searchFields: [
+      { prop: 'contractNo', label: '合同编号', type: 'input', placeholder: '请输入合同编号' },
+      { prop: 'name', label: '甲方名称', type: 'input', placeholder: '请输入甲方名称' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '生效中', value: '生效中' }, { label: '已到期', value: '已到期' }, { label: '已终止', value: '已终止' }] }
+    ],
+    tableColumns: [
+      { prop: 'contractNo', label: '合同编号', minWidth: '180' },
+      { prop: 'partyA', label: '甲方', minWidth: '150' },
+      { prop: 'partyB', label: '乙方', minWidth: '150' },
+      { prop: 'startDate', label: '生效日期', width: '120' },
+      { prop: 'endDate', label: '到期日期', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { contractNo: 'HT20250101001', partyA: '北京某某公司', partyB: '张三', startDate: '2025-01-01', endDate: '2026-01-01', status: '生效中' },
+      { contractNo: 'HT20250102001', partyA: '上海某某公司', partyB: '李四', startDate: '2025-01-02', endDate: '2026-01-02', status: '生效中' },
+      { contractNo: 'HT20250103001', partyA: '广州某某公司', partyB: '王五', startDate: '2025-01-03', endDate: '2026-01-03', status: '已终止' }
+    ],
+    total: 128
+  },
+  '/platform/aqian-contract': {
+    title: '爱签合同',
+    searchFields: [
+      { prop: 'contractNo', label: '合同编号', type: 'input', placeholder: '请输入合同编号' },
+      { prop: 'status', label: '签署状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '待签署', value: '待签署' }, { label: '已签署', value: '已签署' }, { label: '已拒签', value: '已拒签' }] }
+    ],
+    tableColumns: [
+      { prop: 'contractNo', label: '合同编号', minWidth: '180' },
+      { prop: 'title', label: '合同标题', minWidth: '200' },
+      { prop: 'signer', label: '签署人', width: '120' },
+      { prop: 'phone', label: '手机号', width: '140' },
+      { prop: 'sendTime', label: '发送时间', width: '180' },
+      { prop: 'signTime', label: '签署时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { contractNo: 'AQ20250101001', title: '劳务派遣合同', signer: '张三', phone: '13800138001', sendTime: '2025-01-01 10:00:00', signTime: '2025-01-01 11:00:00', status: '已签署' },
+      { contractNo: 'AQ20250102001', title: '用工协议', signer: '李四', phone: '13800138002', sendTime: '2025-01-02 10:00:00', signTime: '', status: '待签署' },
+      { contractNo: 'AQ20250103001', title: '保密协议', signer: '王五', phone: '13800138003', sendTime: '2025-01-03 10:00:00', signTime: '', status: '已拒签' }
+    ],
+    total: 76
+  },
+  '/platform/person-register': {
+    title: '个人注册',
+    searchFields: [
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'phone', label: '手机号', type: 'input', placeholder: '请输入手机号' },
+      { prop: 'dateRange', label: '注册时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '姓名', minWidth: '120' },
+      { prop: 'phone', label: '手机号', width: '140' },
+      { prop: 'idCard', label: '身份证号', minWidth: '180' },
+      { prop: 'source', label: '注册来源', width: '120' },
+      { prop: 'registerTime', label: '注册时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { id: 1, name: '张三', phone: '13800138001', idCard: '110101********1234', source: 'APP注册', registerTime: '2025-07-01 10:00:00', status: '正常' },
+      { id: 2, name: '李四', phone: '13800138002', idCard: '110101********5678', source: '小程序注册', registerTime: '2025-07-02 10:00:00', status: '正常' },
+      { id: 3, name: '王五', phone: '13800138003', idCard: '110101********9012', source: '后台导入', registerTime: '2025-07-03 10:00:00', status: '待审核' }
+    ],
+    total: 345
+  },
+  '/platform/enterprise-register': {
+    title: '企业注册',
+    searchFields: [
+      { prop: 'name', label: '企业名称', type: 'input', placeholder: '请输入企业名称' },
+      { prop: 'dateRange', label: '注册时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '企业名称', minWidth: '200' },
+      { prop: 'creditCode', label: '统一社会信用代码', minWidth: '180' },
+      { prop: 'contact', label: '联系人', width: '120' },
+      { prop: 'phone', label: '联系电话', width: '140' },
+      { prop: 'registerTime', label: '注册时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showAuditBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { id: 1, name: '北京某某科技有限公司', creditCode: '91110100MA01XXXX', contact: '张经理', phone: '010-12345678', registerTime: '2025-07-01 10:00:00', status: '已通过' },
+      { id: 2, name: '上海某某服务有限公司', creditCode: '91310100MA01YYYY', contact: '李经理', phone: '021-87654321', registerTime: '2025-07-02 10:00:00', status: '待审核' },
+      { id: 3, name: '广州某某建筑有限公司', creditCode: '91440100MA01ZZZZ', contact: '王经理', phone: '020-11112222', registerTime: '2025-07-03 10:00:00', status: '已拒绝' }
+    ],
+    total: 67
+  },
+  '/platform/db-view': {
+    title: '数据库查看',
+    searchFields: [{ prop: 'tableName', label: '表名称', type: 'input', placeholder: '请输入表名称' }],
+    tableColumns: [
+      { prop: 'tableName', label: '表名称', minWidth: '200' },
+      { prop: 'tableComment', label: '表描述', minWidth: '200' },
+      { prop: 'dataCount', label: '数据量', width: '120' },
+      { prop: 'dataSize', label: '占用空间', width: '120' },
+      { prop: 'engine', label: '存储引擎', width: '100' },
+      { prop: 'createTime', label: '创建时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { tableName: 'sys_user', tableComment: '用户信息表', dataCount: 12580, dataSize: '15.6MB', engine: 'InnoDB', createTime: '2025-01-01 10:00:00' },
+      { tableName: 'sys_role', tableComment: '角色信息表', dataCount: 25, dataSize: '0.5MB', engine: 'InnoDB', createTime: '2025-01-01 10:00:00' },
+      { tableName: 'task_order', tableComment: '任务订单表', dataCount: 34200, dataSize: '45.2MB', engine: 'InnoDB', createTime: '2025-01-01 10:00:00' }
+    ],
+    total: 28
+  },
+  '/platform/face-record': {
+    title: '上上签人脸记录',
+    searchFields: [
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'dateRange', label: '认证时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '姓名', minWidth: '120' },
+      { prop: 'idCard', label: '身份证号', minWidth: '180' },
+      { prop: 'result', label: '认证结果', width: '100', type: 'tag' },
+      { prop: 'score', label: '相似度', width: '100' },
+      { prop: 'authTime', label: '认证时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { id: 1, name: '张三', idCard: '110101********1234', result: '通过', score: '98.5%', authTime: '2025-07-03 09:30:00' },
+      { id: 2, name: '李四', idCard: '110101********5678', result: '通过', score: '95.2%', authTime: '2025-07-03 10:15:00' },
+      { id: 3, name: '王五', idCard: '110101********9012', result: '不通过', score: '62.3%', authTime: '2025-07-03 11:00:00' }
+    ],
+    total: 580
+  },
+  '/platform/face-base': {
+    title: '人脸底片',
+    searchFields: [
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '姓名', minWidth: '120' },
+      { prop: 'idCard', label: '身份证号', minWidth: '180' },
+      { prop: 'phone', label: '手机号', width: '140' },
+      { prop: 'collectTime', label: '采集时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: true, showViewBtn: true, showOperation: true, showSelection: true, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { id: 1, name: '张三', idCard: '110101********1234', phone: '13800138001', collectTime: '2025-01-01 10:00:00', status: '正常' },
+      { id: 2, name: '李四', idCard: '110101********5678', phone: '13800138002', collectTime: '2025-01-02 10:00:00', status: '正常' },
+      { id: 3, name: '王五', idCard: '110101********9012', phone: '13800138003', collectTime: '2025-01-03 10:00:00', status: '失效' }
+    ],
+    total: 342
+  },
+  '/platform/company-config': {
+    title: '公司配置',
+    searchFields: [{ prop: 'name', label: '公司名称', type: 'input', placeholder: '请输入公司名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '公司名称', minWidth: '200' },
+      { prop: 'code', label: '公司编码', width: '120' },
+      { prop: 'contact', label: '联系人', width: '120' },
+      { prop: 'phone', label: '联系电话', width: '140' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '公司名称', type: 'input' },
+      { prop: 'code', label: '公司编码', type: 'input' },
+      { prop: 'contact', label: '联系人', type: 'input' },
+      { prop: 'phone', label: '联系电话', type: 'input' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '总公司', code: 'HQ001', contact: '张总', phone: '010-12345678', status: '启用' },
+      { id: 2, name: '北京分公司', code: 'BJ001', contact: '李经理', phone: '010-87654321', status: '启用' },
+      { id: 3, name: '上海分公司', code: 'SH001', contact: '王经理', phone: '021-11112222', status: '停用' }
+    ],
+    total: 5
+  },
+  '/platform/insurance-price': {
+    title: '保险定价',
+    searchFields: [{ prop: 'name', label: '险种名称', type: 'input', placeholder: '请输入险种名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '险种名称', minWidth: '150' },
+      { prop: 'price', label: '保费(元)', width: '100' },
+      { prop: 'coverage', label: '保额(元)', width: '120' },
+      { prop: 'period', label: '保障期限', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'updateTime', label: '更新时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'name', label: '险种名称', type: 'input' },
+      { prop: 'price', label: '保费(元)', type: 'number' },
+      { prop: 'coverage', label: '保额(元)', type: 'number' },
+      { prop: 'period', label: '保障期限', type: 'input' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '意外伤害险', price: 50, coverage: 300000, period: '1年', status: '启用', updateTime: '2025-01-01 10:00:00' },
+      { id: 2, name: '医疗保险', price: 100, coverage: 500000, period: '1年', status: '启用', updateTime: '2025-01-02 10:00:00' },
+      { id: 3, name: '雇主责任险', price: 200, coverage: 800000, period: '1年', status: '停用', updateTime: '2025-01-03 10:00:00' }
+    ],
+    total: 8
+  },
+  '/platform/work-type': {
+    title: '平台工种',
+    searchFields: [{ prop: 'name', label: '工种名称', type: 'input', placeholder: '请输入工种名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '工种名称', minWidth: '150' },
+      { prop: 'category', label: '工种分类', width: '120' },
+      { prop: 'desc', label: '描述', minWidth: '200' },
+      { prop: 'sort', label: '排序', width: '80' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '工种名称', type: 'input' },
+      { prop: 'category', label: '工种分类', type: 'input' },
+      { prop: 'desc', label: '描述', type: 'textarea' },
+      { prop: 'sort', label: '排序', type: 'number' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '建筑工人', category: '建筑类', desc: '建筑工地施工人员', sort: 1, status: '启用' },
+      { id: 2, name: '电工', category: '技术类', desc: '电气设备安装维护', sort: 2, status: '启用' },
+      { id: 3, name: '焊工', category: '技术类', desc: '金属焊接作业', sort: 3, status: '启用' },
+      { id: 4, name: '司机', category: '运输类', desc: '货物运输驾驶', sort: 4, status: '停用' }
+    ],
+    total: 15
+  },
+  '/platform/sensitive-word': {
+    title: '企业敏感词',
+    searchFields: [{ prop: 'word', label: '敏感词', type: 'input', placeholder: '请输入敏感词' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'word', label: '敏感词', minWidth: '200' },
+      { prop: 'category', label: '分类', width: '120' },
+      { prop: 'level', label: '级别', width: '100', type: 'tag' },
+      { prop: 'createTime', label: '创建时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'word', label: '敏感词', type: 'input' },
+      { prop: 'category', label: '分类', type: 'select', options: [{ label: '政治', value: '政治' }, { label: '色情', value: '色情' }, { label: '广告', value: '广告' }, { label: '其他', value: '其他' }] },
+      { prop: 'level', label: '级别', type: 'radio', options: [{ label: '高', value: '高' }, { label: '中', value: '中' }, { label: '低', value: '低' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 1, word: '示例敏感词1', category: '广告', level: '低', createTime: '2025-01-01 10:00:00' },
+      { id: 2, word: '示例敏感词2', category: '政治', level: '高', createTime: '2025-01-02 10:00:00' },
+      { id: 3, word: '示例敏感词3', category: '其他', level: '中', createTime: '2025-01-03 10:00:00' }
+    ],
+    total: 120
+  },
+  '/platform/task-template': {
+    title: '任务模版',
+    searchFields: [{ prop: 'name', label: '模版名称', type: 'input', placeholder: '请输入模版名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '模版名称', minWidth: '200' },
+      { prop: 'category', label: '任务分类', width: '120' },
+      { prop: 'desc', label: '模版描述', minWidth: '200' },
+      { prop: 'createTime', label: '创建时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '模版名称', type: 'input' },
+      { prop: 'category', label: '任务分类', type: 'input' },
+      { prop: 'desc', label: '模版描述', type: 'textarea' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '标准配送任务', category: '配送', desc: '标准商品配送任务模版', createTime: '2025-01-01 10:00:00', status: '启用' },
+      { id: 2, name: '临时用工任务', category: '用工', desc: '临时用工需求发布模版', createTime: '2025-01-02 10:00:00', status: '启用' },
+      { id: 3, name: '安装服务任务', category: '服务', desc: '设备安装服务任务模版', createTime: '2025-01-03 10:00:00', status: '停用' }
+    ],
+    total: 12
+  },
+  '/platform/pay-later': {
+    title: '先用后付',
+    searchFields: [
+      { prop: 'name', label: '企业名称', type: 'input', placeholder: '请输入企业名称' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '正常', value: '正常' }, { label: '冻结', value: '冻结' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '企业名称', minWidth: '200' },
+      { prop: 'creditLimit', label: '授信额度(元)', width: '140' },
+      { prop: 'usedAmount', label: '已用额度(元)', width: '140' },
+      { prop: 'availableAmount', label: '可用额度(元)', width: '140' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: true, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { id: 1, name: '北京某某科技有限公司', creditLimit: 500000, usedAmount: 120000, availableAmount: 380000, status: '正常' },
+      { id: 2, name: '上海某某服务有限公司', creditLimit: 300000, usedAmount: 280000, availableAmount: 20000, status: '正常' },
+      { id: 3, name: '广州某某建筑有限公司', creditLimit: 200000, usedAmount: 200000, availableAmount: 0, status: '冻结' }
+    ],
+    total: 25
+  },
+  '/platform/attendance-config': {
+    title: '考勤机配置',
+    searchFields: [{ prop: 'name', label: '设备名称', type: 'input', placeholder: '请输入设备名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '设备名称', minWidth: '150' },
+      { prop: 'sn', label: '设备序列号', minWidth: '180' },
+      { prop: 'location', label: '安装位置', minWidth: '150' },
+      { prop: 'ip', label: 'IP地址', width: '140' },
+      { prop: 'lastOnline', label: '最后在线时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '设备名称', type: 'input' },
+      { prop: 'sn', label: '设备序列号', type: 'input' },
+      { prop: 'location', label: '安装位置', type: 'input' },
+      { prop: 'ip', label: 'IP地址', type: 'input' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '在线', value: '在线' }, { label: '离线', value: '离线' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '前台考勤机', sn: 'ATT20250001', location: '总部前台', ip: '192.168.1.100', lastOnline: '2025-07-03 09:00:00', status: '在线' },
+      { id: 2, name: '车间考勤机', sn: 'ATT20250002', location: '一号车间入口', ip: '192.168.1.101', lastOnline: '2025-07-03 09:00:00', status: '在线' },
+      { id: 3, name: '备用考勤机', sn: 'ATT20250003', location: '仓库', ip: '192.168.1.102', lastOnline: '2025-06-28 18:00:00', status: '离线' }
+    ],
+    total: 8
+  },
+  '/platform/icc-enterprise': {
+    title: 'ICC企业',
+    searchFields: [{ prop: 'name', label: '企业名称', type: 'input', placeholder: '请输入企业名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '企业名称', minWidth: '200' },
+      { prop: 'iccCode', label: 'ICC编码', width: '140' },
+      { prop: 'contact', label: '联系人', width: '120' },
+      { prop: 'phone', label: '联系电话', width: '140' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { id: 1, name: 'ICC北京分公司', iccCode: 'ICC-BJ-001', contact: '张经理', phone: '010-12345678', status: '正常' },
+      { id: 2, name: 'ICC上海分公司', iccCode: 'ICC-SH-001', contact: '李经理', phone: '021-87654321', status: '正常' }
+    ],
+    total: 6
+  },
+  '/training-platform/cert-list': {
+    title: '证书列表',
+    searchFields: [
+      { prop: 'name', label: '证书名称', type: 'input', placeholder: '请输入证书名称' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '有效', value: '有效' }, { label: '已过期', value: '已过期' }] }
+    ],
+    tableColumns: [
+      { prop: 'certNo', label: '证书编号', minWidth: '180' },
+      { prop: 'name', label: '证书名称', minWidth: '150' },
+      { prop: 'holder', label: '持证人', width: '120' },
+      { prop: 'idCard', label: '身份证号', minWidth: '180' },
+      { prop: 'issueDate', label: '发证日期', width: '120' },
+      { prop: 'expiryDate', label: '到期日期', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showExportBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { certNo: 'CERT20250001', name: '建筑施工特种作业操作证', holder: '张三', idCard: '110101********1234', issueDate: '2025-01-01', expiryDate: '2028-01-01', status: '有效' },
+      { certNo: 'CERT20250002', name: '低压电工证', holder: '李四', idCard: '110101********5678', issueDate: '2025-01-02', expiryDate: '2028-01-02', status: '有效' },
+      { certNo: 'CERT20250003', name: '焊工证', holder: '王五', idCard: '110101********9012', issueDate: '2022-01-03', expiryDate: '2025-01-03', status: '已过期' }
+    ],
+    total: 156
+  },
+  '/training-platform/cert-config': {
+    title: '证书配置',
+    searchFields: [{ prop: 'name', label: '证书类型', type: 'input', placeholder: '请输入证书类型' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '证书类型', minWidth: '200' },
+      { prop: 'issuingAuthority', label: '发证机关', minWidth: '150' },
+      { prop: 'validPeriod', label: '有效期(年)', width: '100' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '证书类型', type: 'input' },
+      { prop: 'issuingAuthority', label: '发证机关', type: 'input' },
+      { prop: 'validPeriod', label: '有效期(年)', type: 'number' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '建筑施工特种作业操作证', issuingAuthority: '住建部', validPeriod: 3, status: '启用' },
+      { id: 2, name: '低压电工证', issuingAuthority: '应急管理部', validPeriod: 3, status: '启用' },
+      { id: 3, name: '焊工证', issuingAuthority: '应急管理部', validPeriod: 3, status: '启用' }
+    ],
+    total: 10
+  },
+  '/training/student': {
+    title: '学员管理',
+    searchFields: [
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'phone', label: '手机号', type: 'input', placeholder: '请输入手机号' },
+      { prop: 'classId', label: '班级', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '一期班', value: '一期班' }, { label: '二期班', value: '二期班' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '学号', width: '100' },
+      { prop: 'name', label: '姓名', minWidth: '120' },
+      { prop: 'gender', label: '性别', width: '80' },
+      { prop: 'phone', label: '手机号', width: '140' },
+      { prop: 'idCard', label: '身份证号', minWidth: '180' },
+      { prop: 'className', label: '所属班级', width: '120' },
+      { prop: 'enrollDate', label: '报名日期', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '姓名', type: 'input' },
+      { prop: 'gender', label: '性别', type: 'radio', options: [{ label: '男', value: '男' }, { label: '女', value: '女' }] },
+      { prop: 'phone', label: '手机号', type: 'input' },
+      { prop: 'idCard', label: '身份证号', type: 'input' },
+      { prop: 'className', label: '所属班级', type: 'input' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '在读', value: '在读' }, { label: '毕业', value: '毕业' }, { label: '退学', value: '退学' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 'STU001', name: '张三', gender: '男', phone: '13800138001', idCard: '110101********1234', className: '一期班', enrollDate: '2025-03-01', status: '在读' },
+      { id: 'STU002', name: '李四', gender: '女', phone: '13800138002', idCard: '110101********5678', className: '一期班', enrollDate: '2025-03-01', status: '在读' },
+      { id: 'STU003', name: '王五', gender: '男', phone: '13800138003', idCard: '110101********9012', className: '二期班', enrollDate: '2025-04-01', status: '毕业' }
+    ],
+    total: 89
+  },
+  '/training/payment': {
+    title: '缴费记录',
+    searchFields: [
+      { prop: 'name', label: '学员姓名', type: 'input', placeholder: '请输入学员姓名' },
+      { prop: 'status', label: '缴费状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '已缴费', value: '已缴费' }, { label: '待缴费', value: '待缴费' }, { label: '已退费', value: '已退费' }] }
+    ],
+    tableColumns: [
+      { prop: 'payNo', label: '缴费编号', minWidth: '180' },
+      { prop: 'name', label: '学员姓名', width: '120' },
+      { prop: 'className', label: '班级', width: '120' },
+      { prop: 'amount', label: '缴费金额(元)', width: '120' },
+      { prop: 'payType', label: '缴费方式', width: '100' },
+      { prop: 'payTime', label: '缴费时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { payNo: 'PAY20250301001', name: '张三', className: '一期班', amount: 2000, payType: '微信', payTime: '2025-03-01 10:00:00', status: '已缴费' },
+      { payNo: 'PAY20250301002', name: '李四', className: '一期班', amount: 2000, payType: '支付宝', payTime: '2025-03-02 10:00:00', status: '已缴费' },
+      { payNo: 'PAY20250401001', name: '王五', className: '二期班', amount: 2500, payType: '', payTime: '', status: '待缴费' }
+    ],
+    total: 76
+  },
+  '/training/photo': {
+    title: '拍照记录',
+    searchFields: [
+      { prop: 'name', label: '学员姓名', type: 'input', placeholder: '请输入学员姓名' },
+      { prop: 'dateRange', label: '拍照时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '学员姓名', minWidth: '120' },
+      { prop: 'className', label: '班级', width: '120' },
+      { prop: 'type', label: '拍照类型', width: '120' },
+      { prop: 'photoUrl', label: '照片', minWidth: '150' },
+      { prop: 'photoTime', label: '拍照时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: true, showViewBtn: true, showOperation: true, showSelection: true, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { id: 1, name: '张三', className: '一期班', type: '签到照', photoUrl: '查看照片', photoTime: '2025-07-03 09:00:00' },
+      { id: 2, name: '李四', className: '一期班', type: '签到照', photoUrl: '查看照片', photoTime: '2025-07-03 09:05:00' },
+      { id: 3, name: '王五', className: '二期班', type: '签退照', photoUrl: '查看照片', photoTime: '2025-07-03 17:00:00' }
+    ],
+    total: 320
+  },
+  '/training/base': {
+    title: '培训底片',
+    searchFields: [{ prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '姓名', minWidth: '120' },
+      { prop: 'idCard', label: '身份证号', minWidth: '180' },
+      { prop: 'phone', label: '手机号', width: '140' },
+      { prop: 'collectTime', label: '采集时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: true, showViewBtn: true, showOperation: true, showSelection: true, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { id: 1, name: '张三', idCard: '110101********1234', phone: '13800138001', collectTime: '2025-03-01 10:00:00', status: '正常' },
+      { id: 2, name: '李四', idCard: '110101********5678', phone: '13800138002', collectTime: '2025-03-02 10:00:00', status: '正常' },
+      { id: 3, name: '王五', idCard: '110101********9012', phone: '13800138003', collectTime: '2025-04-01 10:00:00', status: '失效' }
+    ],
+    total: 89
+  },
+  '/training/cert': {
+    title: '证书管理',
+    searchFields: [
+      { prop: 'name', label: '持证人', type: 'input', placeholder: '请输入持证人' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '有效', value: '有效' }, { label: '已过期', value: '已过期' }] }
+    ],
+    tableColumns: [
+      { prop: 'certNo', label: '证书编号', minWidth: '180' },
+      { prop: 'name', label: '持证人', width: '120' },
+      { prop: 'certType', label: '证书类型', minWidth: '150' },
+      { prop: 'issueDate', label: '发证日期', width: '120' },
+      { prop: 'expiryDate', label: '到期日期', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showExportBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { certNo: 'CERT20250001', name: '张三', certType: '建筑施工特种作业操作证', issueDate: '2025-01-01', expiryDate: '2028-01-01', status: '有效' },
+      { certNo: 'CERT20250002', name: '李四', certType: '低压电工证', issueDate: '2025-01-02', expiryDate: '2028-01-02', status: '有效' },
+      { certNo: 'CERT20250003', name: '王五', certType: '焊工证', issueDate: '2022-01-03', expiryDate: '2025-01-03', status: '已过期' }
+    ],
+    total: 156
+  },
+  '/exercise/question': {
+    title: '题目列表',
+    searchFields: [
+      { prop: 'content', label: '题目内容', type: 'input', placeholder: '请输入题目内容' },
+      { prop: 'type', label: '题目类型', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '单选题', value: '单选题' }, { label: '多选题', value: '多选题' }, { label: '判断题', value: '判断题' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'content', label: '题目内容', minWidth: '300' },
+      { prop: 'type', label: '题目类型', width: '100', type: 'tag' },
+      { prop: 'difficulty', label: '难度', width: '100', type: 'tag' },
+      { prop: 'bank', label: '所属题库', minWidth: '150' },
+      { prop: 'createTime', label: '创建时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'content', label: '题目内容', type: 'textarea' },
+      { prop: 'type', label: '题目类型', type: 'select', options: [{ label: '单选题', value: '单选题' }, { label: '多选题', value: '多选题' }, { label: '判断题', value: '判断题' }] },
+      { prop: 'difficulty', label: '难度', type: 'radio', options: [{ label: '简单', value: '简单' }, { label: '中等', value: '中等' }, { label: '困难', value: '困难' }] },
+      { prop: 'bank', label: '所属题库', type: 'input' }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: true, showIndex: false,
+    sampleData: [
+      { id: 1, content: '施工现场安全帽的正确佩戴方法是？', type: '单选题', difficulty: '简单', bank: '建筑施工安全', createTime: '2025-01-01 10:00:00' },
+      { id: 2, content: '低压电工操作规程包括哪些内容？', type: '多选题', difficulty: '中等', bank: '电工基础知识', createTime: '2025-01-02 10:00:00' },
+      { id: 3, content: '焊工作业时必须佩戴防护面罩。', type: '判断题', difficulty: '简单', bank: '焊工操作规范', createTime: '2025-01-03 10:00:00' }
+    ],
+    total: 500
+  },
+  '/study/simulate': {
+    title: '模拟考记录',
+    searchFields: [
+      { prop: 'name', label: '学员姓名', type: 'input', placeholder: '请输入学员姓名' },
+      { prop: 'dateRange', label: '考试时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '学员姓名', minWidth: '120' },
+      { prop: 'className', label: '班级', width: '120' },
+      { prop: 'score', label: '得分', width: '80' },
+      { prop: 'totalScore', label: '总分', width: '80' },
+      { prop: 'passStatus', label: '是否通过', width: '100', type: 'tag' },
+      { prop: 'examTime', label: '考试时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: true, showViewBtn: true, showOperation: true, showSelection: true, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { id: 1, name: '张三', className: '一期班', score: 85, totalScore: 100, passStatus: '通过', examTime: '2025-06-15 14:00:00' },
+      { id: 2, name: '李四', className: '一期班', score: 55, totalScore: 100, passStatus: '不通过', examTime: '2025-06-15 14:00:00' },
+      { id: 3, name: '王五', className: '二期班', score: 92, totalScore: 100, passStatus: '通过', examTime: '2025-06-20 14:00:00' }
+    ],
+    total: 125
+  },
+  '/study/summary': {
+    title: '培训学习汇总',
+    searchFields: [
+      { prop: 'name', label: '学员姓名', type: 'input', placeholder: '请输入学员姓名' },
+      { prop: 'className', label: '班级', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '一期班', value: '一期班' }, { label: '二期班', value: '二期班' }] }
+    ],
+    tableColumns: [
+      { prop: 'name', label: '学员姓名', minWidth: '120' },
+      { prop: 'className', label: '班级', width: '120' },
+      { prop: 'studyHours', label: '学习时长(h)', width: '120' },
+      { prop: 'progress', label: '学习进度', width: '100' },
+      { prop: 'mockCount', label: '模拟考次数', width: '120' },
+      { prop: 'avgScore', label: '平均分', width: '80' },
+      { prop: 'lastStudy', label: '最后学习时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showExportBtn: true, showOperation: false, showSelection: false, showIndex: true,
+    sampleData: [
+      { name: '张三', className: '一期班', studyHours: 48, progress: '100%', mockCount: 5, avgScore: 85, lastStudy: '2025-06-30 18:00:00' },
+      { name: '李四', className: '一期班', studyHours: 36, progress: '75%', mockCount: 3, avgScore: 72, lastStudy: '2025-06-28 18:00:00' },
+      { name: '王五', className: '二期班', studyHours: 50, progress: '100%', mockCount: 6, avgScore: 92, lastStudy: '2025-07-01 18:00:00' }
+    ],
+    total: 89
+  },
+  '/study/detail': {
+    title: '用户培训详情',
+    searchFields: [
+      { prop: 'name', label: '学员姓名', type: 'input', placeholder: '请输入学员姓名' },
+      { prop: 'dateRange', label: '学习时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'name', label: '学员姓名', minWidth: '120' },
+      { prop: 'course', label: '课程名称', minWidth: '200' },
+      { prop: 'studyTime', label: '学习时长(h)', width: '120' },
+      { prop: 'progress', label: '完成进度', width: '100' },
+      { prop: 'lastStudy', label: '最后学习时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { name: '张三', course: '建筑施工安全基础', studyTime: 12, progress: '100%', lastStudy: '2025-06-30 18:00:00', status: '已完成' },
+      { name: '张三', course: '高空作业安全规范', studyTime: 8, progress: '75%', lastStudy: '2025-06-28 18:00:00', status: '学习中' },
+      { name: '李四', course: '建筑施工安全基础', studyTime: 10, progress: '90%', lastStudy: '2025-06-25 18:00:00', status: '学习中' }
+    ],
+    total: 256
+  },
+  '/backend/store': {
+    title: '门店配置',
+    searchFields: [{ prop: 'name', label: '门店名称', type: 'input', placeholder: '请输入门店名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '门店名称', minWidth: '200' },
+      { prop: 'address', label: '门店地址', minWidth: '250' },
+      { prop: 'manager', label: '店长', width: '120' },
+      { prop: 'phone', label: '联系电话', width: '140' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '门店名称', type: 'input' },
+      { prop: 'address', label: '门店地址', type: 'input' },
+      { prop: 'manager', label: '店长', type: 'input' },
+      { prop: 'phone', label: '联系电话', type: 'input' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '营业中', value: '营业中' }, { label: '已关闭', value: '已关闭' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '北京朝阳店', address: '北京市朝阳区某某路1号', manager: '张店长', phone: '010-12345678', status: '营业中' },
+      { id: 2, name: '上海浦东店', address: '上海市浦东新区某某路2号', manager: '李店长', phone: '021-87654321', status: '营业中' },
+      { id: 3, name: '广州天河店', address: '广州市天河区某某路3号', manager: '王店长', phone: '020-11112222', status: '已关闭' }
+    ],
+    total: 15
+  },
+  '/backend/archive': {
+    title: '档案配置',
+    searchFields: [{ prop: 'name', label: '档案名称', type: 'input', placeholder: '请输入档案名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '档案名称', minWidth: '200' },
+      { prop: 'type', label: '档案类型', width: '120' },
+      { prop: 'retention', label: '保存期限(年)', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'updateTime', label: '更新时间', width: '180' }
+    ],
+    formFields: [
+      { prop: 'name', label: '档案名称', type: 'input' },
+      { prop: 'type', label: '档案类型', type: 'input' },
+      { prop: 'retention', label: '保存期限(年)', type: 'number' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '员工档案', type: '人事档案', retention: 30, status: '启用', updateTime: '2025-01-01 10:00:00' },
+      { id: 2, name: '合同档案', type: '合同档案', retention: 10, status: '启用', updateTime: '2025-01-02 10:00:00' },
+      { id: 3, name: '财务档案', type: '财务档案', retention: 15, status: '启用', updateTime: '2025-01-03 10:00:00' }
+    ],
+    total: 8
+  },
+  '/salary/batch': {
+    title: '结算审核批量',
+    searchFields: [
+      { prop: 'batchNo', label: '批次号', type: 'input', placeholder: '请输入批次号' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '待审核', value: '待审核' }, { label: '已通过', value: '已通过' }, { label: '已驳回', value: '已驳回' }] }
+    ],
+    tableColumns: [
+      { prop: 'batchNo', label: '批次号', minWidth: '180' },
+      { prop: 'count', label: '人数', width: '80' },
+      { prop: 'totalAmount', label: '总金额(元)', width: '120' },
+      { prop: 'creator', label: '创建人', width: '100' },
+      { prop: 'createTime', label: '创建时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showAuditBtn: true, showOperation: true, showSelection: true, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { batchNo: 'BAT20250701001', count: 50, totalAmount: 125000, creator: 'admin', createTime: '2025-07-01 10:00:00', status: '待审核' },
+      { batchNo: 'BAT20250628001', count: 35, totalAmount: 89000, creator: 'admin', createTime: '2025-06-28 10:00:00', status: '已通过' },
+      { batchNo: 'BAT20250625001', count: 42, totalAmount: 102000, creator: 'admin', createTime: '2025-06-25 10:00:00', status: '已驳回' }
+    ],
+    total: 28
+  },
+  '/salary/detail': {
+    title: '结算审核明细',
+    searchFields: [
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'batchNo', label: '批次号', type: 'input', placeholder: '请输入批次号' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '待审核', value: '待审核' }, { label: '已通过', value: '已通过' }, { label: '已驳回', value: '已驳回' }] }
+    ],
+    tableColumns: [
+      { prop: 'name', label: '姓名', minWidth: '120' },
+      { prop: 'phone', label: '手机号', width: '140' },
+      { prop: 'batchNo', label: '批次号', minWidth: '180' },
+      { prop: 'workHours', label: '工时(h)', width: '100' },
+      { prop: 'amount', label: '结算金额(元)', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' },
+      { prop: 'auditTime', label: '审核时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showAuditBtn: true, showOperation: true, showSelection: true, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { name: '张三', phone: '13800138001', batchNo: 'BAT20250701001', workHours: 160, amount: 3200, status: '待审核', auditTime: '' },
+      { name: '李四', phone: '13800138002', batchNo: 'BAT20250701001', workHours: 176, amount: 3520, status: '待审核', auditTime: '' },
+      { name: '王五', phone: '13800138003', batchNo: 'BAT20250628001', workHours: 168, amount: 3360, status: '已通过', auditTime: '2025-06-29 10:00:00' }
+    ],
+    total: 127
+  },
+  '/salary/withdraw': {
+    title: '结算提现管理',
+    searchFields: [
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '待处理', value: '待处理' }, { label: '已打款', value: '已打款' }, { label: '已拒绝', value: '已拒绝' }] }
+    ],
+    tableColumns: [
+      { prop: 'withdrawNo', label: '提现编号', minWidth: '180' },
+      { prop: 'name', label: '姓名', width: '120' },
+      { prop: 'amount', label: '提现金额(元)', width: '120' },
+      { prop: 'bank', label: '银行', width: '120' },
+      { prop: 'cardNo', label: '银行卡号', minWidth: '180' },
+      { prop: 'applyTime', label: '申请时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showAuditBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { withdrawNo: 'WD20250701001', name: '张三', amount: 3200, bank: '工商银行', cardNo: '6222 **** 1234', applyTime: '2025-07-01 10:00:00', status: '待处理' },
+      { withdrawNo: 'WD20250628001', name: '李四', amount: 3520, bank: '建设银行', cardNo: '6227 **** 5678', applyTime: '2025-06-28 10:00:00', status: '已打款' },
+      { withdrawNo: 'WD20250625001', name: '王五', amount: 3360, bank: '农业银行', cardNo: '6228 **** 9012', applyTime: '2025-06-25 10:00:00', status: '已拒绝' }
+    ],
+    total: 56
+  },
+  '/salary/transaction': {
+    title: '交易流水',
+    searchFields: [
+      { prop: 'transNo', label: '流水号', type: 'input', placeholder: '请输入流水号' },
+      { prop: 'type', label: '交易类型', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '收入', value: '收入' }, { label: '支出', value: '支出' }] },
+      { prop: 'dateRange', label: '交易时间', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'transNo', label: '流水号', minWidth: '180' },
+      { prop: 'name', label: '交易对象', minWidth: '120' },
+      { prop: 'type', label: '交易类型', width: '100', type: 'tag' },
+      { prop: 'amount', label: '金额(元)', width: '120' },
+      { prop: 'balance', label: '余额(元)', width: '120' },
+      { prop: 'remark', label: '备注', minWidth: '200' },
+      { prop: 'transTime', label: '交易时间', width: '180' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showExportBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { transNo: 'TRX20250701001', name: '张三', type: '支出', amount: -3200, balance: 96800, remark: '薪资提现', transTime: '2025-07-01 10:00:00' },
+      { transNo: 'TRX20250701002', name: '北京某某公司', type: '收入', amount: 50000, balance: 146800, remark: '平台充值', transTime: '2025-07-01 14:00:00' },
+      { transNo: 'TRX20250702001', name: '李四', type: '支出', amount: -3520, balance: 143280, remark: '薪资提现', transTime: '2025-07-02 10:00:00' }
+    ],
+    total: 358
+  },
+  '/salary/balance': {
+    title: '平台余额',
+    searchFields: [{ prop: 'name', label: '企业名称', type: 'input', placeholder: '请输入企业名称' }],
+    tableColumns: [
+      { prop: 'name', label: '企业名称', minWidth: '200' },
+      { prop: 'balance', label: '账户余额(元)', width: '140' },
+      { prop: 'frozenAmount', label: '冻结金额(元)', width: '140' },
+      { prop: 'availableAmount', label: '可用余额(元)', width: '140' },
+      { prop: 'lastRecharge', label: '最后充值时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { name: '北京某某科技有限公司', balance: 568000, frozenAmount: 12000, availableAmount: 556000, lastRecharge: '2025-07-01 10:00:00', status: '正常' },
+      { name: '上海某某服务有限公司', balance: 289000, frozenAmount: 0, availableAmount: 289000, lastRecharge: '2025-06-28 10:00:00', status: '正常' },
+      { name: '广州某某建筑有限公司', balance: 0, frozenAmount: 0, availableAmount: 0, lastRecharge: '2025-06-15 10:00:00', status: '冻结' }
+    ],
+    total: 25
+  },
+  '/task/salary-config': {
+    title: '薪酬工时配置',
+    searchFields: [{ prop: 'name', label: '岗位名称', type: 'input', placeholder: '请输入岗位名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '岗位名称', minWidth: '150' },
+      { prop: 'hourlyRate', label: '时薪(元)', width: '100' },
+      { prop: 'overtimeRate', label: '加班时薪(元)', width: '120' },
+      { prop: 'minHours', label: '最少工时(h)', width: '120' },
+      { prop: 'maxHours', label: '最多工时(h)', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '岗位名称', type: 'input' },
+      { prop: 'hourlyRate', label: '时薪(元)', type: 'number' },
+      { prop: 'overtimeRate', label: '加班时薪(元)', type: 'number' },
+      { prop: 'minHours', label: '最少工时(h)', type: 'number' },
+      { prop: 'maxHours', label: '最多工时(h)', type: 'number' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '普工', hourlyRate: 20, overtimeRate: 30, minHours: 8, maxHours: 12, status: '启用' },
+      { id: 2, name: '技工', hourlyRate: 35, overtimeRate: 52, minHours: 8, maxHours: 12, status: '启用' },
+      { id: 3, name: '高级技工', hourlyRate: 50, overtimeRate: 75, minHours: 8, maxHours: 11, status: '停用' }
+    ],
+    total: 10
+  },
+  '/task/seats': {
+    title: '席位记录',
+    searchFields: [
+      { prop: 'name', label: '用户名', type: 'input', placeholder: '请输入用户名' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '使用中', value: '使用中' }, { label: '已释放', value: '已释放' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '用户名', minWidth: '120' },
+      { prop: 'seatNo', label: '席位编号', width: '120' },
+      { prop: 'taskName', label: '关联任务', minWidth: '200' },
+      { prop: 'acquireTime', label: '获取时间', width: '180' },
+      { prop: 'releaseTime', label: '释放时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { id: 1, name: 'user001', seatNo: 'SEAT001', taskName: '北京朝阳配送任务', acquireTime: '2025-07-03 08:00:00', releaseTime: '', status: '使用中' },
+      { id: 2, name: 'user002', seatNo: 'SEAT002', taskName: '上海浦东配送任务', acquireTime: '2025-07-03 09:00:00', releaseTime: '2025-07-03 12:00:00', status: '已释放' },
+      { id: 3, name: 'user003', seatNo: 'SEAT003', taskName: '广州天河配送任务', acquireTime: '2025-07-03 10:00:00', releaseTime: '', status: '使用中' }
+    ],
+    total: 45
+  },
+  '/task/settlement': {
+    title: '结算记录',
+    searchFields: [
+      { prop: 'settleNo', label: '结算编号', type: 'input', placeholder: '请输入结算编号' },
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '待结算', value: '待结算' }, { label: '已结算', value: '已结算' }, { label: '已失败', value: '已失败' }] }
+    ],
+    tableColumns: [
+      { prop: 'settleNo', label: '结算编号', minWidth: '180' },
+      { prop: 'name', label: '姓名', width: '120' },
+      { prop: 'taskName', label: '任务名称', minWidth: '200' },
+      { prop: 'workHours', label: '工时(h)', width: '100' },
+      { prop: 'amount', label: '结算金额(元)', width: '120' },
+      { prop: 'settleTime', label: '结算时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showExportBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { settleNo: 'STL20250701001', name: '张三', taskName: '北京朝阳配送任务', workHours: 160, amount: 3200, settleTime: '2025-07-01 18:00:00', status: '已结算' },
+      { settleNo: 'STL20250702001', name: '李四', taskName: '上海浦东配送任务', workHours: 176, amount: 3520, settleTime: '', status: '待结算' },
+      { settleNo: 'STL20250628001', name: '王五', taskName: '广州天河配送任务', workHours: 168, amount: 3360, settleTime: '2025-06-28 18:00:00', status: '已失败' }
+    ],
+    total: 128
+  },
+  '/task/finance-report': {
+    title: '财务报表',
+    searchFields: [
+      { prop: 'dateRange', label: '报表日期', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'reportName', label: '报表名称', minWidth: '200' },
+      { prop: 'type', label: '报表类型', width: '120' },
+      { prop: 'period', label: '报表期间', width: '150' },
+      { prop: 'creator', label: '生成人', width: '100' },
+      { prop: 'createTime', label: '生成时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showExportBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { reportName: '2025年6月任务结算报表', type: '月报', period: '2025-06', creator: 'admin', createTime: '2025-07-01 02:00:00', status: '已生成' },
+      { reportName: '2025年6月平台收支报表', type: '月报', period: '2025-06', creator: 'admin', createTime: '2025-07-01 02:00:00', status: '已生成' },
+      { reportName: '2025年7月第1周任务报表', type: '周报', period: '2025-W27', creator: 'admin', createTime: '2025-07-03 02:00:00', status: '已生成' }
+    ],
+    total: 36
+  },
+  '/task/message': {
+    title: '消息通知',
+    searchFields: [
+      { prop: 'title', label: '消息标题', type: 'input', placeholder: '请输入消息标题' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '已发送', value: '已发送' }, { label: '待发送', value: '待发送' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'title', label: '消息标题', minWidth: '200' },
+      { prop: 'type', label: '消息类型', width: '120' },
+      { prop: 'receiver', label: '接收对象', minWidth: '150' },
+      { prop: 'sendTime', label: '发送时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'title', label: '消息标题', type: 'input' },
+      { prop: 'type', label: '消息类型', type: 'select', options: [{ label: '系统通知', value: '系统通知' }, { label: '任务通知', value: '任务通知' }, { label: '活动通知', value: '活动通知' }] },
+      { prop: 'receiver', label: '接收对象', type: 'input' },
+      { prop: 'content', label: '消息内容', type: 'textarea' }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, title: '系统维护通知', type: '系统通知', receiver: '全体用户', sendTime: '2025-07-03 10:00:00', status: '已发送' },
+      { id: 2, title: '新任务发布提醒', type: '任务通知', receiver: '配送员', sendTime: '2025-07-02 14:00:00', status: '已发送' },
+      { id: 3, title: '周末活动通知', type: '活动通知', receiver: '全体用户', sendTime: '', status: '待发送' }
+    ],
+    total: 28
+  },
+  '/statistics/reconciliation': {
+    title: '资金对账',
+    searchFields: [
+      { prop: 'batchNo', label: '对账批次', type: 'input', placeholder: '请输入对账批次' },
+      { prop: 'dateRange', label: '对账日期', type: 'daterange' }
+    ],
+    tableColumns: [
+      { prop: 'batchNo', label: '对账批次', minWidth: '180' },
+      { prop: 'platformAmount', label: '平台金额(元)', width: '140' },
+      { prop: 'bankAmount', label: '银行金额(元)', width: '140' },
+      { prop: 'diff', label: '差异金额(元)', width: '140' },
+      { prop: 'reconcileTime', label: '对账时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showExportBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { batchNo: 'REC20250701001', platformAmount: 56800.00, bankAmount: 56800.00, diff: 0, reconcileTime: '2025-07-01 23:00:00', status: '已平账' },
+      { batchNo: 'REC20250702001', platformAmount: 42300.00, bankAmount: 42250.00, diff: -50, reconcileTime: '2025-07-02 23:00:00', status: '有差异' },
+      { batchNo: 'REC20250703001', platformAmount: 38900.00, bankAmount: 38900.00, diff: 0, reconcileTime: '2025-07-03 23:00:00', status: '已平账' }
+    ],
+    total: 90
+  },
+  '/statistics/invoice': {
+    title: '开票管理',
+    searchFields: [
+      { prop: 'invoiceNo', label: '发票号', type: 'input', placeholder: '请输入发票号' },
+      { prop: 'name', label: '企业名称', type: 'input', placeholder: '请输入企业名称' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '待开票', value: '待开票' }, { label: '已开票', value: '已开票' }, { label: '已作废', value: '已作废' }] }
+    ],
+    tableColumns: [
+      { prop: 'invoiceNo', label: '发票号', minWidth: '180' },
+      { prop: 'name', label: '企业名称', minWidth: '200' },
+      { prop: 'amount', label: '开票金额(元)', width: '120' },
+      { prop: 'type', label: '发票类型', width: '120' },
+      { prop: 'applyTime', label: '申请时间', width: '180' },
+      { prop: 'invoiceTime', label: '开票时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showAuditBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '150',
+    sampleData: [
+      { invoiceNo: 'INV20250701001', name: '北京某某科技有限公司', amount: 56800, type: '增值税专票', applyTime: '2025-07-01 10:00:00', invoiceTime: '2025-07-01 14:00:00', status: '已开票' },
+      { invoiceNo: 'INV20250702001', name: '上海某某服务有限公司', amount: 28900, type: '增值税普票', applyTime: '2025-07-02 10:00:00', invoiceTime: '', status: '待开票' },
+      { invoiceNo: 'INV20250628001', name: '广州某某建筑有限公司', amount: 15000, type: '增值税专票', applyTime: '2025-06-28 10:00:00', invoiceTime: '2025-06-28 14:00:00', status: '已作废' }
+    ],
+    total: 56
+  },
+  '/operation/merchant': {
+    title: '商户拉新管理',
+    searchFields: [
+      { prop: 'name', label: '商户名称', type: 'input', placeholder: '请输入商户名称' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '活跃', value: '活跃' }, { label: '沉默', value: '沉默' }, { label: '流失', value: '流失' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '商户名称', minWidth: '200' },
+      { prop: 'contact', label: '联系人', width: '120' },
+      { prop: 'phone', label: '联系电话', width: '140' },
+      { prop: 'inviteCount', label: '邀请人数', width: '100' },
+      { prop: 'registerTime', label: '注册时间', width: '180' },
+      { prop: 'lastActive', label: '最后活跃时间', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { id: 1, name: '北京朝阳商户', contact: '张经理', phone: '010-12345678', inviteCount: 25, registerTime: '2025-01-01 10:00:00', lastActive: '2025-07-03 09:00:00', status: '活跃' },
+      { id: 2, name: '上海浦东商户', contact: '李经理', phone: '021-87654321', inviteCount: 12, registerTime: '2025-01-02 10:00:00', lastActive: '2025-06-28 09:00:00', status: '沉默' },
+      { id: 3, name: '广州天河商户', contact: '王经理', phone: '020-11112222', inviteCount: 5, registerTime: '2025-01-03 10:00:00', lastActive: '2025-05-15 09:00:00', status: '流失' }
+    ],
+    total: 34
+  },
+  '/operation/service': {
+    title: '服务商管理',
+    searchFields: [
+      { prop: 'name', label: '服务商名称', type: 'input', placeholder: '请输入服务商名称' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '合作中', value: '合作中' }, { label: '已终止', value: '已终止' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '服务商名称', minWidth: '200' },
+      { prop: 'area', label: '服务区域', minWidth: '150' },
+      { prop: 'contact', label: '联系人', width: '120' },
+      { prop: 'phone', label: '联系电话', width: '140' },
+      { prop: 'taskCount', label: '完成任务数', width: '120' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '服务商名称', type: 'input' },
+      { prop: 'area', label: '服务区域', type: 'input' },
+      { prop: 'contact', label: '联系人', type: 'input' },
+      { prop: 'phone', label: '联系电话', type: 'input' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '合作中', value: '合作中' }, { label: '已终止', value: '已终止' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '北京朝阳服务商', area: '朝阳区', contact: '张经理', phone: '010-12345678', taskCount: 580, status: '合作中' },
+      { id: 2, name: '上海浦东服务商', area: '浦东新区', contact: '李经理', phone: '021-87654321', taskCount: 420, status: '合作中' },
+      { id: 3, name: '广州天河服务商', area: '天河区', contact: '王经理', phone: '020-11112222', taskCount: 156, status: '已终止' }
+    ],
+    total: 18
+  },
+  '/enterprise/user': {
+    title: '用户列表',
+    searchFields: [
+      { prop: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
+      { prop: 'phone', label: '手机号', type: 'input', placeholder: '请输入手机号' },
+      { prop: 'status', label: '状态', type: 'select', placeholder: '请选择', options: [{ label: '全部', value: '' }, { label: '正常', value: '正常' }, { label: '禁用', value: '禁用' }] }
+    ],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '姓名', minWidth: '120' },
+      { prop: 'phone', label: '手机号', width: '140' },
+      { prop: 'role', label: '角色', width: '120' },
+      { prop: 'dept', label: '部门', minWidth: '120' },
+      { prop: 'registerTime', label: '注册时间', width: '180' },
+      { prop: 'lastLogin', label: '最后登录', width: '180' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [],
+    showAddBtn: false, showEditBtn: false, showDeleteBtn: false, showViewBtn: true, showOperation: true, showSelection: false, showIndex: true,
+    operationWidth: '100',
+    sampleData: [
+      { id: 1, name: '张三', phone: '13800138001', role: '管理员', dept: '管理部', registerTime: '2025-01-01 10:00:00', lastLogin: '2025-07-03 09:00:00', status: '正常' },
+      { id: 2, name: '李四', phone: '13800138002', role: '操作员', dept: '运营部', registerTime: '2025-01-02 10:00:00', lastLogin: '2025-07-02 18:00:00', status: '正常' },
+      { id: 3, name: '王五', phone: '13800138003', role: '查看者', dept: '财务部', registerTime: '2025-01-03 10:00:00', lastLogin: '2025-06-28 18:00:00', status: '禁用' }
+    ],
+    total: 45
+  },
+  '/city-service/bank-config': {
+    title: '银行类型配置',
+    searchFields: [{ prop: 'name', label: '银行名称', type: 'input', placeholder: '请输入银行名称' }],
+    tableColumns: [
+      { prop: 'id', label: '编号', width: '80' },
+      { prop: 'name', label: '银行名称', minWidth: '200' },
+      { prop: 'code', label: '银行编码', width: '120' },
+      { prop: 'cardPrefix', label: '卡号前缀', width: '120' },
+      { prop: 'singleLimit', label: '单笔限额(元)', width: '140' },
+      { prop: 'dailyLimit', label: '日累计限额(元)', width: '140' },
+      { prop: 'status', label: '状态', width: '100', type: 'tag' }
+    ],
+    formFields: [
+      { prop: 'name', label: '银行名称', type: 'input' },
+      { prop: 'code', label: '银行编码', type: 'input' },
+      { prop: 'cardPrefix', label: '卡号前缀', type: 'input' },
+      { prop: 'singleLimit', label: '单笔限额(元)', type: 'number' },
+      { prop: 'dailyLimit', label: '日累计限额(元)', type: 'number' },
+      { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '停用', value: '停用' }] }
+    ],
+    showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showSelection: false, showIndex: true,
+    sampleData: [
+      { id: 1, name: '工商银行', code: 'ICBC', cardPrefix: '6222', singleLimit: 50000, dailyLimit: 200000, status: '启用' },
+      { id: 2, name: '建设银行', code: 'CCB', cardPrefix: '6227', singleLimit: 50000, dailyLimit: 200000, status: '启用' },
+      { id: 3, name: '农业银行', code: 'ABC', cardPrefix: '6228', singleLimit: 50000, dailyLimit: 200000, status: '启用' },
+      { id: 4, name: '中国银行', code: 'BOC', cardPrefix: '6216', singleLimit: 50000, dailyLimit: 200000, status: '停用' }
+    ],
+    total: 12
+  }
 }
 
-const title = computed(() => titles[route.path] || '数据')
+const defaultConfig = {
+  searchFields: [{ prop: 'keyword', label: '关键词', type: 'input', placeholder: '请输入关键词' }],
+  tableColumns: [
+    { prop: 'name', label: '名称', minWidth: '120' },
+    { prop: 'code', label: '编码', minWidth: '120' },
+    { prop: 'status', label: '状态', width: '100', type: 'tag' },
+    { prop: 'createTime', label: '创建时间', width: '170' }
+  ],
+  formFields: [
+    { prop: 'name', label: '名称', type: 'input' },
+    { prop: 'code', label: '编码', type: 'input' },
+    { prop: 'status', label: '状态', type: 'radio', options: [{ label: '启用', value: '启用' }, { label: '禁用', value: '禁用' }] }
+  ],
+  showAddBtn: true, showEditBtn: true, showDeleteBtn: true, showViewBtn: false, showAuditBtn: false,
+  showOperation: true, showSelection: false, showIndex: true,
+  operationWidth: '200', dialogWidth: '500px'
+}
 
-const searchForm = reactive({
-  keyword: ''
-})
+const config = computed(() => pageConfig[route.path] || { ...defaultConfig, title: '数据管理' })
+const title = computed(() => config.value.title)
 
-const tableData = ref([
-  { name: title.value + '示例1', code: 'CODE001', status: '启用', createTime: '2025-01-01 10:00:00' },
-  { name: title.value + '示例2', code: 'CODE002', status: '成功', createTime: '2025-01-02 10:00:00' },
-  { name: title.value + '示例3', code: 'CODE003', status: '正常', createTime: '2025-01-03 10:00:00' },
-  { name: title.value + '示例4', code: 'CODE004', status: '禁用', createTime: '2025-01-04 10:00:00' },
-  { name: title.value + '示例5', code: 'CODE005', status: '启用', createTime: '2025-01-05 10:00:00' }
-])
+const getSearchForm = () => {
+  const form = {}
+  config.value.searchFields.forEach(field => {
+    if (field.type === 'daterange') {
+      form[field.prop] = []
+    } else if (field.type === 'select') {
+      form[field.prop] = ''
+    } else {
+      form[field.prop] = ''
+    }
+  })
+  return form
+}
+
+const getFormData = () => {
+  const form = {}
+  config.value.formFields.forEach(field => {
+    form[field.prop] = field.type === 'radio' && field.options[0] ? field.options[0].value : ''
+  })
+  return form
+}
+
+const searchForm = reactive(getSearchForm())
+const viewData = reactive({})
+
+const tableData = ref([])
+
+const initTableData = () => {
+  const sampleData = config.value.sampleData
+  if (sampleData) {
+    tableData.value = sampleData
+  } else {
+    tableData.value = [
+      { name: title.value + '示例1', code: 'CODE001', status: '启用', createTime: '2025-01-01 10:00:00' },
+      { name: title.value + '示例2', code: 'CODE002', status: '成功', createTime: '2025-01-02 10:00:00' },
+      { name: title.value + '示例3', code: 'CODE003', status: '正常', createTime: '2025-01-03 10:00:00' },
+      { name: title.value + '示例4', code: 'CODE004', status: '禁用', createTime: '2025-01-04 10:00:00' },
+      { name: title.value + '示例5', code: 'CODE005', status: '启用', createTime: '2025-01-05 10:00:00' }
+    ]
+  }
+}
+
+initTableData()
 
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(5)
+const total = computed(() => config.value.total || 5)
 
 const dialogVisible = ref(false)
+const viewVisible = ref(false)
 const dialogTitle = ref('新增')
-const form = reactive({
-  name: '',
-  code: '',
-  status: '启用'
+const dialogWidth = computed(() => config.value.dialogWidth || '500px')
+const form = reactive(getFormData())
+
+const searchFields = computed(() => config.value.searchFields)
+const tableColumns = computed(() => config.value.tableColumns)
+const formFields = computed(() => config.value.formFields)
+const showAddBtn = computed(() => config.value.showAddBtn !== undefined ? config.value.showAddBtn : true)
+const showEditBtn = computed(() => config.value.showEditBtn !== undefined ? config.value.showEditBtn : true)
+const showDeleteBtn = computed(() => config.value.showDeleteBtn !== undefined ? config.value.showDeleteBtn : true)
+const showViewBtn = computed(() => config.value.showViewBtn !== undefined ? config.value.showViewBtn : false)
+const showAuditBtn = computed(() => config.value.showAuditBtn !== undefined ? config.value.showAuditBtn : false)
+const showExportBtn = computed(() => config.value.showExportBtn !== undefined ? config.value.showExportBtn : false)
+const showRefreshBtn = computed(() => config.value.showRefreshBtn !== undefined ? config.value.showRefreshBtn : false)
+const showOperation = computed(() => {
+  if (config.value.showOperation !== undefined) return config.value.showOperation
+  return showEditBtn.value || showDeleteBtn.value || showViewBtn.value || showAuditBtn.value
 })
+const showSelection = computed(() => config.value.showSelection !== undefined ? config.value.showSelection : false)
+const showIndex = computed(() => config.value.showIndex !== undefined ? config.value.showIndex : true)
+const operationWidth = computed(() => config.value.operationWidth || '200')
+
+const getTagType = (value) => {
+  const successValues = ['正常', '启用', '成功', '已投保', '已通过', '已完成', '已支付', '收入', '已退款']
+  const warningValues = ['待审核', '待处理', '待支付']
+  const dangerValues = ['停用', '禁用', '失败', '已拒绝', '已取消', '已退保', '已驳回', '关闭', '支出']
+  const infoValues = ['显示', '隐藏', '通知', '公告']
+  if (successValues.includes(value)) return 'success'
+  if (warningValues.includes(value)) return 'warning'
+  if (dangerValues.includes(value)) return 'danger'
+  if (infoValues.includes(value)) return 'info'
+  return 'info'
+}
 
 const handleSearch = () => {
-  ElMessage.info('搜索：' + searchForm.keyword)
+  ElMessage.info('搜索')
 }
 
 const handleReset = () => {
-  searchForm.keyword = ''
+  Object.assign(searchForm, getSearchForm())
 }
 
 const handleAdd = () => {
   dialogTitle.value = '新增' + title.value
-  form.name = ''
-  form.code = ''
-  form.status = '启用'
+  Object.assign(form, getFormData())
   dialogVisible.value = true
 }
 
 const handleEdit = (row) => {
   dialogTitle.value = '编辑' + title.value
-  form.name = row.name
-  form.code = row.code
-  form.status = row.status
+  Object.assign(form, row)
   dialogVisible.value = true
 }
 
@@ -231,6 +2035,35 @@ const handleDelete = (row) => {
   }).then(() => {
     ElMessage.success('删除成功')
   })
+}
+
+const handleView = (row) => {
+  Object.assign(viewData, row)
+  viewVisible.value = true
+}
+
+const handleAudit = (row) => {
+  ElMessageBox.confirm('确认审核通过？', '提示', {
+    confirmButtonText: '通过',
+    cancelButtonText: '驳回',
+    type: 'warning'
+  }).then(() => {
+    ElMessage.success('审核通过')
+  }).catch(() => {
+    ElMessage.info('已驳回')
+  })
+}
+
+const handleExport = () => {
+  ElMessage.success('导出成功')
+}
+
+const handleRefresh = () => {
+  ElMessage.success('缓存刷新成功')
+}
+
+const handleLinkClick = (row) => {
+  ElMessage.info('查看详情')
 }
 
 const handleSubmit = () => {

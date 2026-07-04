@@ -93,6 +93,25 @@
         <el-button type="primary" @click="handleAuditSubmit">确定</el-button>
       </template>
     </el-dialog>
+    <el-dialog v-model="viewDialogVisible" title="查看资料" width="600px">
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="姓名">{{ viewForm.name }}</el-descriptions-item>
+        <el-descriptions-item label="手机号">{{ viewForm.phone }}</el-descriptions-item>
+        <el-descriptions-item label="身份证号">{{ viewForm.idCard }}</el-descriptions-item>
+        <el-descriptions-item label="证书名称">{{ viewForm.certName }}</el-descriptions-item>
+        <el-descriptions-item label="机构">{{ viewForm.institution }}</el-descriptions-item>
+        <el-descriptions-item label="报名类别">{{ viewForm.type }}</el-descriptions-item>
+        <el-descriptions-item label="省">{{ viewForm.province }}</el-descriptions-item>
+        <el-descriptions-item label="市">{{ viewForm.city }}</el-descriptions-item>
+        <el-descriptions-item label="区">{{ viewForm.district }}</el-descriptions-item>
+        <el-descriptions-item label="街道">{{ viewForm.street }}</el-descriptions-item>
+        <el-descriptions-item label="审核状态">{{ viewForm.statusText }}</el-descriptions-item>
+        <el-descriptions-item label="提交时间">{{ viewForm.submitTime }}</el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button @click="viewDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -202,6 +221,22 @@ const auditForm = reactive({
   remark: ''
 })
 
+const viewDialogVisible = ref(false)
+const viewForm = reactive({
+  name: '',
+  phone: '',
+  idCard: '',
+  certName: '',
+  institution: '',
+  type: '',
+  province: '',
+  city: '',
+  district: '',
+  street: '',
+  statusText: '',
+  submitTime: ''
+})
+
 const getStatusType = (status) => {
   const map = {
     pending: 'warning',
@@ -224,7 +259,21 @@ const handleReset = () => {
 }
 
 const handleView = (row) => {
-  ElMessage.info(`查看 ${row.name} 的资料`)
+  Object.assign(viewForm, {
+    name: row.name,
+    phone: row.phone,
+    idCard: row.idCard,
+    certName: row.certName,
+    institution: row.institution,
+    type: row.type,
+    province: row.province,
+    city: row.city,
+    district: row.district,
+    street: row.street,
+    statusText: row.statusText,
+    submitTime: row.submitTime
+  })
+  viewDialogVisible.value = true
 }
 
 const handleAudit = (row) => {
