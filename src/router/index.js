@@ -91,6 +91,37 @@ const routes = [
       { path: 'settlement', name: 'AgentV2Settlement', component: () => import('../views/AgentV2/Settlement.vue'), meta: { title: '结算明细' } },
       { path: 'incentive', name: 'AgentV2Incentive', component: () => import('../views/AgentV2/Incentive.vue'), meta: { title: '激励奖励' } }
     ]
+  },
+  {
+    path: '/company/login',
+    name: 'CompanyLogin',
+    component: () => import('../views/Company/Login.vue'),
+    meta: { title: '登录' }
+  },
+  {
+    path: '/company/company-list',
+    name: 'CompanyListPage',
+    component: () => import('../views/Company/CompanyList.vue'),
+    meta: { title: '企业列表' }
+  },
+  {
+    path: '/company',
+    name: 'CompanyLayout',
+    component: () => import('../layout/CompanyLayout.vue'),
+    redirect: '/company/home',
+    children: [
+      { path: 'home', name: 'CompanyHome', component: () => import('../views/Company/Home.vue'), meta: { title: '首页' } },
+      { path: 'work-type', name: 'CompanyWorkType', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '任务工种' } },
+      { path: 'task-schedule', name: 'CompanyTaskSchedule', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '任务排期' } },
+      { path: 'talent-pool', name: 'CompanyTalentPool', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '人才库' } },
+      { path: 'task-list-guide', name: 'CompanyTaskListGuide', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '任务列表' } },
+      { path: 'task-center', name: 'CompanyTaskCenter', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '任务中心' } },
+      { path: 'settlement', name: 'CompanySettlement', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '结算记录' } },
+      { path: 'attendance', name: 'CompanyAttendance', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '打卡机数据' } },
+      { path: 'account', name: 'CompanyAccount', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '账户管理' } },
+      { path: 'project', name: 'CompanyProject', component: () => import('../views/Company/ProjectList.vue'), meta: { title: '项目管理' } },
+      { path: 'system', name: 'CompanySystem', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '系统管理' } }
+    ]
   }
 ]
 
@@ -101,15 +132,30 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
+  const companyToken = localStorage.getItem('company_token')
   if (to.meta.title) {
     if (to.path.startsWith('/agentv2')) {
       document.title = to.meta.title + ' - 城市服务商系统'
+    } else if (to.path.startsWith('/company')) {
+      document.title = to.meta.title + ' - 民匠有约'
     } else {
       document.title = to.meta.title + ' - 民匠有约管理系统'
     }
   }
-  if (to.path === '/login' || to.path === '/agentv2/login') {
+  if (to.path === '/login' || to.path === '/agentv2/login' || to.path === '/company/login') {
     next()
+  } else if (to.path === '/company/company-list') {
+    if (companyToken) {
+      next()
+    } else {
+      next('/company/login')
+    }
+  } else if (to.path.startsWith('/company')) {
+    if (companyToken) {
+      next()
+    } else {
+      next('/company/login')
+    }
   } else {
     if (token) {
       next()
