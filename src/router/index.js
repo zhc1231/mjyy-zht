@@ -35,7 +35,8 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/Login.vue')
+    component: () => import('../views/Login.vue'),
+    meta: { title: '登录' }
   },
   {
     path: '/',
@@ -43,37 +44,30 @@ const routes = [
     component: () => import('../layout/index.vue'),
     redirect: '/dashboard',
     children: [
-      { path: 'dashboard', name: 'Dashboard', component: () => import('../views/Dashboard.vue') },
-      { path: 'cockpit', name: 'Cockpit', component: () => import('../views/Cockpit.vue') },
-      { path: 'training/verify', name: 'TrainingVerify', component: () => import('../views/Training/Verify.vue') },
-      { path: '401', name: 'Error401', component: () => import('../views/Error401.vue') },
-      // 系统管理
-      { path: 'system/dict', name: 'SystemDict', component: () => import('../views/System/Dict.vue') },
-      { path: 'system/message', name: 'SystemMessage', component: () => import('../views/System/Message.vue') },
-      { path: 'system/icon', name: 'SystemIcon', component: () => import('../views/System/Icon.vue') },
-      { path: 'system/params', name: 'SystemParams', component: () => import('../views/System/Params.vue') },
-      { path: 'system/menu', name: 'SystemMenu', component: () => import('../views/System/Menu.vue') },
-      { path: 'system/post', name: 'SystemPost', component: () => import('../views/System/Post.vue') },
-      // 区域数据
-      { path: 'region/local', name: 'RegionLocal', component: () => import('../views/Region/Local.vue') },
-      // 用户管理
-      { path: 'user/list', name: 'UserList', component: () => import('../views/User/List.vue') },
-      { path: 'user/role', name: 'UserRole', component: () => import('../views/User/Role.vue') },
-      { path: 'user/dept', name: 'UserDept', component: () => import('../views/User/Dept.vue') },
-      // 平台配置
-      { path: 'platform/user-list', name: 'PlatformUserList', component: () => import('../views/Platform/UserList.vue') },
-      // 培训后台
-      { path: 'training/class', name: 'TrainingClass', component: () => import('../views/Training/Class.vue') },
-      // 财务管理
-      { path: 'finance/transaction', name: 'FinanceTransaction', component: () => import('../views/Finance/Transaction.vue') },
-      // 平台任务
-      { path: 'task/list', name: 'TaskList', component: () => import('../views/Task/List.vue') },
-      // 统计报表
-      { path: 'statistics/report', name: 'StatisticsReport', component: () => import('../views/Statistics/Report.vue') },
+      { path: 'dashboard', name: 'Dashboard', component: () => import('../views/Dashboard.vue'), meta: { title: '首页' } },
+      { path: 'cockpit', name: 'Cockpit', component: () => import('../views/Cockpit.vue'), meta: { title: '驾驶舱' } },
+      { path: 'training/verify', name: 'TrainingVerify', component: () => import('../views/Training/Verify.vue'), meta: { title: '培训审核' } },
+      { path: '401', name: 'Error401', component: () => import('../views/Error401.vue'), meta: { title: '无权限' } },
+      { path: 'system/dict', name: 'SystemDict', component: () => import('../views/System/Dict.vue'), meta: { title: '字典管理' } },
+      { path: 'system/message', name: 'SystemMessage', component: () => import('../views/System/Message.vue'), meta: { title: '消息管理' } },
+      { path: 'system/icon', name: 'SystemIcon', component: () => import('../views/System/Icon.vue'), meta: { title: '图标库' } },
+      { path: 'system/params', name: 'SystemParams', component: () => import('../views/System/Params.vue'), meta: { title: '参数设置' } },
+      { path: 'system/menu', name: 'SystemMenu', component: () => import('../views/System/Menu.vue'), meta: { title: '菜单管理' } },
+      { path: 'system/post', name: 'SystemPost', component: () => import('../views/System/Post.vue'), meta: { title: '岗位管理' } },
+      { path: 'region/local', name: 'RegionLocal', component: () => import('../views/Region/Local.vue'), meta: { title: '当地数据' } },
+      { path: 'user/list', name: 'UserList', component: () => import('../views/User/List.vue'), meta: { title: '用户列表' } },
+      { path: 'user/role', name: 'UserRole', component: () => import('../views/User/Role.vue'), meta: { title: '角色管理' } },
+      { path: 'user/dept', name: 'UserDept', component: () => import('../views/User/Dept.vue'), meta: { title: '部门管理' } },
+      { path: 'platform/user-list', name: 'PlatformUserList', component: () => import('../views/Platform/UserList.vue'), meta: { title: '用户列表' } },
+      { path: 'training/class', name: 'TrainingClass', component: () => import('../views/Training/Class.vue'), meta: { title: '班级管理' } },
+      { path: 'finance/transaction', name: 'FinanceTransaction', component: () => import('../views/Finance/Transaction.vue'), meta: { title: '交易流水' } },
+      { path: 'task/list', name: 'TaskList', component: () => import('../views/Task/List.vue'), meta: { title: '任务列表' } },
+      { path: 'statistics/report', name: 'StatisticsReport', component: () => import('../views/Statistics/Report.vue'), meta: { title: '统计报表' } },
       ...commonRoutes.map(path => ({
         path: path.slice(1),
         name: 'Common' + path.replace(/\//g, '_'),
-        component: () => import('../views/CommonPage.vue')
+        component: () => import('../views/CommonPage.vue'),
+        meta: { title: path.split('/').pop() }
       }))
     ]
   }
@@ -86,6 +80,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
+  if (to.meta.title) {
+    document.title = to.meta.title + ' - 民匠有约管理系统'
+  }
   if (to.path === '/login') {
     next()
   } else {
