@@ -86,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock, Key, View, Hide } from '@element-plus/icons-vue'
@@ -98,6 +98,10 @@ const loading = ref(false)
 const passwordVisible = ref(false)
 const codeCountdown = ref(0)
 const record = ref('蜀ICP备20240xxxx号-1')
+
+onMounted(() => {
+  document.title = '登录 - 民匠有约管理系统'
+})
 
 const loginForm = reactive({
   username: '',
