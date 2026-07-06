@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民匠有约管理系统 - 产品流程图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #303133;
+    background: #f5f7fa;
+  }
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+  .header {
+    background: linear-gradient(135deg, #E6A23C 0%, #f0ad4e 100%);
+    color: #fff;
+    padding: 60px 50px;
+    text-align: center;
+  }
+  .header h1 { font-size: 32px; margin-bottom: 12px; font-weight: 600; }
+  .header .subtitle { font-size: 15px; opacity: 0.9; }
+  .header .version { margin-top: 16px; font-size: 13px; opacity: 0.8; }
+  .header .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .header .back-link:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
+  .toc {
+    background: #f8f9fc;
+    border-left: 4px solid #E6A23C;
+    padding: 24px 32px;
+    margin: 30px 50px;
+    border-radius: 4px;
+  }
+  .toc h2 { font-size: 18px; color: #E6A23C; margin-bottom: 16px; font-weight: 600; }
+  .toc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 32px; }
+  .toc a { color: #606266; text-decoration: none; transition: color 0.2s; }
+  .toc a:hover { color: #E6A23C; }
+
+  .content { padding: 0 50px 40px; }
+  h2 {
+    font-size: 24px; color: #303133; margin: 40px 0 24px;
+    padding-bottom: 12px; border-bottom: 2px solid #ebeef5; font-weight: 600;
+  }
+
+  /* 流程图样式 */
+  .flow-section {
+    margin-bottom: 50px;
+  }
+  .flow-desc {
+    color: #606266; margin-bottom: 20px; font-size: 14px;
+  }
+
+  .flow-chart {
+    background: #fafbfc;
+    border: 1px solid #ebeef5;
+    border-radius: 8px;
+    padding: 40px 20px;
+    overflow-x: auto;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .flow-node {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    max-width: 180px;
+    padding: 16px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.5;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .node-start {
+    background: #67C23A; color: #fff;
+    border-radius: 30px;
+    min-width: 100px;
+  }
+  .node-end {
+    background: #F56C6C; color: #fff;
+    border-radius: 30px;
+    min-width: 100px;
+  }
+  .node-process {
+    background: #fff;
+    border: 2px solid #409EFF;
+    color: #303133;
+  }
+  .node-decision {
+    background: #fdf6ec;
+    border: 2px solid #E6A23C;
+    color: #303133;
+    transform: rotate(45deg);
+    min-width: 80px;
+    min-height: 80px;
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .node-decision span {
+    transform: rotate(-45deg);
+    display: inline-block;
+  }
+  .node-data {
+    background: #ecf5ff;
+    border: 2px solid #409EFF;
+    color: #303133;
+  }
+  .node-highlight {
+    background: #409EFF;
+    color: #fff;
+    border: none;
+  }
+
+  .flow-arrow {
+    display: inline-flex;
+    align-items: center;
+    color: #c0c4cc;
+    font-size: 18px;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+  .flow-arrow-down {
+    color: #c0c4cc;
+    font-size: 18px;
+    text-align: center;
+    padding: 4px 0;
+  }
+  .arrow-label {
+    font-size: 12px;
+    color: #909399;
+    padding: 0 8px;
+    white-space: nowrap;
+  }
+
+  .flow-branch {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 40px;
+  }
+  .flow-branch-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .branch-label {
+    font-size: 12px;
+    color: #E6A23C;
+    font-weight: 600;
+    margin-bottom: -4px;
+  }
+
+  /* 纵向流程 */
+  .flow-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-vertical .flow-node { margin: 4px 0; }
+
+  /* 分支容器 */
+  .flow-split {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin: 8px 0;
+  }
+
+  .legend {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 16px 24px;
+    background: #f8f9fc;
+    border-radius: 6px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #606266;
+  }
+  .legend-box {
+    width: 24px; height: 18px; border-radius: 4px;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 30px 50px;
+    color: #909399;
+    font-size: 13px;
+    border-top: 1px solid #ebeef5;
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 id="top">民匠有约管理系统</h1>
+    <div class="subtitle">产品流程图</div>
+    <div class="version">版本 V1.0 · 2026-07-04</div>
+    <a href="./changelog.html" class="back-link">← 返回更新日志</a>
+  </div>
+
+  <div class="toc">
+    <h2>目 录</h2>
+    <div class="toc-grid">
+      <a href="#f1">1. 登录流程</a>
+      <a href="#f2">2. 用户管理流程</a>
+      <a href="#f3">3. 企业注册审核流程</a>
+      <a href="#f4">4. 培训报名与审核流程</a>
+      <a href="#f5">5. 任务发布与执行流程</a>
+      <a href="#f6">6. 薪资结算流程</a>
+      <a href="#f7">7. 提现流程</a>
+      <a href="#f8">8. 财务对账流程</a>
+      <a href="#f9">9. 站内信流程</a>
+      <a href="#f10">10. 保险订单流程</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-box" style="background:#67C23A;border-radius:12px;"></div>开始/结束</div>
+      <div class="legend-item"><div class="legend-box" style="background:#fff;border:2px solid #409EFF;"></div>处理步骤</div>
+      <div class="legend-item"><div class="legend-box" style="background:#fdf6ec;border:2px solid #E6A23C;"></div>判断节点</div>
+      <div class="legend-item"><div class="legend-box" style="background:#ecf5ff;border:2px solid #409EFF;"></div>数据/记录</div>
+      <div class="legend-item"><div class="legend-box" style="background:#409EFF;"></div>关键步骤</div>
+    </div>
+
+    <!-- 1. 登录流程 -->
+    <div class="flow-section" id="f1">
+      <h2>1. 登录流程</h2>
+      <p class="flow-desc">用户通过账号密码和图形验证码登录系统，支持登录失败锁定机制。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">开始</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">输入账号</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">输入密码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">输入图形验证码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>验证码<br>正确？</span></div>
+          <div class="flow-arrow-down">↓ 否</div>
+          <div class="flow-node node-process">提示验证码错误</div>
+          <div class="flow-arrow-down">↓ 是</div>
+          <div class="flow-node node-decision"><span>账号密码<br>正确？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">否</div>
+              <div class="flow-node node-process">失败次数 +1</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-decision"><span>失败≥5次？</span></div>
+              <div class="flow-arrow-down">↓ 是</div>
+              <div class="flow-node node-process">锁定账号30分钟</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">是</div>
+              <div class="flow-node node-highlight">生成登录Token</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">记录登录日志</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-start">进入首页</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 用户管理流程 -->
+    <div class="flow-section" id="f2">
+      <h2>2. 用户管理流程</h2>
+      <p class="flow-desc">管理员创建用户账号、分配角色、管理状态。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">开始</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">进入用户列表</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>新增或<br>编辑？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">新增</div>
+              <div class="flow-node node-process">填写用户信息<br>（用户名/昵称/手机号）</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">选择部门</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">分配角色</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">编辑</div>
+              <div class="flow-node node-process">修改用户信息</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">调整角色/部门</div>
+            </div>
+          </div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">保存用户数据</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>是否<br>启用？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">是</div>
+              <div class="flow-node node-process">账号正常使用</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">否</div>
+              <div class="flow-node node-process">禁用账号</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">记录操作日志</div>
+            </div>
+          </div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-end">结束</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 企业注册审核流程 -->
+    <div class="flow-section" id="f3">
+      <h2>3. 企业注册审核流程</h2>
+      <p class="flow-desc">企业提交注册申请，管理员审核通过后企业可正常使用系统。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">企业提交注册</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-data">提交资料：营业执照、法人信息、联系人</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">进入企业注册列表</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">管理员查看详情</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>资料是否<br>齐全？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">否</div>
+              <div class="flow-node node-process">填写驳回理由</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">通知企业补充资料</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">企业重新提交</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">是</div>
+              <div class="flow-node node-decision"><span>审核<br>通过？</span></div>
+              <div class="flow-split">
+                <div class="flow-branch-col">
+                  <div class="branch-label">通过</div>
+                  <div class="flow-node node-highlight">激活企业账号</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-data">发送通知</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-start">企业可登录</div>
+                </div>
+                <div class="flow-branch-col">
+                  <div class="branch-label">驳回</div>
+                  <div class="flow-node node-process">填写驳回理由</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-end">流程结束</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 培训报名与审核流程 -->
+    <div class="flow-section" id="f4">
+      <h2>4. 培训报名与审核流程</h2>
+      <p class="flow-desc">学员报名培训班级，提交资料审核，缴费后参加培训与考试，通过后颁发证书。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">学员报名</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">选择培训班级</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">填写报名信息</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-data">上传资料：身份证、学历证明、工作证明</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">进入资料审核</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>审核<br>结果？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">驳回</div>
+              <div class="flow-node node-process">填写驳回理由</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">学员补充资料重新提交</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">通过</div>
+              <div class="flow-node node-process">缴纳培训费用</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">记录缴费信息</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-highlight">正式入学</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">参加培训学习</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">模拟考试</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-decision"><span>考试<br>通过？</span></div>
+              <div class="flow-split">
+                <div class="flow-branch-col">
+                  <div class="branch-label">否</div>
+                  <div class="flow-node node-process">补考</div>
+                </div>
+                <div class="flow-branch-col">
+                  <div class="branch-label">是</div>
+                  <div class="flow-node node-highlight">颁发证书</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-start">培训完成</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 任务发布与执行流程 -->
+    <div class="flow-section" id="f5">
+      <h2>5. 任务发布与执行流程</h2>
+      <p class="flow-desc">企业发布任务，用户领取并执行，完成后进行结算。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">企业发布任务</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">填写任务信息<br>（类型/人数/薪酬/时间）</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">任务上架</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">用户领取任务</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-data">记录席位（占位）</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">用户执行任务</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>是否<br>完成？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">否</div>
+              <div class="flow-node node-process">释放席位</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">其他用户领取</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">是</div>
+              <div class="flow-node node-process">提交完成记录</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-decision"><span>企业<br>确认？</span></div>
+              <div class="flow-split">
+                <div class="flow-branch-col">
+                  <div class="branch-label">否</div>
+                  <div class="flow-node node-process">驳回，重新执行</div>
+                </div>
+                <div class="flow-branch-col">
+                  <div class="branch-label">是</div>
+                  <div class="flow-node node-highlight">进入结算流程</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-data">生成结算记录</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. 薪资结算流程 -->
+    <div class="flow-section" id="f6">
+      <h2>6. 薪资结算流程</h2>
+      <p class="flow-desc">任务完成后生成结算批次，管理员批量审核，通过后计入用户余额。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">任务完成确认</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">系统生成结算明细</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">汇总结算批次</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">进入结算审核（批量）</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>审核<br>结果？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">驳回</div>
+              <div class="flow-node node-process">填写驳回理由</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">退回重新结算</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">通过</div>
+              <div class="flow-node node-highlight">结算入账</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">更新用户余额</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">生成交易流水</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">发送站内信通知</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-start">可提现</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. 提现流程 -->
+    <div class="flow-section" id="f7">
+      <h2>7. 提现流程</h2>
+      <p class="flow-desc">用户发起提现申请，管理员审核后打款到银行卡。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">用户发起提现</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>余额<br>充足？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">否</div>
+              <div class="flow-node node-process">提示余额不足</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-end">结束</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">是</div>
+              <div class="flow-node node-process">输入提现金额</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">选择银行卡</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-highlight">提交提现申请</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">冻结提现金额</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">管理员审核</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-decision"><span>审核<br>结果？</span></div>
+              <div class="flow-split">
+                <div class="flow-branch-col">
+                  <div class="branch-label">拒绝</div>
+                  <div class="flow-node node-process">解冻金额</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-process">通知用户</div>
+                </div>
+                <div class="flow-branch-col">
+                  <div class="branch-label">通过</div>
+                  <div class="flow-node node-highlight">银行打款</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-data">记录交易流水</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-decision"><span>打款<br>成功？</span></div>
+                  <div class="flow-split">
+                    <div class="flow-branch-col">
+                      <div class="branch-label">失败</div>
+                      <div class="flow-node node-process">退回金额</div>
+                    </div>
+                    <div class="flow-branch-col">
+                      <div class="branch-label">成功</div>
+                      <div class="flow-node node-start">提现完成</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. 财务对账流程 -->
+    <div class="flow-section" id="f8">
+      <h2>8. 财务对账流程</h2>
+      <p class="flow-desc">平台资金与银行资金对账，处理差异，生成对账单。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">选择对账日期范围</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">生成对账批次</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">拉取平台流水</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">拉取银行流水</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">系统自动比对</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>是否<br>平账？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">是</div>
+              <div class="flow-node node-data">生成对账单</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">导出Excel</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-start">对账完成</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">否</div>
+              <div class="flow-node node-process">标记差异记录</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">财务人工核查</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-decision"><span>差异<br>处理？</span></div>
+              <div class="flow-split">
+                <div class="flow-branch-col">
+                  <div class="branch-label">补录</div>
+                  <div class="flow-node node-process">补充遗漏记录</div>
+                </div>
+                <div class="flow-branch-col">
+                  <div class="branch-label">冲正</div>
+                  <div class="flow-node node-process">冲正错误记录</div>
+                </div>
+              </div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">重新对账</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. 站内信流程 -->
+    <div class="flow-section" id="f9">
+      <h2>9. 站内信流程</h2>
+      <p class="flow-desc">系统/任务/审核等事件触发站内信通知，用户查看并处理。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">事件触发</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>事件<br>类型？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">系统通知</div>
+              <div class="flow-node node-process">系统升级/维护提醒</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">任务通知</div>
+              <div class="flow-node node-process">任务分配/完成/超时</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">审核通知</div>
+              <div class="flow-node node-process">审核结果/进度</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">活动通知</div>
+              <div class="flow-node node-process">运营活动/节日</div>
+            </div>
+          </div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">生成站内信消息</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-data">写入消息表（未读）</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">右上角铃铛显示未读数</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>用户<br>操作？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">点击消息</div>
+              <div class="flow-node node-process">标记为已读</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">查看消息详情</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">全部已读</div>
+              <div class="flow-node node-process">一键标记所有已读</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">查看全部</div>
+              <div class="flow-node node-process">进入消息中心</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">搜索/筛选/批量操作</div>
+            </div>
+          </div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-end">结束</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. 保险订单流程 -->
+    <div class="flow-section" id="f10">
+      <h2>10. 保险订单流程</h2>
+      <p class="flow-desc">用户购买保险，生成保险订单，承保后生效。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">用户选择保险产品</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">查看保险详情<br>（保费/保额/保障期限）</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">填写投保信息</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">提交保险订单</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">支付保费</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>支付<br>成功？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">失败</div>
+              <div class="flow-node node-process">订单关闭</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-end">结束</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">成功</div>
+              <div class="flow-node node-data">生成保单号</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-highlight">保险公司承保</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-decision"><span>承保<br>结果？</span></div>
+              <div class="flow-split">
+                <div class="flow-branch-col">
+                  <div class="branch-label">拒保</div>
+                  <div class="flow-node node-process">退还保费</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-data">记录退款</div>
+                </div>
+                <div class="flow-branch-col">
+                  <div class="branch-label">承保</div>
+                  <div class="flow-node node-data">保单生效</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-process">发送站内信通知</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-start">保障中</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    民匠有约管理系统 · 产品流程图<br>
+    更新日期：2026-07-04<br><br>
+    <a href="./changelog.html" style="color: #F56C6C;">← 返回更新日志</a>
+  </div>
+</div>
+</body>
+</html>

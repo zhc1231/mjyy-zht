@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民匠有约主管理系统 - 产品更新日志</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #303133;
+    background: #f5f7fa;
+  }
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+  /* 头部 */
+  .header {
+    background: linear-gradient(135deg, #409EFF 0%, #5b6cff 100%);
+    color: #fff;
+    padding: 60px 50px;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    opacity: 0.9;
+  }
+  .header .version {
+    margin-top: 16px;
+    font-size: 13px;
+    opacity: 0.8;
+  }
+  .header .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .header .back-link:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
+  /* 入口卡片 */
+  .entries {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    padding: 40px 50px;
+    align-items: stretch;
+  }
+  .entry-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    background: #fff;
+    border: 1px solid #ebeef5;
+    border-radius: 8px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .entry-card .entry-icon { flex-shrink: 0; }
+  .entry-card h3 { flex-shrink: 0; }
+  .entry-card p {
+    flex-grow: 1;
+    margin-bottom: 16px;
+  }
+  .entry-card .entry-btn { flex-shrink: 0; }
+  .entry-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(64,158,255,0.15);
+    border-color: #409EFF;
+  }
+  .entry-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+  .entry-card.manual::before { background: linear-gradient(90deg, #409EFF, #5b6cff); }
+  .entry-card.prd::before    { background: linear-gradient(90deg, #67C23A, #5cb85c); }
+  .entry-card.proto::before  { background: linear-gradient(90deg, #E6A23C, #f0ad4e); }
+  .entry-card.flow::before   { background: linear-gradient(90deg, #F56C6C, #ff8a80); }
+  .entry-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #fff;
+  }
+  .entry-card.manual .entry-icon { background: linear-gradient(135deg, #409EFF, #5b6cff); }
+  .entry-card.prd .entry-icon    { background: linear-gradient(135deg, #67C23A, #5cb85c); }
+  .entry-card.proto .entry-icon  { background: linear-gradient(135deg, #E6A23C, #f0ad4e); }
+  .entry-card.flow .entry-icon   { background: linear-gradient(135deg, #F56C6C, #ff8a80); }
+  .entry-card h3 {
+    font-size: 18px;
+    color: #303133;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .entry-card p {
+    font-size: 13px;
+    color: #909399;
+    margin-bottom: 16px;
+  }
+  .entry-card .entry-btn {
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #fff;
+  }
+  .entry-card.manual .entry-btn { background: #409EFF; }
+  .entry-card.prd .entry-btn    { background: #67C23A; }
+  .entry-card.proto .entry-btn  { background: #E6A23C; }
+  .entry-card.flow .entry-btn   { background: #F56C6C; }
+
+  /* 更新日志 */
+  .content {
+    padding: 0 50px 40px;
+  }
+  .content h2 {
+    font-size: 24px;
+    color: #303133;
+    margin: 20px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #ebeef5;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .content h2 .icon { color: #409EFF; }
+
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: #ebeef5;
+  }
+  .version-item {
+    position: relative;
+    margin-bottom: 32px;
+  }
+  .version-item::before {
+    content: '';
+    position: absolute;
+    left: -32px;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #409EFF;
+    z-index: 1;
+  }
+  .version-item.major::before {
+    border-color: #F56C6C;
+  }
+  .version-item.minor::before {
+    border-color: #E6A23C;
+  }
+  .version-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .version-tag {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .version-tag.major { background: #F56C6C; }
+  .version-tag.minor { background: #E6A23C; }
+  .version-tag.patch { background: #409EFF; }
+  .version-date {
+    color: #909399;
+    font-size: 13px;
+  }
+  .version-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+  }
+  .version-body {
+    background: #f8f9fc;
+    border-radius: 6px;
+    padding: 16px 24px;
+  }
+  .version-body h4 {
+    font-size: 14px;
+    margin: 12px 0 8px;
+    font-weight: 600;
+  }
+  .version-body h4:first-child { margin-top: 0; }
+  .version-body ul {
+    padding-left: 20px;
+    color: #606266;
+    font-size: 14px;
+  }
+  .version-body li {
+    margin-bottom: 6px;
+    line-height: 1.7;
+  }
+  .badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-right: 6px;
+    font-weight: 500;
+  }
+  .badge-new     { background: #f0f9eb; color: #67C23A; }
+  .badge-fix     { background: #fef0f0; color: #F56C6C; }
+  .badge-update  { background: #ecf5ff; color: #409EFF; }
+  .badge-opt     { background: #fdf6ec; color: #E6A23C; }
+
+  .version-body a {
+    color: #409EFF;
+    text-decoration: none;
+    border-bottom: 1px dashed #c0c4cc;
+    transition: all 0.2s;
+  }
+  .version-body a:hover {
+    color: #66b1ff;
+    border-bottom-color: #409EFF;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 30px 50px;
+    color: #909399;
+    font-size: 13px;
+    border-top: 1px solid #ebeef5;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 id="top">民匠有约主管理系统</h1>
+    <div class="subtitle">产品更新日志</div>
+    <div class="version">版本 V1.0 · 2026-07-04</div>
+    <a href="./system.html" class="back-link">← 返回平台登陆入口</a>
+  </div>
+
+  <!-- 四个入口 -->
+  <div class="entries">
+    <a href="./manual.html" class="entry-card manual">
+      <div class="entry-icon">📖</div>
+      <h3>产品使用手册</h3>
+      <p>系统功能操作指南，含23个模块详细说明</p>
+      <span class="entry-btn">查看手册</span>
+    </a>
+    <a href="./prd.html" class="entry-card prd">
+      <div class="entry-icon">📋</div>
+      <h3>产品需求文档</h3>
+      <p>完整PRD，含功能需求、设计规范、上线标准</p>
+      <span class="entry-btn">查看文档</span>
+    </a>
+    <a href="./flowchart.html" class="entry-card flow">
+      <div class="entry-icon">🔄</div>
+      <h3>产品流程图</h3>
+      <p>10个核心业务流程，含登录、培训、结算等</p>
+      <span class="entry-btn">查看流程图</span>
+    </a>
+    <a href="./#/login" class="entry-card proto">
+      <div class="entry-icon">🖥️</div>
+      <h3>产品原型</h3>
+      <p>完整系统原型，含全部页面与交互体验</p>
+      <span class="entry-btn">进入原型</span>
+    </a>
+  </div>
+
+  <!-- 更新日志 -->
+  <div class="content">
+    <h2><span class="icon">📜</span> 更新日志</h2>
+
+    <div class="timeline">
+
+      <div class="version-item">
+        <div class="version-header">
+          <span class="version-tag patch">V1.0.3</span>
+          <span class="version-title">文档交付</span>
+          <span class="version-date">2026-07-04</span>
+        </div>
+        <div class="version-body">
+          <h4>📝 文档输出</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span><a href="./manual.html">产品使用手册（HTML 版）</a>，含 23 个功能模块操作说明</li>
+            <li><span class="badge badge-new">新增</span><a href="./prd.html">产品需求文档 PRD（HTML 版）</a>，含功能需求、设计规范、上线标准</li>
+            <li><span class="badge badge-new">新增</span><a href="./flowchart.html">产品流程图（HTML 版）</a>，含 10 个核心业务流程</li>
+            <li><span class="badge badge-new">新增</span><a href="./changelog.html">产品更新日志页面</a>，整合手册、文档、原型、流程图入口</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/login">产品原型完整在线预览</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-item">
+        <div class="version-header">
+          <span class="version-tag patch">V1.0.2</span>
+          <span class="version-title">功能完善与补充</span>
+          <span class="version-date">2026-07-04</span>
+        </div>
+        <div class="version-body">
+          <h4>🔄 功能更新</h4>
+          <ul>
+            <li><span class="badge badge-update">更新</span>补充 40+ 子页面配置，覆盖<a href="./#/system/dict">系统管理</a>、<a href="./#/region/local">区域数据</a>、<a href="./#/user/list">用户管理</a>等全模块</li>
+            <li><span class="badge badge-update">更新</span>CommonPage 通用列表组件重构为动态配置模式</li>
+            <li><span class="badge badge-update">更新</span><a href="./#/system/dict">字典管理</a>、<a href="./#/statistics/report">财务报表</a>、<a href="./#/training/verify">资料审核</a>等页面按钮功能补充</li>
+            <li><span class="badge badge-update">更新</span><a href="./#/system/message">站内信</a>"查看全部"跳转消息中心页面丰富</li>
+            <li><span class="badge badge-update">更新</span><a href="./#/dashboard">个人中心</a>和修改密码弹窗实现</li>
+            <li><span class="badge badge-update">更新</span>系统名称统一修正为"民匠有约管理系统"</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-item minor">
+        <div class="version-header">
+          <span class="version-tag minor">V1.0.1</span>
+          <span class="version-title">交互优化与问题修复</span>
+          <span class="version-date">2026-07-04</span>
+        </div>
+        <div class="version-body">
+          <h4>🔧 问题修复</h4>
+          <ul>
+            <li><span class="badge badge-fix">修复</span><a href="./#/dashboard">左侧菜单栏</a>下拉展开导致其他菜单消失的问题（添加 el-scrollbar 滚动容器）</li>
+            <li><span class="badge badge-fix">修复</span><a href="./#/dashboard">首页</a>图标与原网站差异问题（替换为 SVG 线性图标）</li>
+            <li><span class="badge badge-fix">修复</span>部分菜单点击无页面问题（批量注册路由，CommonPage 动态配置）</li>
+            <li><span class="badge badge-fix">修复</span><a href="./#/cockpit">驾驶舱</a>跳转不正确问题（创建独立 Cockpit.vue 页面）</li>
+            <li><span class="badge badge-fix">修复</span><a href="./#/system/message">站内信</a> Bell 图标未正确导入问题</li>
+            <li><span class="badge badge-fix">修复</span>BookOpen 图标未导出构建错误（替换为 Notebook）</li>
+          </ul>
+          <h4>⚡ 优化改进</h4>
+          <ul>
+            <li><span class="badge badge-opt">优化</span><a href="./#/dashboard">菜单</a>关闭折叠动画，提升响应速度</li>
+            <li><span class="badge badge-opt">优化</span>Logo 修改为原网站样式</li>
+            <li><span class="badge badge-opt">优化</span><a href="./#/statistics/report">报表导出</a>功能增加加载状态和日期校验</li>
+            <li><span class="badge badge-opt">优化</span><a href="./#/dashboard">仪表盘</a>图表天/月切换增加动画和数据更新提示</li>
+            <li><span class="badge badge-opt">优化</span><a href="./#/system/message">站内信</a>边距与布局优化</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-item major">
+        <div class="version-header">
+          <span class="version-tag major">V1.0.0</span>
+          <span class="version-title">初始版本发布</span>
+          <span class="version-date">2026-07-04</span>
+        </div>
+        <div class="version-body">
+          <h4>🆕 新增功能</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span><a href="./#/login">登录系统</a>：账号密码 + 图形验证码登录</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/dashboard">首页仪表盘</a>：4张统计卡片 + 4个数据图表，支持天/月切换</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/cockpit">驾驶舱</a>：核心指标卡片、任务趋势折线图、任务类型饼图、地区柱状图、实时动态时间线、待办事项表格</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/system/dict">系统管理</a>：字典管理、图标库、参数设置、菜单管理、岗位管理、配置类型/表管理、通知公告、操作日志、登录日志、在线用户、定时任务、数据/服务/缓存监控、缓存列表、表单构建、代码生成、系统接口</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/region/local">区域数据</a>：当地数据、地区排序</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/user/list">用户管理</a>：用户列表、角色管理、部门管理、人员管理</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/platform/user-list">平台配置</a>：用户/个人/企业列表、用工合同、爱签合同、个人/企业注册、数据库查看、上上签人脸记录、人脸底片、公司配置、保险定价、平台工种、企业敏感词、任务模版、先用后付、考勤机配置、ICC企业</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/platform/cert-list">平台培训</a>：证书列表、证书配置</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/training/class">培训后台</a>：班级管理、资料审核、学员管理、缴费记录、拍照记录、培训底片</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/exam/question-bank">习题管理</a>：题库列表、题目列表</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/finance/transaction">财务管理</a>：交易流水、退款记录</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/study/mock-exam">学习记录</a>：模拟考记录、培训学习汇总、用户培训详情</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/config/store">后台配置</a>：门店配置、档案配置</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/salary/batch-audit">薪资发放</a>：结算审核批量/明细、结算提现管理、交易流水、平台余额</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/task/list">平台任务</a>：任务列表、团队列表、薪酬工时配置、席位记录、结算记录、财务报表、消息通知、绑卡白名单、保险订单</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/statistics/report">统计报表</a>：财务总览、资金对账、对账单、收支明细、开票管理</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/operation/merchant">运营</a>：商户拉新管理、服务商管理</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/order/list">订单管理</a></li>
+            <li><span class="badge badge-new">新增</span><a href="./#/enterprise/audit">企业管理后台</a>：审核信息、用户列表</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/city-service/bank">城市服务商管理</a>：银行类型配置</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/system/message">站内信功能</a>：右上角铃铛消息提醒、消息列表、标记已读、全部已读、消息中心页、搜索筛选、批量操作、查看详情</li>
+            <li><span class="badge badge-new">新增</span><a href="./#/dashboard">个人中心</a>：个人信息查看、修改密码</li>
+          </ul>
+          <h4>🎨 界面设计</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>1:1 复刻原网站登录页样式</li>
+            <li><span class="badge badge-new">新增</span>左侧菜单栏 SVG 线性图标</li>
+            <li><span class="badge badge-new">新增</span>原网站 Logo 样式</li>
+            <li><span class="badge badge-new">新增</span>响应式布局，适配 1366*768 以上分辨率</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    民匠有约管理系统 · 产品更新日志<br>
+    更新日期：2026-07-04
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民匠有约管理系统 - 产品需求文档</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #303133;
+    background: #f5f7fa;
+  }
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+  .header {
+    background: linear-gradient(135deg, #67C23A 0%, #409EFF 100%);
+    color: #fff;
+    padding: 60px 50px;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    opacity: 0.9;
+  }
+  .header .version {
+    margin-top: 16px;
+    font-size: 13px;
+    opacity: 0.8;
+  }
+  .header .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .header .back-link:hover {
+    background: rgba(255,255,255,0.3);
+  }
+  .content {
+    padding: 40px 50px;
+  }
+  .toc {
+    background: #f8f9fc;
+    border-left: 4px solid #67C23A;
+    padding: 24px 32px;
+    margin-bottom: 40px;
+    border-radius: 4px;
+  }
+  .toc h2 {
+    font-size: 18px;
+    color: #67C23A;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .toc ol {
+    padding-left: 24px;
+  }
+  .toc li {
+    margin-bottom: 8px;
+  }
+  .toc a {
+    color: #606266;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc a:hover {
+    color: #67C23A;
+  }
+  .info-table {
+    margin-bottom: 30px;
+  }
+  h2 {
+    font-size: 24px;
+    color: #303133;
+    margin: 40px 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #ebeef5;
+    font-weight: 600;
+  }
+  h3 {
+    font-size: 18px;
+    color: #67C23A;
+    margin: 28px 0 16px;
+    font-weight: 600;
+  }
+  h4 {
+    font-size: 16px;
+    color: #E6A23C;
+    margin: 20px 0 12px;
+    font-weight: 600;
+  }
+  p {
+    margin-bottom: 14px;
+    color: #606266;
+  }
+  ul, ol {
+    margin-bottom: 14px;
+    padding-left: 24px;
+    color: #606266;
+  }
+  li {
+    margin-bottom: 6px;
+  }
+  strong {
+    color: #303133;
+    font-weight: 600;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid #ebeef5;
+    padding: 12px 16px;
+    text-align: left;
+  }
+  th {
+    background: #f5f7fa;
+    color: #303133;
+    font-weight: 600;
+  }
+  tr:nth-child(even) {
+    background: #fafbfc;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #ebeef5;
+    margin: 30px 0;
+  }
+  code {
+    background: #f5f7fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    color: #F56C6C;
+  }
+  pre {
+    background: #2d2d2d;
+    color: #ccc;
+    padding: 20px;
+    border-radius: 4px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+  }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-right: 6px;
+  }
+  .tag-p0 { background: #fef0f0; color: #F56C6C; }
+  .tag-p1 { background: #fdf6ec; color: #E6A23C; }
+  .tag-p2 { background: #ecf5ff; color: #409EFF; }
+  .tag-p3 { background: #f0f9eb; color: #67C23A; }
+  .footer {
+    text-align: center;
+    padding: 30px 50px;
+    color: #909399;
+    font-size: 13px;
+    border-top: 1px solid #ebeef5;
+    margin-top: 40px;
+  }
+  .back-top {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    width: 44px;
+    height: 44px;
+    background: #67C23A;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(103,194,58,0.4);
+    transition: all 0.3s;
+    text-decoration: none;
+    font-size: 18px;
+  }
+  .back-top:hover {
+    background: #85ce61;
+    transform: translateY(-2px);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 id="top">民匠有约管理系统</h1>
+    <div class="subtitle">产品需求文档（PRD）</div>
+    <div class="version">版本 V1.0 · 2026-07-04</div>
+    <a href="./changelog.html" class="back-link">← 返回更新日志</a>
+  </div>
+  <div class="content">
+    <div class="toc">
+      <h2>目 录</h2>
+      <ol>
+        <li><a href="#section1">产品概述</a></li>
+        <li><a href="#section2">用户角色与权限</a></li>
+        <li><a href="#section3">功能需求总览</a></li>
+        <li><a href="#section4">详细功能需求</a></li>
+        <li><a href="#section5">非功能需求</a></li>
+        <li><a href="#section6">界面设计规范</a></li>
+        <li><a href="#section7">数据需求</a></li>
+        <li><a href="#section8">接口需求</a></li>
+        <li><a href="#section9">上线标准</a></li>
+      </ol>
+    </div>
+
+    <div class="info-table">
+      <table>
+        <tr><th style="width:20%">项目名称</th><td>民匠有约管理系统</td></tr>
+        <tr><th>文档版本</th><td>V1.0</td></tr>
+        <tr><th>创建日期</th><td>2026-07-04</td></tr>
+        <tr><th>产品负责人</th><td>产品部</td></tr>
+        <tr><th>技术负责人</th><td>研发部</td></tr>
+      </table>
+    </div>
+
+    <h3>修订记录</h3>
+    <table>
+      <tr><th>版本</th><th>日期</th><th>修订人</th><th>修订内容</th></tr>
+      <tr><td>V1.0</td><td>2026-07-04</td><td>产品部</td><td>初始版本，包含完整功能需求</td></tr>
+    </table>
+
+    <h2 id="section1">1. 产品概述</h2>
+    <h3>1.1 产品背景</h3>
+    <p>民匠有约管理系统是面向企业的综合型人力资源与任务管理平台，旨在通过数字化手段提升企业管理效率，降低运营成本，为企业提供一站式的人力、培训、财务、任务管理解决方案。</p>
+    <h3>1.2 产品目标</h3>
+    <ul>
+      <li>实现用户全生命周期管理</li>
+      <li>提供在线培训与考试能力</li>
+      <li>建立灵活的薪资结算体系</li>
+      <li>提供多维度数据统计分析</li>
+      <li>保障系统安全与数据隐私</li>
+    </ul>
+    <h3>1.3 目标用户</h3>
+    <ul>
+      <li><strong>系统管理员</strong>：负责系统配置与维护</li>
+      <li><strong>企业管理员</strong>：负责企业内部人员与任务管理</li>
+      <li><strong>财务人员</strong>：负责财务对账与结算</li>
+      <li><strong>培训管理员</strong>：负责培训课程与学员管理</li>
+      <li><strong>普通用户</strong>：使用平台提供的各项服务</li>
+    </ul>
+    <h3>1.4 产品定位</h3>
+    <p>一站式人力资源与任务管理 SaaS 平台，服务于中大型企业的数字化转型需求。</p>
+
+    <h2 id="section2">2. 用户角色与权限</h2>
+    <h3>2.1 角色定义</h3>
+    <table>
+      <tr><th>角色</th><th>描述</th><th>主要权限</th></tr>
+      <tr><td>超级管理员</td><td>系统最高权限</td><td>全部功能权限、用户管理、系统配置</td></tr>
+      <tr><td>系统管理员</td><td>系统运维管理</td><td>系统管理模块、日志查看、监控</td></tr>
+      <tr><td>企业管理员</td><td>企业运营管理</td><td>用户管理、任务管理、薪资审核</td></tr>
+      <tr><td>财务人员</td><td>财务相关操作</td><td>财务管理、统计报表、对账开票</td></tr>
+      <tr><td>培训管理员</td><td>培训相关管理</td><td>培训班级、学员管理、习题管理</td></tr>
+      <tr><td>运营人员</td><td>运营推广管理</td><td>商户管理、服务商管理、消息通知</td></tr>
+      <tr><td>普通用户</td><td>基础功能使用</td><td>个人信息、任务查看、学习记录</td></tr>
+    </table>
+    <h3>2.2 权限设计原则</h3>
+    <ul>
+      <li><strong>最小权限原则</strong>：用户仅拥有完成工作所需的最小权限</li>
+      <li><strong>角色继承</strong>：高级角色默认拥有低级角色权限</li>
+      <li><strong>数据隔离</strong>：不同企业间数据完全隔离</li>
+      <li><strong>操作审计</strong>：所有关键操作记录审计日志</li>
+    </ul>
+
+    <h2 id="section3">3. 功能需求总览</h2>
+    <h3>3.1 功能模块图</h3>
+    <pre><code>民匠有约管理系统
+├── 登录系统
+├── 首页仪表盘
+├── 驾驶舱
+├── 系统管理
+│   ├── 字典管理
+│   ├── 图标库
+│   ├── 参数设置
+│   ├── 菜单管理
+│   ├── 岗位管理
+│   ├── 配置类型管理
+│   ├── 配置表管理
+│   ├── 通知公告
+│   ├── 操作日志
+│   ├── 登录日志
+│   ├── 在线用户
+│   ├── 定时任务
+│   ├── 数据监控
+│   ├── 服务监控
+│   ├── 缓存监控
+│   ├── 缓存列表
+│   ├── 表单构建
+│   ├── 代码生成
+│   └── 系统接口
+├── 区域数据
+│   ├── 当地数据
+│   └── 地区排序
+├── 用户管理
+│   ├── 用户列表
+│   ├── 角色管理
+│   ├── 部门管理
+│   └── 人员管理
+├── 平台配置
+│   ├── 用户列表 / 个人列表 / 企业列表
+│   ├── 用工合同 / 爱签合同
+│   ├── 个人注册 / 企业注册
+│   ├── 数据库查看
+│   ├── 上上签人脸记录 / 人脸底片
+│   ├── 公司配置 / 保险定价 / 平台工种
+│   ├── 企业敏感词 / 任务模版
+│   ├── 先用后付 / 考勤机配置 / ICC企业
+├── 平台培训
+│   ├── 证书列表
+│   └── 证书配置
+├── 培训后台(新)
+│   ├── 班级管理 / 资料审核 / 学员管理
+│   ├── 缴费记录 / 拍照记录 / 培训底片
+├── 习题管理
+│   ├── 题库列表
+│   └── 题目列表
+├── 财务管理
+│   ├── 交易流水
+│   └── 退款记录
+├── 学习记录
+│   ├── 模拟考记录
+│   ├── 培训学习汇总
+│   └── 用户培训详情
+├── 后台配置
+│   ├── 门店配置
+│   └── 档案配置
+├── 薪资发放
+│   ├── 结算审核批量 / 结算审核明细
+│   ├── 结算提现管理 / 交易流水
+│   └── 平台余额
+├── 平台任务
+│   ├── 任务列表 / 团队列表
+│   ├── 薪酬工时配置 / 席位记录
+│   ├── 结算记录 / 财务报表
+│   ├── 消息通知 / 绑卡白名单
+│   └── 保险订单
+├── 统计报表
+│   ├── 财务总览 / 资金对账
+│   ├── 对账单 / 收支明细
+│   └── 开票管理
+├── 运营
+│   ├── 商户拉新管理
+│   └── 服务商管理
+├── 订单管理
+├── 企业管理后台
+│   ├── 审核信息
+│   └── 用户列表
+├── 城市服务商管理
+│   └── 银行类型配置
+└── 个人中心
+    ├── 个人信息
+    └── 修改密码</code></pre>
+
+    <h3>3.2 功能优先级</h3>
+    <table>
+      <tr><th>优先级</th><th>说明</th><th>包含模块</th></tr>
+      <tr><td><span class="tag tag-p0">P0</span>核心必选</td><td>上线必须功能</td><td>登录、用户管理、任务管理、薪资结算、财务管理</td></tr>
+      <tr><td><span class="tag tag-p1">P1</span>重要功能</td><td>核心业务功能</td><td>培训管理、统计报表、企业管理、站内信</td></tr>
+      <tr><td><span class="tag tag-p2">P2</span>一般功能</td><td>日常运营功能</td><td>系统管理、运营管理、区域数据、后台配置</td></tr>
+      <tr><td><span class="tag tag-p3">P3</span>增强功能</td><td>效率提升工具</td><td>表单构建、代码生成、图标库</td></tr>
+    </table>
+
+    <h2 id="section4">4. 详细功能需求</h2>
+
+    <h3>4.1 登录系统</h3>
+    <p><strong>功能描述</strong>：用户通过账号密码验证码登录系统。</p>
+    <p><strong>输入项</strong>：</p>
+    <ul>
+      <li>账号：文本输入，必填</li>
+      <li>密码：密码输入，必填，支持显示/隐藏</li>
+      <li>验证码：图形验证码，必填</li>
+    </ul>
+    <p><strong>处理逻辑</strong>：</p>
+    <ol>
+      <li>验证账号密码是否正确</li>
+      <li>验证验证码是否匹配</li>
+      <li>验证通过后生成登录 Token</li>
+      <li>记录登录日志</li>
+      <li>跳转到首页</li>
+    </ol>
+    <p><strong>输出项</strong>：</p>
+    <ul>
+      <li>登录成功：跳转首页</li>
+      <li>登录失败：显示错误提示</li>
+    </ul>
+    <p><strong>业务规则</strong>：</p>
+    <ul>
+      <li>连续 5 次登录失败，账号锁定 30 分钟</li>
+      <li>密码长度不少于 8 位，包含字母和数字</li>
+      <li>验证码有效期 5 分钟</li>
+    </ul>
+
+    <h3>4.2 首页仪表盘</h3>
+    <p><strong>功能描述</strong>：展示系统核心数据概览。</p>
+    <h4>页面元素</h4>
+    <p><strong>1. 统计卡片（4个）</strong></p>
+    <ul>
+      <li>培训统计：班级数、学员数、环比增长率</li>
+      <li>任务统计：发布数、完成数、进行中数</li>
+      <li>用户统计：总用户数、新增用户、活跃用户</li>
+      <li>完成率统计：任务完成率、培训完成率</li>
+    </ul>
+    <p><strong>2. 数据图表（4个）</strong></p>
+    <ul>
+      <li>培训趋势图：折线图，支持天/月切换</li>
+      <li>任务趋势图：折线图，支持天/月切换</li>
+      <li>用户增长趋势：折线图，支持天/月切换</li>
+      <li>完成率对比：柱状图</li>
+    </ul>
+    <p><strong>交互要求</strong>：</p>
+    <ul>
+      <li>点击天/月按钮切换图表时间维度</li>
+      <li>切换时有加载动画和成功提示</li>
+      <li>鼠标悬停显示详细数据</li>
+    </ul>
+
+    <h3>4.3 驾驶舱</h3>
+    <p><strong>功能描述</strong>：运营数据综合可视化展示。</p>
+    <h4>页面元素</h4>
+    <p><strong>1. 核心指标卡片（4个）</strong></p>
+    <ul>
+      <li>总任务数：12,580，同比 +12.5%</li>
+      <li>活跃用户：3,420，同比 +8.2%</li>
+      <li>交易总额：¥856,200，同比 +15.3%</li>
+      <li>完成率：86.5%，同比 +3.2%</li>
+    </ul>
+    <p><strong>2. 图表区（上排）</strong></p>
+    <ul>
+      <li>任务趋势折线图：近7天，发布/完成双线</li>
+      <li>任务类型分布饼图：配送35%、审核25%、客服20%、其他20%</li>
+    </ul>
+    <p><strong>3. 图表区（下排）</strong></p>
+    <ul>
+      <li>地区任务量柱状图：北京、上海、广州、深圳、杭州、成都</li>
+      <li>实时动态时间线：最新5条系统动态</li>
+    </ul>
+    <p><strong>4. 待办事项表格</strong></p>
+    <ul>
+      <li>列：任务名称、类型、优先级、状态、截止时间、操作</li>
+      <li>支持查看详情、立即处理</li>
+    </ul>
+
+    <h3>4.4 系统管理</h3>
+
+    <h4>4.4.1 字典管理</h4>
+    <p><strong>功能描述</strong>：管理系统各类字典数据。</p>
+    <table>
+      <tr><th>功能</th><th>描述</th><th>优先级</th></tr>
+      <tr><td>字典类型搜索</td><td>按类型名称搜索</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>新增字典类型</td><td>输入类型名称、描述、排序</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>编辑字典类型</td><td>修改字典类型信息</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>删除字典类型</td><td>删除前确认提示</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>查看字典数据</td><td>点击类型进入数据列表</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>新增字典数据</td><td>添加字典标签、键值、排序</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>编辑字典数据</td><td>修改字典数据</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>删除字典数据</td><td>删除字典数据</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>刷新缓存</td><td>刷新字典缓存</td><td><span class="tag tag-p2">P2</span></td></tr>
+    </table>
+    <p><strong>字段说明</strong>：</p>
+    <ul>
+      <li>字典标签：显示用文字</li>
+      <li>字典键值：实际存储值</li>
+      <li>排序：数值越小越靠前</li>
+      <li>状态：正常/停用</li>
+    </ul>
+
+    <h4>4.4.2 通知公告</h4>
+    <p><strong>功能描述</strong>：发布和管理系统通知公告。</p>
+    <table>
+      <tr><th>功能</th><th>描述</th><th>优先级</th></tr>
+      <tr><td>搜索</td><td>按标题、类型搜索</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>新增</td><td>输入标题、类型、内容、状态</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>编辑</td><td>修改公告信息</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>删除</td><td>删除公告</td><td><span class="tag tag-p2">P2</span></td></tr>
+      <tr><td>查看详情</td><td>弹窗展示公告全文</td><td><span class="tag tag-p0">P0</span></td></tr>
+    </table>
+
+    <h4>4.4.3 操作日志</h4>
+    <p><strong>功能描述</strong>：记录用户所有操作日志。</p>
+    <table>
+      <tr><th>功能</th><th>描述</th><th>优先级</th></tr>
+      <tr><td>搜索</td><td>按操作人、操作类型、时间范围搜索</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>查看详情</td><td>查看操作详细信息</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>导出</td><td>导出日志为Excel</td><td><span class="tag tag-p2">P2</span></td></tr>
+      <tr><td>删除</td><td>删除单条日志</td><td><span class="tag tag-p3">P3</span></td></tr>
+    </table>
+
+    <h4>4.4.4 登录日志</h4>
+    <p><strong>功能描述</strong>：记录用户登录登出日志。</p>
+    <table>
+      <tr><th>功能</th><th>描述</th><th>优先级</th></tr>
+      <tr><td>搜索</td><td>按用户名、IP、时间、状态搜索</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>查看详情</td><td>查看登录详细信息</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>导出</td><td>导出登录日志</td><td><span class="tag tag-p2">P2</span></td></tr>
+    </table>
+
+    <h4>4.4.5 在线用户</h4>
+    <p><strong>功能描述</strong>：查看当前在线用户列表。</p>
+    <table>
+      <tr><th>功能</th><th>描述</th><th>优先级</th></tr>
+      <tr><td>列表展示</td><td>展示所有在线用户</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>强制下线</td><td>将指定用户踢下线</td><td><span class="tag tag-p2">P2</span></td></tr>
+    </table>
+
+    <h4>4.4.6 定时任务</h4>
+    <p><strong>功能描述</strong>：管理系统定时任务。</p>
+    <table>
+      <tr><th>功能</th><th>描述</th><th>优先级</th></tr>
+      <tr><td>搜索</td><td>按任务名称搜索</td><td><span class="tag tag-p2">P2</span></td></tr>
+      <tr><td>新增</td><td>配置任务名称、执行类、cron表达式</td><td><span class="tag tag-p2">P2</span></td></tr>
+      <tr><td>编辑</td><td>修改任务配置</td><td><span class="tag tag-p2">P2</span></td></tr>
+      <tr><td>删除</td><td>删除任务</td><td><span class="tag tag-p3">P3</span></td></tr>
+      <tr><td>手动执行</td><td>立即执行一次任务</td><td><span class="tag tag-p2">P2</span></td></tr>
+      <tr><td>查看日志</td><td>查看任务执行日志</td><td><span class="tag tag-p1">P1</span></td></tr>
+    </table>
+
+    <h4>4.4.7 数据监控</h4>
+    <p><strong>功能描述</strong>：监控数据库运行状态。</p>
+    <ul>
+      <li>数据源列表：展示所有数据源状态</li>
+      <li>查看详情：查看详细监控指标</li>
+    </ul>
+
+    <h4>4.4.8 服务监控</h4>
+    <p><strong>功能描述</strong>：监控微服务运行状态。</p>
+    <ul>
+      <li>服务列表：展示所有服务状态</li>
+      <li>查看详情：查看服务详细指标</li>
+    </ul>
+
+    <h4>4.4.9 缓存监控</h4>
+    <p><strong>功能描述</strong>：监控Redis缓存运行状态。</p>
+    <ul>
+      <li>缓存列表：展示缓存监控概览</li>
+    </ul>
+
+    <h4>4.4.10 缓存列表</h4>
+    <p><strong>功能描述</strong>：查看和管理系统缓存。</p>
+    <ul>
+      <li>搜索：按缓存名称搜索</li>
+      <li>查看详情、删除缓存、刷新缓存、批量操作</li>
+    </ul>
+
+    <h4>4.4.11 表单构建</h4>
+    <p><strong>功能描述</strong>：可视化表单设计器。</p>
+    <ul>
+      <li>表单列表、拖拽设计、预览、保存、导出</li>
+      <li>支持组件：输入框、文本域、单选框、复选框、下拉选择、日期选择、数字输入、开关、上传组件</li>
+    </ul>
+
+    <h4>4.4.12 代码生成</h4>
+    <p><strong>功能描述</strong>：根据数据库表自动生成前后端代码。</p>
+    <ul>
+      <li>表列表、预览、生成、下载、配置</li>
+    </ul>
+
+    <h4>4.4.13 系统接口</h4>
+    <p><strong>功能描述</strong>：系统API接口文档展示。</p>
+    <ul>
+      <li>接口列表、接口详情、在线调试</li>
+    </ul>
+
+    <h3>4.5 用户管理</h3>
+
+    <h4>4.5.1 用户列表</h4>
+    <p><strong>功能描述</strong>：管理系统用户账号。</p>
+    <table>
+      <tr><th>功能</th><th>描述</th><th>优先级</th></tr>
+      <tr><td>搜索</td><td>按用户名、手机号、状态搜索</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>新增</td><td>创建新用户账号</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>编辑</td><td>修改用户信息</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>删除</td><td>删除用户账号</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>重置密码</td><td>重置用户密码</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>分配角色</td><td>给用户分配角色</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>启用/禁用</td><td>启用或禁用账号</td><td><span class="tag tag-p0">P0</span></td></tr>
+    </table>
+
+    <h4>4.5.2 角色管理</h4>
+    <p><strong>功能描述</strong>：管理系统角色及权限。</p>
+    <ul>
+      <li>搜索、新增、编辑、删除、分配权限、数据权限</li>
+    </ul>
+
+    <h4>4.5.3 部门管理</h4>
+    <p><strong>功能描述</strong>：管理组织部门结构。</p>
+    <ul>
+      <li>部门树、新增部门、编辑部门、删除部门、设置负责人</li>
+    </ul>
+
+    <h4>4.5.4 人员管理</h4>
+    <p><strong>功能描述</strong>：管理人员档案信息。</p>
+    <ul>
+      <li>搜索、新增、编辑、删除、导入、导出</li>
+    </ul>
+
+    <h3>4.6 平台配置</h3>
+
+    <h4>4.6.1 企业注册审核</h4>
+    <p><strong>功能描述</strong>：审核企业注册申请。</p>
+    <ul>
+      <li>搜索、查看详情、审核通过、审核驳回</li>
+    </ul>
+    <p><strong>审核资料</strong>：企业名称、统一社会信用代码、营业执照照片、法人信息、联系人信息、企业地址</p>
+
+    <h4>4.6.2 先用后付</h4>
+    <p><strong>功能描述</strong>：管理企业先用后付额度。</p>
+    <ul>
+      <li>搜索、查看详情、调整额度、冻结/解冻</li>
+    </ul>
+
+    <h4>4.6.3 保险定价</h4>
+    <p><strong>功能描述</strong>：管理保险产品定价。</p>
+    <ul>
+      <li>搜索、新增、编辑、删除、启用/停用</li>
+    </ul>
+
+    <h3>4.7 培训后台</h3>
+
+    <h4>4.7.1 班级管理</h4>
+    <p><strong>功能描述</strong>：管理培训班级。</p>
+    <ul>
+      <li>搜索、新增、编辑、删除、学员管理</li>
+    </ul>
+
+    <h4>4.7.2 资料审核</h4>
+    <p><strong>功能描述</strong>：审核学员提交的报名资料。</p>
+    <ul>
+      <li>搜索、查看详情、审核通过、审核驳回</li>
+    </ul>
+    <p><strong>审核资料</strong>：身份证照片、学历证明、工作证明、其他补充材料</p>
+
+    <h4>4.7.3 缴费记录</h4>
+    <p><strong>功能描述</strong>：查看学员缴费记录。</p>
+    <ul>
+      <li>搜索、查看详情、导出</li>
+    </ul>
+
+    <h3>4.8 薪资发放</h3>
+
+    <h4>4.8.1 结算审核批量</h4>
+    <p><strong>功能描述</strong>：批量审核薪资结算。</p>
+    <ul>
+      <li>搜索、查看详情、批量通过、批量驳回</li>
+    </ul>
+
+    <h4>4.8.2 结算提现管理</h4>
+    <p><strong>功能描述</strong>：管理用户提现申请。</p>
+    <ul>
+      <li>搜索、查看详情、审核通过、审核驳回</li>
+    </ul>
+
+    <h3>4.9 统计报表</h3>
+
+    <h4>4.9.1 对账单</h4>
+    <p><strong>功能描述</strong>：生成和导出财务对账单。</p>
+    <ul>
+      <li>任务结算对账、平台收支对账、服务费对账</li>
+    </ul>
+    <p><strong>业务规则</strong>：</p>
+    <ul>
+      <li>开始日期不能大于结束日期</li>
+      <li>导出时有加载状态</li>
+      <li>支持 Excel 格式下载</li>
+    </ul>
+
+    <h4>4.9.2 资金对账</h4>
+    <p><strong>功能描述</strong>：平台资金与银行对账。</p>
+    <ul>
+      <li>搜索、查看详情、导出</li>
+    </ul>
+
+    <h4>4.9.3 开票管理</h4>
+    <p><strong>功能描述</strong>：管理发票申请。</p>
+    <ul>
+      <li>搜索、查看详情、审核开票、作废</li>
+    </ul>
+
+    <h3>4.10 站内信</h3>
+    <p><strong>功能描述</strong>：系统内部消息通知。</p>
+    <table>
+      <tr><th>功能</th><th>描述</th><th>优先级</th></tr>
+      <tr><td>消息提醒</td><td>右上角铃铛显示未读数</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>消息列表</td><td>弹出层展示最近消息</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>标记已读</td><td>点击消息标记为已读</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>全部已读</td><td>一键标记所有消息已读</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>消息中心</td><td>进入完整消息列表页</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>搜索筛选</td><td>按标题、类型、状态筛选</td><td><span class="tag tag-p1">P1</span></td></tr>
+      <tr><td>批量操作</td><td>批量已读、批量删除</td><td><span class="tag tag-p2">P2</span></td></tr>
+      <tr><td>查看详情</td><td>弹窗查看消息全文</td><td><span class="tag tag-p0">P0</span></td></tr>
+      <tr><td>删除消息</td><td>删除单条消息</td><td><span class="tag tag-p2">P2</span></td></tr>
+    </table>
+    <p><strong>消息类型</strong>：</p>
+    <ul>
+      <li>系统通知：系统升级、维护、安全提醒</li>
+      <li>任务通知：任务分配、完成、超时</li>
+      <li>审核通知：审核结果、进度通知</li>
+      <li>活动通知：运营活动、节日祝福</li>
+    </ul>
+
+    <h3>4.11 个人中心</h3>
+
+    <h4>4.11.1 个人信息</h4>
+    <p><strong>功能描述</strong>：查看个人基本信息。</p>
+    <p><strong>展示信息</strong>：用户名、昵称、手机号、邮箱、部门、角色、创建时间、最后登录时间</p>
+
+    <h4>4.11.2 修改密码</h4>
+    <p><strong>功能描述</strong>：修改登录密码。</p>
+    <p><strong>输入项</strong>：</p>
+    <ul>
+      <li>旧密码：必填，验证正确性</li>
+      <li>新密码：必填，长度8-20位，含字母数字</li>
+      <li>确认密码：必填，与新密码一致</li>
+    </ul>
+    <p><strong>业务规则</strong>：</p>
+    <ul>
+      <li>旧密码验证通过才能修改</li>
+      <li>新密码不能与旧密码相同</li>
+      <li>修改成功后需重新登录</li>
+    </ul>
+
+    <h2 id="section5">5. 非功能需求</h2>
+    <h3>5.1 性能需求</h3>
+    <table>
+      <tr><th>指标</th><th>要求</th></tr>
+      <tr><td>页面加载时间</td><td>首屏 &lt; 3s，其他页面 &lt; 2s</td></tr>
+      <tr><td>接口响应时间</td><td>普通查询 &lt; 500ms，复杂查询 &lt; 2s</td></tr>
+      <tr><td>并发用户数</td><td>支持 1000+ 并发用户</td></tr>
+      <tr><td>系统可用性</td><td>99.9% 以上</td></tr>
+    </table>
+
+    <h3>5.2 安全需求</h3>
+    <ul>
+      <li>用户密码加密存储，使用 BCrypt 算法</li>
+      <li>敏感数据传输使用 HTTPS</li>
+      <li>SQL 注入、XSS、CSRF 防护</li>
+      <li>接口权限校验，防止越权访问</li>
+      <li>操作日志完整记录，支持审计</li>
+      <li>定期自动备份数据</li>
+    </ul>
+
+    <h3>5.3 兼容性需求</h3>
+    <ul>
+      <li>浏览器：Chrome 90+、Edge 90+、Firefox 88+、Safari 14+</li>
+      <li>分辨率：最小支持 1366*768，推荐 1920*1080</li>
+      <li>移动端：响应式布局，支持平板访问</li>
+    </ul>
+
+    <h3>5.4 可用性需求</h3>
+    <ul>
+      <li>操作反馈：所有操作有明确的成功/失败提示</li>
+      <li>加载状态：数据加载显示 Loading 动画</li>
+      <li>错误提示：友好的错误信息，避免技术术语</li>
+      <li>帮助文档：关键功能提供操作指引</li>
+    </ul>
+
+    <h2 id="section6">6. 界面设计规范</h2>
+    <h3>6.1 设计风格</h3>
+    <ul>
+      <li>风格：简洁、专业、商务</li>
+      <li>主色调：#409EFF（蓝色）</li>
+      <li>辅助色：#67C23A（成功绿）、#E6A23C（警告橙）、#F56C6C（危险红）、#909399（灰色）</li>
+      <li>字体：系统默认字体，字号 14px</li>
+      <li>圆角：4px 小圆角</li>
+    </ul>
+
+    <h3>6.2 布局规范</h3>
+    <ul>
+      <li>侧边栏宽度：210px，折叠后 64px</li>
+      <li>顶部导航高度：60px</li>
+      <li>内容区左右内边距：20px</li>
+      <li>卡片间距：20px</li>
+    </ul>
+
+    <h3>6.3 组件规范</h3>
+    <ul>
+      <li>使用 Element Plus 组件库</li>
+      <li>表格必须有边框和斑马纹</li>
+      <li>弹窗宽度：小型 400px、中型 600px、大型 800px</li>
+      <li>按钮主操作使用 type="primary"</li>
+      <li>危险操作使用 type="danger" + 确认弹窗</li>
+    </ul>
+
+    <h2 id="section7">7. 数据需求</h2>
+    <h3>7.1 核心数据实体</h3>
+    <table>
+      <tr><th>实体</th><th>主要字段</th><th>说明</th></tr>
+      <tr><td>用户</td><td>id、用户名、密码、昵称、手机号、邮箱、状态、创建时间</td><td>系统用户表</td></tr>
+      <tr><td>角色</td><td>id、角色名、角色编码、排序、状态</td><td>角色表</td></tr>
+      <tr><td>菜单</td><td>id、菜单名、路径、图标、父级ID、排序</td><td>菜单权限表</td></tr>
+      <tr><td>企业</td><td>id、企业名、信用代码、联系人、状态</td><td>企业用户表</td></tr>
+      <tr><td>任务</td><td>id、任务名、类型、状态、发布人、创建时间</td><td>任务订单表</td></tr>
+      <tr><td>培训班级</td><td>id、班级名、课程、人数、状态</td><td>培训班表</td></tr>
+      <tr><td>学员</td><td>id、姓名、手机号、身份证、班级ID</td><td>学员表</td></tr>
+    </table>
+
+    <h3>7.2 数据量预估</h3>
+    <ul>
+      <li>用户数据：10万级</li>
+      <li>订单数据：百万级/年</li>
+      <li>日志数据：千万级/年</li>
+      <li>文件数据：TB级</li>
+    </ul>
+
+    <h2 id="section8">8. 接口需求</h2>
+    <h3>8.1 接口规范</h3>
+    <ul>
+      <li>协议：HTTPS</li>
+      <li>格式：JSON</li>
+      <li>认证：Bearer Token</li>
+      <li>版本：URL 中带版本号（/api/v1/）</li>
+    </ul>
+
+    <h3>8.2 响应格式</h3>
+    <pre><code>{
+  "code": 200,
+  "message": "success",
+  "data": {}
+}</code></pre>
+
+    <h3>8.3 主要接口模块</h3>
+    <ul>
+      <li>用户认证接口</li>
+      <li>用户管理接口</li>
+      <li>角色权限接口</li>
+      <li>任务管理接口</li>
+      <li>培训管理接口</li>
+      <li>财务管理接口</li>
+      <li>报表统计接口</li>
+    </ul>
+
+    <h2 id="section9">9. 上线标准</h2>
+    <h3>9.1 功能验收</h3>
+    <ul>
+      <li>P0 功能 100% 通过测试</li>
+      <li>P1 功能 95% 以上通过</li>
+      <li>无严重级别 Bug</li>
+      <li>一般级别 Bug 不超过 10 个</li>
+    </ul>
+
+    <h3>9.2 性能验收</h3>
+    <ul>
+      <li>首页加载 &lt; 3s</li>
+      <li>列表查询 &lt; 500ms</li>
+      <li>1000 并发稳定运行 1 小时</li>
+    </ul>
+
+    <h3>9.3 安全验收</h3>
+    <ul>
+      <li>通过安全扫描</li>
+      <li>无高危安全漏洞</li>
+      <li>密码等敏感数据加密存储</li>
+    </ul>
+
+    <h3>9.4 文档验收</h3>
+    <ul>
+      <li>产品文档完整</li>
+      <li>接口文档完整</li>
+      <li>运维部署文档完整</li>
+      <li>用户使用手册完整</li>
+    </ul>
+
+    <div class="footer">
+      民匠有约管理系统 · 产品需求文档 V1.0<br>
+      更新日期：2026-07-04<br><br>
+      <a href="./changelog.html" style="color: #67C23A;">← 返回更新日志</a>
+    </div>
+  </div>
+</div>
+<a href="#top" class="back-top" title="返回顶部">↑</a>
+</body>
+</html>

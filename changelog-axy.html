@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安心云 - 产品更新日志</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #303133;
+    background: #f5f7fa;
+  }
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+  /* 头部 */
+  .header {
+    background: linear-gradient(135deg, #67C23A 0%, #5cb85c 100%);
+    color: #fff;
+    padding: 60px 50px;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    opacity: 0.9;
+  }
+  .header .version {
+    margin-top: 16px;
+    font-size: 13px;
+    opacity: 0.8;
+  }
+  .header .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .header .back-link:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
+  /* 入口卡片 */
+  .entries {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    padding: 40px 50px;
+    align-items: stretch;
+  }
+  .entry-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    background: #fff;
+    border: 1px solid #ebeef5;
+    border-radius: 8px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .entry-card .entry-icon { flex-shrink: 0; }
+  .entry-card h3 { flex-shrink: 0; }
+  .entry-card p {
+    flex-grow: 1;
+    margin-bottom: 16px;
+  }
+  .entry-card .entry-btn { flex-shrink: 0; }
+  .entry-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(103,194,58,0.15);
+    border-color: #67C23A;
+  }
+  .entry-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+  .entry-card.manual::before { background: linear-gradient(90deg, #67C23A, #5cb85c); }
+  .entry-card.prd::before    { background: linear-gradient(90deg, #409EFF, #5b6cff); }
+  .entry-card.proto::before  { background: linear-gradient(90deg, #E6A23C, #f0ad4e); }
+  .entry-card.flow::before   { background: linear-gradient(90deg, #F56C6C, #ff8a80); }
+  .entry-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #fff;
+  }
+  .entry-card.manual .entry-icon { background: linear-gradient(135deg, #67C23A, #5cb85c); }
+  .entry-card.prd .entry-icon    { background: linear-gradient(135deg, #409EFF, #5b6cff); }
+  .entry-card.proto .entry-icon  { background: linear-gradient(135deg, #E6A23C, #f0ad4e); }
+  .entry-card.flow .entry-icon   { background: linear-gradient(135deg, #F56C6C, #ff8a80); }
+  .entry-card h3 {
+    font-size: 18px;
+    color: #303133;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .entry-card p {
+    font-size: 13px;
+    color: #909399;
+    margin-bottom: 16px;
+  }
+  .entry-card .entry-btn {
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #fff;
+  }
+  .entry-card.manual .entry-btn { background: #67C23A; }
+  .entry-card.prd .entry-btn    { background: #409EFF; }
+  .entry-card.proto .entry-btn  { background: #E6A23C; }
+  .entry-card.flow .entry-btn   { background: #F56C6C; }
+
+  /* 更新日志 */
+  .content {
+    padding: 0 50px 40px;
+  }
+  .content h2 {
+    font-size: 24px;
+    color: #303133;
+    margin: 20px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #ebeef5;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .content h2 .icon { color: #67C23A; }
+
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: #ebeef5;
+  }
+  .version-item {
+    position: relative;
+    margin-bottom: 32px;
+  }
+  .version-item::before {
+    content: '';
+    position: absolute;
+    left: -32px;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #67C23A;
+    z-index: 1;
+  }
+  .version-item.major::before {
+    border-color: #F56C6C;
+  }
+  .version-item.minor::before {
+    border-color: #E6A23C;
+  }
+  .version-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .version-tag {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .version-tag.major { background: #F56C6C; }
+  .version-tag.minor { background: #E6A23C; }
+  .version-tag.patch { background: #67C23A; }
+  .version-date {
+    color: #909399;
+    font-size: 13px;
+  }
+  .version-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+  }
+  .version-body {
+    background: #f8f9fc;
+    border-radius: 6px;
+    padding: 16px 24px;
+  }
+  .version-body h4 {
+    font-size: 14px;
+    margin: 12px 0 8px;
+    font-weight: 600;
+  }
+  .version-body h4:first-child { margin-top: 0; }
+  .version-body ul {
+    padding-left: 20px;
+    color: #606266;
+    font-size: 14px;
+  }
+  .version-body li {
+    margin-bottom: 6px;
+    line-height: 1.7;
+  }
+  .badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-right: 6px;
+    font-weight: 500;
+  }
+  .badge-new     { background: #f0f9eb; color: #67C23A; }
+  .badge-fix     { background: #fef0f0; color: #F56C6C; }
+  .badge-update  { background: #ecf5ff; color: #409EFF; }
+  .badge-opt     { background: #fdf6ec; color: #E6A23C; }
+
+  .version-body a {
+    color: #67C23A;
+    text-decoration: none;
+    border-bottom: 1px dashed #c0c4cc;
+    transition: all 0.2s;
+  }
+  .version-body a:hover {
+    color: #85ce61;
+    border-bottom-color: #67C23A;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 30px 50px;
+    color: #909399;
+    font-size: 13px;
+    border-top: 1px solid #ebeef5;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 id="top">安心云</h1>
+    <div class="subtitle">用工管理平台 - 产品更新日志</div>
+    <div class="version">版本 V1.0 · 2026-07-04</div>
+    <a href="./system.html" class="back-link">← 返回平台登陆入口</a>
+  </div>
+
+  <!-- 四个入口 -->
+  <div class="entries">
+    <a href="./manual-axy.html" class="entry-card manual">
+      <div class="entry-icon">📖</div>
+      <h3>产品使用手册</h3>
+      <p>系统功能操作指南，含用户管理、任务管理、培训考证等模块</p>
+      <span class="entry-btn">查看手册</span>
+    </a>
+    <a href="./prd-axy.html" class="entry-card prd">
+      <div class="entry-icon">📋</div>
+      <h3>产品需求文档</h3>
+      <p>完整PRD，含功能需求、设计规范、上线标准</p>
+      <span class="entry-btn">查看文档</span>
+    </a>
+    <a href="./flowchart-axy.html" class="entry-card flow">
+      <div class="entry-icon">🔄</div>
+      <h3>产品流程图</h3>
+      <p>核心业务流程，含用户认证、任务执行、薪资结算等</p>
+      <span class="entry-btn">查看流程图</span>
+    </a>
+    <a href="./#/axy/login" class="entry-card proto">
+      <div class="entry-icon">🖥️</div>
+      <h3>产品原型</h3>
+      <p>完整系统原型，含全部页面与交互体验</p>
+      <span class="entry-btn">进入原型</span>
+    </a>
+  </div>
+
+  <!-- 更新日志 -->
+  <div class="content">
+    <h2><span class="icon">📜</span> 更新日志</h2>
+
+    <div class="timeline">
+
+      <div class="version-item">
+        <div class="version-header">
+          <span class="version-tag patch">V1.0.3</span>
+          <span class="version-title">文档交付</span>
+          <span class="version-date">2026-07-04</span>
+        </div>
+        <div class="version-body">
+          <h4>📝 文档输出</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span><a href="./manual-axy.html">产品使用手册（HTML 版）</a>，含用户管理、任务管理、培训考证等模块操作说明</li>
+            <li><span class="badge badge-new">新增</span><a href="./prd-axy.html">产品需求文档 PRD（HTML 版）</a>，含功能需求、设计规范、上线标准</li>
+            <li><span class="badge badge-new">新增</span><a href="./flowchart-axy.html">产品流程图（HTML 版）</a>，含核心业务流程</li>
+            <li><span class="badge badge-new">新增</span><a href="./changelog-axy.html">产品更新日志页面</a>，整合手册、文档、原型、流程图入口</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-item minor">
+        <div class="version-header">
+          <span class="version-tag minor">V1.0.2</span>
+          <span class="version-title">功能优化</span>
+          <span class="version-date">2026-06-20</span>
+        </div>
+        <div class="version-body">
+          <h4>⚡ 性能优化</h4>
+          <ul>
+            <li><span class="badge badge-opt">优化</span>任务列表加载速度，支持分页和懒加载</li>
+            <li><span class="badge badge-opt">优化</span>培训学习视频播放流畅度</li>
+            <li><span class="badge badge-opt">优化</span>结算审核流程响应时间</li>
+            <li><span class="badge badge-opt">优化</span>移动端适配体验</li>
+          </ul>
+          <h4>🔧 问题修复</h4>
+          <ul>
+            <li><span class="badge badge-fix">修复</span>企业认证提交后状态显示异常问题</li>
+            <li><span class="badge badge-fix">修复</span>培训学习进度统计不准确问题</li>
+            <li><span class="badge badge-fix">修复</span>部分页面表单验证提示不清晰问题</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-item minor">
+        <div class="version-header">
+          <span class="version-tag minor">V1.0.1</span>
+          <span class="version-title">功能完善</span>
+          <span class="version-date">2026-06-10</span>
+        </div>
+        <div class="version-body">
+          <h4>🔄 功能更新</h4>
+          <ul>
+            <li><span class="badge badge-update">更新</span>任务管理增加批量操作功能</li>
+            <li><span class="badge badge-update">更新</span>培训考证增加在线模拟考试</li>
+            <li><span class="badge badge-update">更新</span>结算管理增加导出Excel功能</li>
+            <li><span class="badge badge-update">更新</span>用户中心增加消息通知功能</li>
+          </ul>
+          <h4>🔧 问题修复</h4>
+          <ul>
+            <li><span class="badge badge-fix">修复</span>登录验证码过期时间过短问题</li>
+            <li><span class="badge badge-fix">修复</span>任务发布时间选择器显示错误问题</li>
+            <li><span class="badge badge-fix">修复</span>保险订单详情页加载失败问题</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-item major">
+        <div class="version-header">
+          <span class="version-tag major">V1.0.0</span>
+          <span class="version-title">安心云初始版本发布</span>
+          <span class="version-date">2026-06-01</span>
+        </div>
+        <div class="version-body">
+          <h4>🔐 登录系统</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span><a href="http://121.199.7.40:9086/">手机号登录</a>：手机号 + 密码 + 短信验证码登录</li>
+            <li><span class="badge badge-new">新增</span>登录状态保持与自动刷新</li>
+            <li><span class="badge badge-new">新增</span>修改密码与找回密码功能</li>
+          </ul>
+          <h4>👤 用户管理</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>个人用户注册与实名认证</li>
+            <li><span class="badge badge-new">新增</span>用户信息管理与资质上传</li>
+            <li><span class="badge badge-new">新增</span>用户列表查看与搜索筛选</li>
+            <li><span class="badge badge-new">新增</span>用户状态管理（启用/禁用）</li>
+          </ul>
+          <h4>🏭 企业管理</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>企业注册与认证申请</li>
+            <li><span class="badge badge-new">新增</span>企业信息管理与资质审核</li>
+            <li><span class="badge badge-new">新增</span>企业项目与团队管理</li>
+            <li><span class="badge badge-new">新增</span>企业敏感词配置</li>
+          </ul>
+          <h4>📋 任务管理</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>任务发布与编辑</li>
+            <li><span class="badge badge-new">新增</span>任务工种配置</li>
+            <li><span class="badge badge-new">新增</span>任务排期与人员分配</li>
+            <li><span class="badge badge-new">新增</span>任务执行与打卡记录</li>
+            <li><span class="badge badge-new">新增</span>任务状态跟踪（进行中/已完成/已取消）</li>
+          </ul>
+          <h4>📚 培训考证</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>培训班级管理</li>
+            <li><span class="badge badge-new">新增</span>资料审核与学员管理</li>
+            <li><span class="badge badge-new">新增</span>缴费记录与拍照记录</li>
+            <li><span class="badge badge-new">新增</span>证书列表与证书配置</li>
+            <li><span class="badge badge-new">新增</span>在线学习与视频课程</li>
+            <li><span class="badge badge-new">新增</span>模拟考试与正式考试</li>
+          </ul>
+          <h4>💰 薪资结算</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>结算审核（批量/明细）</li>
+            <li><span class="badge badge-new">新增</span>薪资发放与提现管理</li>
+            <li><span class="badge badge-new">新增</span>交易流水查看</li>
+            <li><span class="badge badge-new">新增</span>财务报表与对账单</li>
+          </ul>
+          <h4>🛡️ 保险管理</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>保险订单管理</li>
+            <li><span class="badge badge-new">新增</span>保险定价配置</li>
+            <li><span class="badge badge-new">新增</span>保险记录与理赔申请</li>
+          </ul>
+          <h4>📊 数据统计</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>首页仪表盘数据概览</li>
+            <li><span class="badge badge-new">新增</span>用户统计与任务统计</li>
+            <li><span class="badge badge-new">新增</span>财务统计与培训统计</li>
+          </ul>
+          <h4>🎨 界面设计</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>绿色系主题风格设计</li>
+            <li><span class="badge badge-new">新增</span>响应式布局，适配多终端</li>
+            <li><span class="badge badge-new">新增</span>左侧菜单栏 + 顶部导航布局</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    安心云 · 用工管理平台 · 产品更新日志<br>
+    更新日期：2026-07-04
+  </div>
+</div>
+
+</body>
+</html>

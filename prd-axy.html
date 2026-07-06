@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安心云 - 产品需求文档</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #303133;
+    background: #f5f7fa;
+  }
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+  .header {
+    background: linear-gradient(135deg, #409EFF 0%, #5b6cff 100%);
+    color: #fff;
+    padding: 40px 50px;
+    text-align: center;
+  }
+  .header h1 { font-size: 28px; margin-bottom: 8px; font-weight: 600; }
+  .header .subtitle { font-size: 14px; opacity: 0.9; }
+  .header .back-link {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+  }
+  .header .back-link:hover { background: rgba(255,255,255,0.3); }
+  .content { padding: 40px 50px; }
+  .content h2 {
+    font-size: 22px;
+    color: #303133;
+    margin: 24px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #409EFF;
+    font-weight: 600;
+  }
+  .content h3 {
+    font-size: 18px;
+    color: #303133;
+    margin: 20px 0 12px;
+    font-weight: 600;
+  }
+  .content p { color: #606266; margin-bottom: 12px; }
+  .content ul { padding-left: 24px; color: #606266; margin-bottom: 16px; }
+  .content li { margin-bottom: 8px; }
+  .table-wrap { margin: 16px 0; overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+  }
+  th, td {
+    padding: 12px 16px;
+    border: 1px solid #ebeef5;
+    text-align: left;
+  }
+  th { background: #f8f9fc; font-weight: 600; color: #303133; }
+  td { color: #606266; }
+  .highlight {
+    background: #ecf5ff;
+    padding: 16px 20px;
+    border-radius: 6px;
+    border-left: 4px solid #409EFF;
+    margin: 16px 0;
+  }
+  .footer {
+    text-align: center;
+    padding: 30px 50px;
+    color: #909399;
+    font-size: 13px;
+    border-top: 1px solid #ebeef5;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>安心云 · 产品需求文档</h1>
+    <div class="subtitle">PRD - Product Requirements Document</div>
+    <a href="./changelog-axy.html" class="back-link">← 返回更新日志</a>
+  </div>
+
+  <div class="content">
+    <h2>1. 文档概述</h2>
+    <h3>1.1 文档目的</h3>
+    <p>本文档旨在详细描述安心云用工管理平台的产品需求，包括功能需求、业务流程、设计规范等，为产品开发、测试、验收提供标准依据。</p>
+    <h3>1.2 产品定位</h3>
+    <p>安心云是一个综合性用工管理平台，面向企业用户和个人用户提供任务管理、培训考证、薪资结算、保险管理等服务。</p>
+
+    <h2>2. 产品背景</h2>
+    <h3>2.1 市场背景</h3>
+    <p>随着灵活用工市场的快速发展，企业和劳动者需要一个合规、高效、透明的用工管理平台，实现任务发布、人员管理、薪资结算的数字化管理。</p>
+    <h3>2.2 用户痛点</h3>
+    <ul>
+      <li>企业：用工管理分散、薪资结算复杂、合规风险高</li>
+      <li>劳动者：薪资不透明、培训考证不便、保险保障缺失</li>
+      <li>平台：监管难度大、数据统计复杂、服务效率低</li>
+    </ul>
+
+    <h2>3. 用户角色</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>角色</th><th>描述</th><th>主要功能</th></tr>
+        <tr><td>个人用户</td><td>劳动者，参与任务、获取薪资</td><td>注册认证、任务执行、培训考试、薪资提现</td></tr>
+        <tr><td>企业用户</td><td>用工方，发布任务、管理团队</td><td>企业认证、任务发布、人员管理、薪资结算</td></tr>
+        <tr><td>平台管理员</td><td>系统管理与监管</td><td>用户审核、任务监管、数据统计、系统配置</td></tr>
+      </table>
+    </div>
+
+    <h2>4. 功能需求</h2>
+    <h3>4.1 登录系统</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>功能点</th><th>需求描述</th><th>优先级</th></tr>
+        <tr><td>手机号登录</td><td>输入手机号、密码、短信验证码登录</td><td>P0</td></tr>
+        <tr><td>验证码发送</td><td>点击按钮发送短信验证码，60秒倒计时</td><td>P0</td></tr>
+        <tr><td>密码修改</td><td>输入旧密码、新密码进行密码修改</td><td>P1</td></tr>
+        <tr><td>找回密码</td><td>通过手机验证码重置密码</td><td>P1</td></tr>
+      </table>
+    </div>
+
+    <h3>4.2 用户管理</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>功能点</th><th>需求描述</th><th>优先级</th></tr>
+        <tr><td>用户注册</td><td>手机号注册，设置密码，同意协议</td><td>P0</td></tr>
+        <tr><td>实名认证</td><td>填写姓名、身份证，上传证件照片</td><td>P0</td></tr>
+        <tr><td>资质管理</td><td>上传技能证书、培训证书等资质材料</td><td>P1</td></tr>
+        <tr><td>用户列表</td><td>查看用户列表，支持搜索筛选</td><td>P1</td></tr>
+      </table>
+    </div>
+
+    <h3>4.3 企业管理</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>功能点</th><th>需求描述</th><th>优先级</th></tr>
+        <tr><td>企业注册</td><td>填写企业信息，上传营业执照</td><td>P0</td></tr>
+        <tr><td>企业认证</td><td>提交企业资质，平台审核认证</td><td>P0</td></tr>
+        <tr><td>项目管理</td><td>创建项目，配置项目信息，关联任务</td><td>P1</td></tr>
+        <tr><td>团队管理</td><td>添加团队成员，分配角色权限</td><td>P1</td></tr>
+      </table>
+    </div>
+
+    <h3>4.4 任务管理</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>功能点</th><th>需求描述</th><th>优先级</th></tr>
+        <tr><td>任务发布</td><td>填写任务信息，设置时间、地点、薪资</td><td>P0</td></tr>
+        <tr><td>工种配置</td><td>配置任务所需工种类型</td><td>P0</td></tr>
+        <tr><td>人员分配</td><td>指定任务人员或开放报名</td><td>P0</td></tr>
+        <tr><td>打卡签到</td><td>任务人员打卡签到/签退</td><td>P0</td></tr>
+        <tr><td>任务跟踪</td><td>查看任务进度、人员打卡记录</td><td>P1</td></tr>
+        <tr><td>任务结算</td><td>计算薪资，生成结算记录</td><td>P0</td></tr>
+      </table>
+    </div>
+
+    <h3>4.5 培训考证</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>功能点</th><th>需求描述</th><th>优先级</th></tr>
+        <tr><td>班级管理</td><td>创建培训班级，配置课程安排</td><td>P1</td></tr>
+        <tr><td>在线学习</td><td>观看培训视频，记录学习进度</td><td>P1</td></tr>
+        <tr><td>模拟考试</td><td>在线模拟考试，查看成绩解析</td><td>P1</td></tr>
+        <tr><td>正式考试</td><td>参加正式考试，获取证书</td><td>P1</td></tr>
+        <tr><td>证书管理</td><td>查看证书列表，下载证书</td><td>P1</td></tr>
+      </table>
+    </div>
+
+    <h3>4.6 薪资结算</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>功能点</th><th>需求描述</th><th>优先级</th></tr>
+        <tr><td>结算审核</td><td>审核薪资计算明细，确认结算</td><td>P0</td></tr>
+        <tr><td>薪资发放</td><td>确认发放金额，完成发放</td><td>P0</td></tr>
+        <tr><td>提现管理</td><td>申请提现，查看提现记录</td><td>P0</td></tr>
+        <tr><td>财务报表</td><td>查看财务数据，导出报表</td><td>P1</td></tr>
+      </table>
+    </div>
+
+    <h3>4.7 保险管理</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>功能点</th><th>需求描述</th><th>优先级</th></tr>
+        <tr><td>保险购买</td><td>为任务人员购买保险</td><td>P1</td></tr>
+        <tr><td>订单管理</td><td>查看保险订单，管理保单</td><td>P1</td></tr>
+        <tr><td>理赔申请</td><td>提交理赔申请材料，跟踪进度</td><td>P1</td></tr>
+      </table>
+    </div>
+
+    <h2>5. 非功能需求</h2>
+    <h3>5.1 性能要求</h3>
+    <ul>
+      <li>页面加载时间不超过3秒</li>
+      <li>接口响应时间不超过1秒</li>
+      <li>支持并发用户数1000+</li>
+    </ul>
+    <h3>5.2 安全要求</h3>
+    <ul>
+      <li>用户数据加密存储</li>
+      <li>敏感操作需二次验证</li>
+      <li>接口请求需身份认证</li>
+    </ul>
+    <h3>5.3 可用性要求</h3>
+    <ul>
+      <li>系统可用性99.9%</li>
+      <li>数据备份每日一次</li>
+      <li>故障恢复时间不超过1小时</li>
+    </ul>
+
+    <h2>6. 上线标准</h2>
+    <div class="highlight">
+      <strong>验收标准：</strong>
+      <ul>
+        <li>所有P0功能100%实现且通过测试</li>
+        <li>所有P1功能90%以上实现且通过测试</li>
+        <li>性能、安全、可用性要求达标</li>
+        <li>用户验收测试通过</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    安心云 · 用工管理平台 · 产品需求文档<br>
+    更新日期：2026-07-04
+  </div>
+</div>
+</body>
+</html>

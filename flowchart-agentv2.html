@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民匠有约-服务商系统（代理商2.0） - 产品流程图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #303133;
+    background: #f5f7fa;
+  }
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+  .header {
+    background: linear-gradient(135deg, #F56C6C 0%, #ff8a80 100%);
+    color: #fff;
+    padding: 60px 50px;
+    text-align: center;
+  }
+  .header h1 { font-size: 32px; margin-bottom: 12px; font-weight: 600; }
+  .header .subtitle { font-size: 15px; opacity: 0.9; }
+  .header .version { margin-top: 16px; font-size: 13px; opacity: 0.8; }
+  .header .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .header .back-link:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
+  .toc {
+    background: #f8f9fc;
+    border-left: 4px solid #F56C6C;
+    padding: 24px 32px;
+    margin: 30px 50px;
+    border-radius: 4px;
+  }
+  .toc h2 { font-size: 18px; color: #F56C6C; margin-bottom: 16px; font-weight: 600; }
+  .toc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 32px; }
+  .toc a { color: #606266; text-decoration: none; transition: color 0.2s; }
+  .toc a:hover { color: #F56C6C; }
+
+  .content { padding: 0 50px 40px; }
+  h2 {
+    font-size: 24px; color: #303133; margin: 40px 0 24px;
+    padding-bottom: 12px; border-bottom: 2px solid #ebeef5; font-weight: 600;
+  }
+
+  /* 流程图样式 */
+  .flow-section {
+    margin-bottom: 50px;
+  }
+  .flow-desc {
+    color: #606266; margin-bottom: 20px; font-size: 14px;
+  }
+
+  .flow-chart {
+    background: #fafbfc;
+    border: 1px solid #ebeef5;
+    border-radius: 8px;
+    padding: 40px 20px;
+    overflow-x: auto;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .flow-node {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    max-width: 180px;
+    padding: 16px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.5;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .node-start {
+    background: #67C23A; color: #fff;
+    border-radius: 30px;
+    min-width: 100px;
+  }
+  .node-end {
+    background: #F56C6C; color: #fff;
+    border-radius: 30px;
+    min-width: 100px;
+  }
+  .node-process {
+    background: #fff;
+    border: 2px solid #67C23A;
+    color: #303133;
+  }
+  .node-decision {
+    background: #fdf6ec;
+    border: 2px solid #E6A23C;
+    color: #303133;
+    transform: rotate(45deg);
+    min-width: 80px;
+    min-height: 80px;
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .node-decision span {
+    transform: rotate(-45deg);
+    display: inline-block;
+  }
+  .node-data {
+    background: #f0f9eb;
+    border: 2px solid #67C23A;
+    color: #303133;
+  }
+  .node-highlight {
+    background: #67C23A;
+    color: #fff;
+    border: none;
+  }
+
+  .flow-arrow {
+    display: inline-flex;
+    align-items: center;
+    color: #c0c4cc;
+    font-size: 18px;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+  .flow-arrow-down {
+    color: #c0c4cc;
+    font-size: 18px;
+    text-align: center;
+    padding: 4px 0;
+  }
+  .arrow-label {
+    font-size: 12px;
+    color: #909399;
+    padding: 0 8px;
+    white-space: nowrap;
+  }
+
+  .flow-branch {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 40px;
+  }
+  .flow-branch-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .branch-label {
+    font-size: 12px;
+    color: #F56C6C;
+    font-weight: 600;
+    margin-bottom: -4px;
+  }
+
+  /* 纵向流程 */
+  .flow-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-vertical .flow-node { margin: 4px 0; }
+
+  /* 分支容器 */
+  .flow-split {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin: 8px 0;
+  }
+
+  .legend {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 16px 24px;
+    background: #f8f9fc;
+    border-radius: 6px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #606266;
+  }
+  .legend-box {
+    width: 24px; height: 18px; border-radius: 4px;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 30px 50px;
+    color: #909399;
+    font-size: 13px;
+    border-top: 1px solid #ebeef5;
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 id="top">民匠有约-服务商系统（代理商2.0）</h1>
+    <div class="subtitle">产品流程图</div>
+    <div class="version">版本 V2.0 · 2026-07-04</div>
+    <a href="./agentv2.html" class="back-link">← 返回代理商2.0系统</a>
+  </div>
+
+  <div class="toc">
+    <h2>目 录</h2>
+    <div class="toc-grid">
+      <a href="#f1">1. 登录流程</a>
+      <a href="#f2">2. 注册流程</a>
+      <a href="#f3">3. 企业信息查看流程</a>
+      <a href="#f4">4. 个人代理管理流程</a>
+      <a href="#f5">5. 企业列表查看流程</a>
+      <a href="#f6">6. 购买明细查询流程</a>
+      <a href="#f7">7. 结算明细查询流程</a>
+      <a href="#f8">8. 激励奖励查询流程</a>
+      <a href="#f9">9. 修改密码流程</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-box" style="background:#67C23A;border-radius:12px;"></div>开始/结束</div>
+      <div class="legend-item"><div class="legend-box" style="background:#fff;border:2px solid #67C23A;"></div>处理步骤</div>
+      <div class="legend-item"><div class="legend-box" style="background:#fdf6ec;border:2px solid #E6A23C;"></div>判断节点</div>
+      <div class="legend-item"><div class="legend-box" style="background:#f0f9eb;border:2px solid #67C23A;"></div>数据/记录</div>
+      <div class="legend-item"><div class="legend-box" style="background:#67C23A;"></div>关键步骤</div>
+    </div>
+
+    <!-- 1. 登录流程 -->
+    <div class="flow-section" id="f1">
+      <h2>1. 登录流程</h2>
+      <p class="flow-desc">代理商通过手机号/账号和验证码登录系统，登录成功进入首页，失败则提示错误信息。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">打开登录页</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">输入手机号/账号</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">输入密码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">获取验证码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">输入验证码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">点击登录</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>登录<br>结果？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">失败</div>
+              <div class="flow-node node-process">提示错误信息</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">返回登录页重新输入</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">成功</div>
+              <div class="flow-node node-highlight">生成登录Token</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-start">进入首页</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 注册流程 -->
+    <div class="flow-section" id="f2">
+      <h2>2. 注册流程</h2>
+      <p class="flow-desc">新代理商通过手机号注册账号，获取验证码验证后设置密码，注册成功跳转登录页。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">登录页点击注册</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">填写手机号</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">获取验证码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">输入验证码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">设置密码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">确认注册</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>注册<br>结果？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">失败</div>
+              <div class="flow-node node-process">提示注册失败原因</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">返回注册页重新填写</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">成功</div>
+              <div class="flow-node node-start">跳转登录页</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 企业信息查看流程 -->
+    <div class="flow-section" id="f3">
+      <h2>3. 企业信息查看流程</h2>
+      <p class="flow-desc">代理商登录后默认进入企业信息页面，可查看代理区域、企业Id、邀请码、营业执照、企业合同和法人信息。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">登录成功</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">进入默认页（企业信息）</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>查看<br>内容？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">基本信息</div>
+              <div class="flow-node node-data">查看代理区域</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">查看企业Id</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">查看邀请码</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">资质信息</div>
+              <div class="flow-node node-process">查看营业执照</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">查看企业合同</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">查看法人信息</div>
+            </div>
+          </div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-end">查看完毕</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 个人代理管理流程 -->
+    <div class="flow-section" id="f4">
+      <h2>4. 个人代理管理流程</h2>
+      <p class="flow-desc">代理商管理旗下业务员，支持新增、搜索和查看业务员详情。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">点击个人代理</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">查看业务员列表</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>操作<br>类型？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">新增业务员</div>
+              <div class="flow-node node-process">填写业务员信息</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-highlight">提交新增</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">更新业务员列表</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">搜索业务员</div>
+              <div class="flow-node node-process">输入搜索条件</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">显示搜索结果</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">查看详情</div>
+              <div class="flow-node node-process">点击业务员记录</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">查看业务员详情</div>
+            </div>
+          </div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-end">操作完毕</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 企业列表查看流程 -->
+    <div class="flow-section" id="f5">
+      <h2>5. 企业列表查看流程</h2>
+      <p class="flow-desc">代理商查看名下企业列表，可按条件筛选，查看产品统计和激励奖励信息。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">点击企业列表</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">查看企业列表</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">按注册地/企业名称筛选</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>查看<br>内容？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">产品统计</div>
+              <div class="flow-node node-data">查看如意宝统计</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">查看福运宝统计</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">查看安心云统计</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">激励奖励</div>
+              <div class="flow-node node-process">查看激励奖励</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">奖励金额汇总</div>
+            </div>
+          </div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-end">查看完毕</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. 购买明细查询流程 -->
+    <div class="flow-section" id="f6">
+      <h2>6. 购买明细查询流程</h2>
+      <p class="flow-desc">代理商查询购买明细记录，支持多条件筛选、查看交易统计及导出Excel。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">点击购买明细</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">设置筛选条件<br>（时间/拉新方/企业/产品类型）</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">查询</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>查看<br>内容？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">购买记录</div>
+              <div class="flow-node node-data">查看购买记录列表</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">查看交易统计</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">导出</div>
+              <div class="flow-node node-highlight">导出Excel</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">下载文件</div>
+            </div>
+          </div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-end">查询完毕</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. 结算明细查询流程 -->
+    <div class="flow-section" id="f7">
+      <h2>7. 结算明细查询流程</h2>
+      <p class="flow-desc">代理商查询结算明细记录，查看到账金额，支持多条件筛选及导出Excel。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">点击结算明细</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">设置筛选条件<br>（拉新方/企业/落地服务/姓名/时间）</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">查询</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>查看<br>内容？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">结算记录</div>
+              <div class="flow-node node-data">查看结算记录列表</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">查看到账金额</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">导出</div>
+              <div class="flow-node node-highlight">导出Excel</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">下载文件</div>
+            </div>
+          </div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-end">查询完毕</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. 激励奖励查询流程 -->
+    <div class="flow-section" id="f8">
+      <h2>8. 激励奖励查询流程</h2>
+      <p class="flow-desc">代理商查询激励奖励记录，查看奖励统计，支持多条件筛选及导出Excel。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">点击激励奖励</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">设置筛选条件<br>（拉新方/企业/落地服务）</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-highlight">查询</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>查看<br>内容？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">奖励记录</div>
+              <div class="flow-node node-data">查看奖励记录列表</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">查看奖励统计</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">导出</div>
+              <div class="flow-node node-highlight">导出Excel</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-process">下载文件</div>
+            </div>
+          </div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-end">查询完毕</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. 修改密码流程 -->
+    <div class="flow-section" id="f9">
+      <h2>9. 修改密码流程</h2>
+      <p class="flow-desc">代理商修改登录密码，需验证旧密码后设置新密码，提交后需重新登录。</p>
+      <div class="flow-chart">
+        <div class="flow-vertical">
+          <div class="flow-node node-start">点击用户名</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">点击修改密码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">输入旧密码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">输入新密码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-process">确认新密码</div>
+          <div class="flow-arrow-down">↓</div>
+          <div class="flow-node node-decision"><span>新密码<br>一致？</span></div>
+          <div class="flow-split">
+            <div class="flow-branch-col">
+              <div class="branch-label">否</div>
+              <div class="flow-node node-process">提示密码不一致</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-data">重新输入新密码</div>
+            </div>
+            <div class="flow-branch-col">
+              <div class="branch-label">是</div>
+              <div class="flow-node node-highlight">提交修改</div>
+              <div class="flow-arrow-down">↓</div>
+              <div class="flow-node node-decision"><span>旧密码<br>正确？</span></div>
+              <div class="flow-split">
+                <div class="flow-branch-col">
+                  <div class="branch-label">否</div>
+                  <div class="flow-node node-process">提示旧密码错误</div>
+                </div>
+                <div class="flow-branch-col">
+                  <div class="branch-label">是</div>
+                  <div class="flow-node node-highlight">密码修改成功</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-data">清除登录状态</div>
+                  <div class="flow-arrow-down">↓</div>
+                  <div class="flow-node node-start">重新登录</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    民匠有约-服务商系统（代理商2.0） · 产品流程图<br>
+    更新日期：2026-07-04<br><br>
+    <a href="./agentv2.html" style="color: #F56C6C;">← 返回代理商2.0系统</a>
+  </div>
+</div>
+</body>
+</html>

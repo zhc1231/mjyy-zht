@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民匠有约管理系统 - 产品使用手册</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #303133;
+    background: #f5f7fa;
+  }
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+  .header {
+    background: linear-gradient(135deg, #409EFF 0%, #67C23A 100%);
+    color: #fff;
+    padding: 60px 50px;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    opacity: 0.9;
+  }
+  .header .version {
+    margin-top: 16px;
+    font-size: 13px;
+    opacity: 0.8;
+  }
+  .header .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .header .back-link:hover {
+    background: rgba(255,255,255,0.3);
+  }
+  .content {
+    padding: 40px 50px;
+  }
+  .toc {
+    background: #f8f9fc;
+    border-left: 4px solid #409EFF;
+    padding: 24px 32px;
+    margin-bottom: 40px;
+    border-radius: 4px;
+  }
+  .toc h2 {
+    font-size: 18px;
+    color: #409EFF;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .toc ol {
+    padding-left: 24px;
+    columns: 2;
+    column-gap: 32px;
+  }
+  .toc li {
+    margin-bottom: 8px;
+    break-inside: avoid;
+  }
+  .toc a {
+    color: #606266;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc a:hover {
+    color: #409EFF;
+  }
+  h2 {
+    font-size: 24px;
+    color: #303133;
+    margin: 40px 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #ebeef5;
+    font-weight: 600;
+  }
+  h3 {
+    font-size: 18px;
+    color: #409EFF;
+    margin: 28px 0 16px;
+    font-weight: 600;
+  }
+  p {
+    margin-bottom: 14px;
+    color: #606266;
+  }
+  ul, ol {
+    margin-bottom: 14px;
+    padding-left: 24px;
+    color: #606266;
+  }
+  li {
+    margin-bottom: 6px;
+  }
+  strong {
+    color: #303133;
+    font-weight: 600;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid #ebeef5;
+    padding: 12px 16px;
+    text-align: left;
+  }
+  th {
+    background: #f5f7fa;
+    color: #303133;
+    font-weight: 600;
+  }
+  tr:nth-child(even) {
+    background: #fafbfc;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #ebeef5;
+    margin: 30px 0;
+  }
+  .footer {
+    text-align: center;
+    padding: 30px 50px;
+    color: #909399;
+    font-size: 13px;
+    border-top: 1px solid #ebeef5;
+    margin-top: 40px;
+  }
+  .back-top {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    width: 44px;
+    height: 44px;
+    background: #409EFF;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(64,158,255,0.4);
+    transition: all 0.3s;
+    text-decoration: none;
+    font-size: 18px;
+  }
+  .back-top:hover {
+    background: #66b1ff;
+    transform: translateY(-2px);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 id="top">民匠有约管理系统</h1>
+    <div class="subtitle">产品使用手册</div>
+    <div class="version">版本 V1.0 · 2026-07-04</div>
+    <a href="./changelog.html" class="back-link">← 返回更新日志</a>
+  </div>
+  <div class="content">
+    <div class="toc">
+      <h2>目 录</h2>
+      <ol>
+        <li><a href="#section1">系统概述</a></li>
+        <li><a href="#section2">登录系统</a></li>
+        <li><a href="#section3">首页仪表盘</a></li>
+        <li><a href="#section4">驾驶舱</a></li>
+        <li><a href="#section5">系统管理</a></li>
+        <li><a href="#section6">区域数据</a></li>
+        <li><a href="#section7">用户管理</a></li>
+        <li><a href="#section8">平台配置</a></li>
+        <li><a href="#section9">平台培训</a></li>
+        <li><a href="#section10">培训后台</a></li>
+        <li><a href="#section11">习题管理</a></li>
+        <li><a href="#section12">财务管理</a></li>
+        <li><a href="#section13">学习记录</a></li>
+        <li><a href="#section14">后台配置</a></li>
+        <li><a href="#section15">薪资发放</a></li>
+        <li><a href="#section16">平台任务</a></li>
+        <li><a href="#section17">统计报表</a></li>
+        <li><a href="#section18">运营</a></li>
+        <li><a href="#section19">订单管理</a></li>
+        <li><a href="#section20">企业管理后台</a></li>
+        <li><a href="#section21">城市服务商管理</a></li>
+        <li><a href="#section22">站内信</a></li>
+        <li><a href="#section23">个人中心</a></li>
+      </ol>
+    </div>
+
+    <h2 id="section1">1. 系统概述</h2>
+    <p>民匠有约管理系统是一个综合型的人力资源与任务管理平台，涵盖用户管理、培训管理、薪资结算、财务管理、任务调度等核心功能模块，为企业提供一站式的数字化管理解决方案。</p>
+    <h3>系统特色</h3>
+    <ul>
+      <li>完整的用户生命周期管理</li>
+      <li>在线培训与考试系统</li>
+      <li>灵活的薪资结算体系</li>
+      <li>多维度数据统计报表</li>
+      <li>安全的权限控制体系</li>
+    </ul>
+
+    <h2 id="section2">2. 登录系统</h2>
+    <h3>2.1 访问方式</h3>
+    <ul>
+      <li>打开浏览器，访问系统登录地址</li>
+      <li>输入正确的账号、密码和验证码</li>
+      <li>点击「登录」按钮进入系统</li>
+    </ul>
+    <h3>2.2 账号说明</h3>
+    <ul>
+      <li>管理员账号由系统初始化时创建</li>
+      <li>普通用户账号由管理员在用户管理中添加</li>
+      <li>首次登录后建议及时修改密码</li>
+    </ul>
+    <h3>2.3 注意事项</h3>
+    <ul>
+      <li>验证码不区分大小写</li>
+      <li>连续登录失败可能导致账号锁定</li>
+      <li>长时间未操作系统会自动退出登录</li>
+    </ul>
+
+    <h2 id="section3">3. 首页仪表盘</h2>
+    <p>首页仪表盘展示系统核心数据概览，包含以下内容：</p>
+    <h3>3.1 统计卡片</h3>
+    <ul>
+      <li><strong>培训统计</strong>：展示培训班级数量、学员总数等</li>
+      <li><strong>任务统计</strong>：任务发布数、完成数、进行中数量</li>
+      <li><strong>用户统计</strong>：平台总用户数、新增用户数、活跃用户数</li>
+      <li><strong>完成率统计</strong>：任务完成率、培训完成率等</li>
+    </ul>
+    <h3>3.2 数据图表</h3>
+    <ul>
+      <li>培训趋势图：支持按天/月切换查看</li>
+      <li>任务趋势图：展示任务发布与完成趋势</li>
+      <li>用户增长趋势：用户注册增长曲线</li>
+      <li>完成率对比：各指标完成率对比</li>
+    </ul>
+    <h3>3.3 操作说明</h3>
+    <ul>
+      <li>点击天/月按钮切换图表时间维度</li>
+      <li>鼠标悬停图表可查看详细数据</li>
+      <li>数据会根据权限范围自动过滤</li>
+    </ul>
+
+    <h2 id="section4">4. 驾驶舱</h2>
+    <p>驾驶舱提供更全面的运营数据可视化展示。</p>
+    <h3>4.1 核心指标卡片</h3>
+    <ul>
+      <li>总任务数及同比增长率</li>
+      <li>活跃用户数及同比增长率</li>
+      <li>交易总额及同比增长率</li>
+      <li>完成率及同比变化</li>
+    </ul>
+    <h3>4.2 数据图表</h3>
+    <ul>
+      <li><strong>任务趋势折线图</strong>：近7天任务发布与完成趋势</li>
+      <li><strong>任务类型分布饼图</strong>：各类任务占比分布</li>
+      <li><strong>地区任务量柱状图</strong>：各地区任务量对比</li>
+      <li><strong>实时动态时间线</strong>：系统最新动态滚动展示</li>
+    </ul>
+    <h3>4.3 待办事项</h3>
+    <ul>
+      <li>展示当前用户待处理事项列表</li>
+      <li>支持按优先级、截止时间排序</li>
+      <li>点击事项可直接跳转处理</li>
+    </ul>
+
+    <h2 id="section5">5. 系统管理</h2>
+    <h3>5.1 字典管理</h3>
+    <ul>
+      <li><strong>功能说明</strong>：管理系统各类字典数据，如性别、状态、类型等</li>
+      <li><strong>操作功能</strong>：
+        <ul>
+          <li>搜索字典类型</li>
+          <li>新增/编辑/删除字典类型</li>
+          <li>点击字典类型查看字典数据</li>
+          <li>字典数据的增删改</li>
+          <li>刷新缓存</li>
+        </ul>
+      </li>
+    </ul>
+    <h3>5.2 图标库</h3>
+    <ul>
+      <li>展示系统可用图标列表</li>
+      <li>支持按名称搜索图标</li>
+      <li>点击图标可复制图标代码</li>
+    </ul>
+    <h3>5.3 参数设置</h3>
+    <ul>
+      <li>管理系统全局参数配置</li>
+      <li>支持参数的新增、编辑、删除</li>
+      <li>参数修改后实时生效</li>
+    </ul>
+    <h3>5.4 菜单管理</h3>
+    <ul>
+      <li>管理系统菜单结构</li>
+      <li>支持多级菜单配置</li>
+      <li>可配置菜单图标、排序、权限</li>
+    </ul>
+    <h3>5.5 岗位管理</h3>
+    <ul>
+      <li>管理组织岗位信息</li>
+      <li>支持岗位的增删改查</li>
+      <li>岗位与用户角色关联</li>
+    </ul>
+    <h3>5.6 配置类型管理</h3>
+    <ul>
+      <li>管理系统配置分类</li>
+      <li>支持配置类型的增删改查</li>
+      <li>用于组织和归类配置项</li>
+    </ul>
+    <h3>5.7 配置表管理</h3>
+    <ul>
+      <li>管理系统配置表信息</li>
+      <li>查看各数据表的结构和描述</li>
+      <li>支持配置表的增删改查</li>
+    </ul>
+    <h3>5.8 通知公告</h3>
+    <ul>
+      <li>发布系统通知和公告</li>
+      <li>支持公告的新增、编辑、删除</li>
+      <li>可设置公告类型和状态</li>
+      <li>查看公告详情</li>
+    </ul>
+    <h3>5.9 操作日志</h3>
+    <ul>
+      <li>记录用户系统操作日志</li>
+      <li>支持按操作人、操作类型、时间筛选</li>
+      <li>查看操作详情</li>
+      <li>可导出操作日志</li>
+    </ul>
+    <h3>5.10 登录日志</h3>
+    <ul>
+      <li>记录用户登录日志</li>
+      <li>支持按用户名、IP、时间筛选</li>
+      <li>展示登录状态（成功/失败）</li>
+      <li>可导出登录日志</li>
+    </ul>
+    <h3>5.11 在线用户</h3>
+    <ul>
+      <li>查看当前在线用户列表</li>
+      <li>展示用户登录IP、登录时间</li>
+      <li>支持强制用户下线操作</li>
+    </ul>
+    <h3>5.12 定时任务</h3>
+    <ul>
+      <li>管理系统定时任务</li>
+      <li>支持任务的新增、编辑、删除</li>
+      <li>可手动执行任务</li>
+      <li>查看任务执行日志</li>
+    </ul>
+    <h3>5.13 数据监控</h3>
+    <ul>
+      <li>监控数据库运行状态</li>
+      <li>展示数据源连接数、响应时间</li>
+      <li>查看数据库状态详情</li>
+    </ul>
+    <h3>5.14 服务监控</h3>
+    <ul>
+      <li>监控各微服务运行状态</li>
+      <li>展示服务IP、端口、CPU、内存使用率</li>
+      <li>实时更新服务运行数据</li>
+    </ul>
+    <h3>5.15 缓存监控</h3>
+    <ul>
+      <li>监控Redis缓存运行状态</li>
+      <li>展示缓存命中率、键值数量</li>
+      <li>查看各缓存占用大小</li>
+    </ul>
+    <h3>5.16 缓存列表</h3>
+    <ul>
+      <li>查看系统所有缓存项</li>
+      <li>支持按名称搜索缓存</li>
+      <li>可手动删除指定缓存</li>
+      <li>支持批量刷新缓存</li>
+    </ul>
+    <h3>5.17 表单构建</h3>
+    <ul>
+      <li>可视化表单设计器</li>
+      <li>支持拖拽方式构建表单</li>
+      <li>预览表单效果</li>
+      <li>保存和管理表单模板</li>
+    </ul>
+    <h3>5.18 代码生成</h3>
+    <ul>
+      <li>根据数据库表生成前后端代码</li>
+      <li>支持自定义代码模板</li>
+      <li>预览生成的代码</li>
+      <li>一键下载生成代码</li>
+    </ul>
+    <h3>5.19 系统接口</h3>
+    <ul>
+      <li>展示系统API接口文档</li>
+      <li>按模块分类展示接口</li>
+      <li>查看接口请求参数和响应格式</li>
+      <li>支持接口在线调试</li>
+    </ul>
+
+    <h2 id="section6">6. 区域数据</h2>
+    <h3>6.1 当地数据</h3>
+    <ul>
+      <li>查看各地区基础数据</li>
+      <li>支持按地区名称搜索</li>
+      <li>展示地区统计信息</li>
+    </ul>
+    <h3>6.2 地区排序</h3>
+    <ul>
+      <li>管理地区显示排序</li>
+      <li>支持拖拽调整排序</li>
+      <li>启用/停用地区</li>
+      <li>编辑地区信息</li>
+    </ul>
+
+    <h2 id="section7">7. 用户管理</h2>
+    <h3>7.1 用户列表</h3>
+    <ul>
+      <li>管理系统用户账号</li>
+      <li>支持用户的新增、编辑、删除</li>
+      <li>可重置用户密码</li>
+      <li>分配用户角色</li>
+      <li>启用/禁用用户账号</li>
+    </ul>
+    <h3>7.2 角色管理</h3>
+    <ul>
+      <li>管理系统角色</li>
+      <li>支持角色的增删改查</li>
+      <li>配置角色权限菜单</li>
+      <li>分配数据权限范围</li>
+    </ul>
+    <h3>7.3 部门管理</h3>
+    <ul>
+      <li>管理组织部门结构</li>
+      <li>支持多级部门树</li>
+      <li>部门的增删改查</li>
+      <li>配置部门负责人</li>
+    </ul>
+    <h3>7.4 人员管理</h3>
+    <ul>
+      <li>管理人员档案信息</li>
+      <li>支持人员信息的增删改查</li>
+      <li>记录入职/离职信息</li>
+      <li>管理职位和部门归属</li>
+    </ul>
+
+    <h2 id="section8">8. 平台配置</h2>
+    <h3>8.1 用户列表</h3>
+    <ul>
+      <li>查看平台注册用户</li>
+      <li>支持按姓名、手机号搜索</li>
+      <li>查看用户详细信息</li>
+      <li>管理用户状态</li>
+    </ul>
+    <h3>8.2 个人列表</h3>
+    <ul>
+      <li>查看个人用户列表</li>
+      <li>展示身份证号、注册时间</li>
+      <li>查看用户详情</li>
+    </ul>
+    <h3>8.3 企业列表</h3>
+    <ul>
+      <li>查看企业用户列表</li>
+      <li>展示企业信用代码、联系人</li>
+      <li>查看企业详情</li>
+    </ul>
+    <h3>8.4 用工合同</h3>
+    <ul>
+      <li>管理用工合同</li>
+      <li>查看合同详情</li>
+      <li>按状态筛选合同</li>
+      <li>支持合同导出</li>
+    </ul>
+    <h3>8.5 爱签合同</h3>
+    <ul>
+      <li>管理电子签署合同</li>
+      <li>查看合同签署状态</li>
+      <li>查看签署详情</li>
+      <li>按签署状态筛选</li>
+    </ul>
+    <h3>8.6 个人注册</h3>
+    <ul>
+      <li>查看个人注册记录</li>
+      <li>按注册时间、来源筛选</li>
+      <li>查看注册详情</li>
+      <li>管理注册状态</li>
+    </ul>
+    <h3>8.7 企业注册</h3>
+    <ul>
+      <li>查看企业注册申请</li>
+      <li>审核企业注册信息</li>
+      <li>通过/驳回注册申请</li>
+      <li>查看审核详情</li>
+    </ul>
+    <h3>8.8 数据库查看</h3>
+    <ul>
+      <li>查看数据库表信息</li>
+      <li>展示表名、描述、数据量</li>
+      <li>查看表详情</li>
+      <li>支持按表名搜索</li>
+    </ul>
+    <h3>8.9 上上签人脸记录</h3>
+    <ul>
+      <li>查看人脸识别认证记录</li>
+      <li>展示认证结果和相似度</li>
+      <li>按时间范围筛选</li>
+      <li>查看认证详情</li>
+    </ul>
+    <h3>8.10 人脸底片</h3>
+    <ul>
+      <li>管理人脸底库数据</li>
+      <li>查看人脸采集信息</li>
+      <li>支持删除失效底片</li>
+      <li>批量管理底片</li>
+    </ul>
+    <h3>8.11 公司配置</h3>
+    <ul>
+      <li>管理公司信息配置</li>
+      <li>支持公司信息增删改查</li>
+      <li>配置公司编码和联系方式</li>
+    </ul>
+    <h3>8.12 保险定价</h3>
+    <ul>
+      <li>管理保险产品定价</li>
+      <li>配置保费、保额、保障期限</li>
+      <li>启用/停用保险产品</li>
+      <li>调整保险价格</li>
+    </ul>
+    <h3>8.13 平台工种</h3>
+    <ul>
+      <li>管理平台工种类目</li>
+      <li>配置工种分类和描述</li>
+      <li>调整工种排序</li>
+      <li>启用/停用工种</li>
+    </ul>
+    <h3>8.14 企业敏感词</h3>
+    <ul>
+      <li>管理敏感词库</li>
+      <li>支持敏感词的增删改查</li>
+      <li>配置敏感词分类和级别</li>
+      <li>批量导入敏感词</li>
+    </ul>
+    <h3>8.15 任务模版</h3>
+    <ul>
+      <li>管理任务发布模板</li>
+      <li>配置任务分类和描述</li>
+      <li>支持模版的增删改查</li>
+      <li>启用/停用模版</li>
+    </ul>
+    <h3>8.16 先用后付</h3>
+    <ul>
+      <li>管理企业先用后付额度</li>
+      <li>查看授信额度和使用情况</li>
+      <li>调整企业授信额度</li>
+      <li>冻结/解冻账户</li>
+    </ul>
+    <h3>8.17 考勤机配置</h3>
+    <ul>
+      <li>管理考勤设备</li>
+      <li>配置设备名称、序列号、位置</li>
+      <li>查看设备在线状态</li>
+      <li>启用/停用设备</li>
+    </ul>
+    <h3>8.18 ICC企业</h3>
+    <ul>
+      <li>管理ICC合作企业</li>
+      <li>查看企业ICC编码</li>
+      <li>管理合作状态</li>
+    </ul>
+
+    <h2 id="section9">9. 平台培训</h2>
+    <h3>9.1 证书列表</h3>
+    <ul>
+      <li>查看所有证书信息</li>
+      <li>按证书名称、状态筛选</li>
+      <li>查看证书详情</li>
+      <li>支持证书导出</li>
+    </ul>
+    <h3>9.2 证书配置</h3>
+    <ul>
+      <li>管理证书类型配置</li>
+      <li>配置发证机关、有效期</li>
+      <li>支持证书类型增删改查</li>
+      <li>启用/停用证书类型</li>
+    </ul>
+
+    <h2 id="section10">10. 培训后台</h2>
+    <h3>10.1 班级管理</h3>
+    <ul>
+      <li>管理培训班级</li>
+      <li>支持班级的增删改查</li>
+      <li>配置班级课程和人数</li>
+      <li>管理班级学员</li>
+    </ul>
+    <h3>10.2 资料审核</h3>
+    <ul>
+      <li>审核学员提交的资料</li>
+      <li>查看学员提交的材料</li>
+      <li>审核通过/驳回操作</li>
+      <li>填写驳回理由</li>
+    </ul>
+    <h3>10.3 学员管理</h3>
+    <ul>
+      <li>管理培训学员信息</li>
+      <li>支持学员的增删改查</li>
+      <li>分配学员班级</li>
+      <li>管理学习状态</li>
+    </ul>
+    <h3>10.4 缴费记录</h3>
+    <ul>
+      <li>查看学员缴费记录</li>
+      <li>按缴费状态筛选</li>
+      <li>查看缴费详情</li>
+      <li>支持导出缴费记录</li>
+    </ul>
+    <h3>10.5 拍照记录</h3>
+    <ul>
+      <li>查看学员人脸拍照记录</li>
+      <li>按拍照类型、时间筛选</li>
+      <li>查看照片详情</li>
+      <li>支持删除记录</li>
+    </ul>
+    <h3>10.6 培训底片</h3>
+    <ul>
+      <li>管理培训人脸底库</li>
+      <li>查看采集的人脸数据</li>
+      <li>管理底库状态</li>
+      <li>支持批量删除</li>
+    </ul>
+
+    <h2 id="section11">11. 习题管理</h2>
+    <h3>11.1 题库列表</h3>
+    <ul>
+      <li>管理试题库</li>
+      <li>支持题库的增删改查</li>
+      <li>配置题库类型和状态</li>
+      <li>查看题库题目数量</li>
+    </ul>
+    <h3>11.2 题目列表</h3>
+    <ul>
+      <li>管理具体题目</li>
+      <li>支持单选、多选、判断等题型</li>
+      <li>配置题目难度和所属题库</li>
+      <li>支持题目批量导入导出</li>
+    </ul>
+
+    <h2 id="section12">12. 财务管理</h2>
+    <h3>12.1 交易流水</h3>
+    <ul>
+      <li>查看所有资金交易记录</li>
+      <li>按交易类型、时间筛选</li>
+      <li>查看交易详情</li>
+      <li>支持流水导出</li>
+    </ul>
+    <h3>12.2 退款记录</h3>
+    <ul>
+      <li>查看退款申请记录</li>
+      <li>按退款状态筛选</li>
+      <li>审核退款申请</li>
+      <li>查看退款详情</li>
+    </ul>
+
+    <h2 id="section13">13. 学习记录</h2>
+    <h3>13.1 模拟考记录</h3>
+    <ul>
+      <li>查看学员模拟考试记录</li>
+      <li>按考试时间、学员筛选</li>
+      <li>查看考试成绩和详情</li>
+      <li>支持删除记录</li>
+    </ul>
+    <h3>13.2 培训学习汇总</h3>
+    <ul>
+      <li>汇总学员学习数据</li>
+      <li>展示学习时长、进度、平均分</li>
+      <li>按班级、学员筛选</li>
+      <li>支持导出汇总数据</li>
+    </ul>
+    <h3>13.3 用户培训详情</h3>
+    <ul>
+      <li>查看用户详细学习记录</li>
+      <li>展示各课程学习进度</li>
+      <li>查看学习时长和最后学习时间</li>
+      <li>按学员、时间筛选</li>
+    </ul>
+
+    <h2 id="section14">14. 后台配置</h2>
+    <h3>14.1 门店配置</h3>
+    <ul>
+      <li>管理门店信息</li>
+      <li>支持门店的增删改查</li>
+      <li>配置门店地址和联系方式</li>
+      <li>启用/停用门店</li>
+    </ul>
+    <h3>14.2 档案配置</h3>
+    <ul>
+      <li>管理档案类型配置</li>
+      <li>配置保存期限</li>
+      <li>支持档案类型增删改查</li>
+    </ul>
+
+    <h2 id="section15">15. 薪资发放</h2>
+    <h3>15.1 结算审核批量</h3>
+    <ul>
+      <li>批量审核薪资结算</li>
+      <li>按批次号、状态筛选</li>
+      <li>查看批次详情</li>
+      <li>批量通过/驳回</li>
+    </ul>
+    <h3>15.2 结算审核明细</h3>
+    <ul>
+      <li>查看薪资结算明细</li>
+      <li>按姓名、批次号筛选</li>
+      <li>逐条审核明细</li>
+      <li>查看明细详情</li>
+    </ul>
+    <h3>15.3 结算提现管理</h3>
+    <ul>
+      <li>管理用户提现申请</li>
+      <li>按提现状态筛选</li>
+      <li>审核提现申请</li>
+      <li>查看提现详情</li>
+    </ul>
+    <h3>15.4 交易流水</h3>
+    <ul>
+      <li>查看薪资相关交易流水</li>
+      <li>按交易类型、时间筛选</li>
+      <li>查看流水详情</li>
+      <li>支持导出</li>
+    </ul>
+    <h3>15.5 平台余额</h3>
+    <ul>
+      <li>查看企业账户余额</li>
+      <li>展示可用余额、冻结金额</li>
+      <li>查看最后充值时间</li>
+      <li>按企业名称搜索</li>
+    </ul>
+
+    <h2 id="section16">16. 平台任务</h2>
+    <h3>16.1 任务列表</h3>
+    <ul>
+      <li>管理平台任务</li>
+      <li>查看任务详情</li>
+      <li>按任务状态筛选</li>
+      <li>支持任务发布和管理</li>
+    </ul>
+    <h3>16.2 团队列表</h3>
+    <ul>
+      <li>管理工作团队</li>
+      <li>支持团队的增删改查</li>
+      <li>配置团队成员</li>
+      <li>管理团队状态</li>
+    </ul>
+    <h3>16.3 薪酬工时配置</h3>
+    <ul>
+      <li>管理岗位薪酬标准</li>
+      <li>配置时薪、加班时薪</li>
+      <li>设置工时上下限</li>
+      <li>启用/停用薪酬配置</li>
+    </ul>
+    <h3>16.4 席位记录</h3>
+    <ul>
+      <li>查看任务席位使用记录</li>
+      <li>按状态、用户名筛选</li>
+      <li>查看席位详情</li>
+      <li>展示获取和释放时间</li>
+    </ul>
+    <h3>16.5 结算记录</h3>
+    <ul>
+      <li>查看任务结算记录</li>
+      <li>按结算状态筛选</li>
+      <li>查看结算详情</li>
+      <li>支持导出结算记录</li>
+    </ul>
+    <h3>16.6 财务报表</h3>
+    <ul>
+      <li>查看任务相关财务报表</li>
+      <li>按时间范围生成报表</li>
+      <li>查看报表详情</li>
+      <li>支持报表导出</li>
+    </ul>
+    <h3>16.7 消息通知</h3>
+    <ul>
+      <li>管理任务消息通知</li>
+      <li>支持消息的增删改查</li>
+      <li>配置消息类型和接收对象</li>
+      <li>查看消息发送状态</li>
+    </ul>
+    <h3>16.8 绑卡白名单</h3>
+    <ul>
+      <li>管理银行卡白名单</li>
+      <li>支持白名单的增删改查</li>
+      <li>验证银行卡信息</li>
+      <li>启用/停用白名单</li>
+    </ul>
+    <h3>16.9 保险订单</h3>
+    <ul>
+      <li>管理保险订单</li>
+      <li>查看订单详情</li>
+      <li>按订单状态筛选</li>
+      <li>支持订单导出</li>
+    </ul>
+
+    <h2 id="section17">17. 统计报表</h2>
+    <h3>17.1 财务总览</h3>
+    <ul>
+      <li>展示财务数据概览</li>
+      <li>收支统计图表</li>
+      <li>关键财务指标</li>
+      <li>按时间范围查看</li>
+    </ul>
+    <h3>17.2 资金对账</h3>
+    <ul>
+      <li>平台与银行资金对账</li>
+      <li>查看对账批次和结果</li>
+      <li>处理对账差异</li>
+      <li>导出对账单</li>
+    </ul>
+    <h3>17.3 对账单</h3>
+    <ul>
+      <li>生成财务对账单</li>
+      <li>按日期范围生成</li>
+      <li>三个导出表单：
+        <ul>
+          <li>任务结算对账单</li>
+          <li>平台收支对账单</li>
+          <li>服务费对账单</li>
+        </ul>
+      </li>
+      <li>导出前校验日期范围</li>
+    </ul>
+    <h3>17.4 收支明细</h3>
+    <ul>
+      <li>查看详细收支记录</li>
+      <li>按交易类型筛选</li>
+      <li>查看每笔交易详情</li>
+      <li>支持导出明细</li>
+    </ul>
+    <h3>17.5 开票管理</h3>
+    <ul>
+      <li>管理发票申请</li>
+      <li>按开票状态筛选</li>
+      <li>审核开票申请</li>
+      <li>查看发票详情</li>
+    </ul>
+
+    <h2 id="section18">18. 运营</h2>
+    <h3>18.1 商户拉新管理</h3>
+    <ul>
+      <li>管理商户推广数据</li>
+      <li>查看商户邀请人数</li>
+      <li>按活跃状态筛选</li>
+      <li>查看商户详情</li>
+    </ul>
+    <h3>18.2 服务商管理</h3>
+    <ul>
+      <li>管理合作服务商</li>
+      <li>支持服务商的增删改查</li>
+      <li>配置服务区域</li>
+      <li>查看完成任务数</li>
+    </ul>
+
+    <h2 id="section19">19. 订单管理</h2>
+    <ul>
+      <li>查看平台所有订单</li>
+      <li>按订单状态筛选</li>
+      <li>查看订单详情</li>
+      <li>支持订单导出</li>
+    </ul>
+
+    <h2 id="section20">20. 企业管理后台</h2>
+    <h3>20.1 审核信息</h3>
+    <ul>
+      <li>审核企业资质信息</li>
+      <li>查看企业提交的资料</li>
+      <li>审核通过/驳回</li>
+      <li>填写审核意见</li>
+    </ul>
+    <h3>20.2 用户列表</h3>
+    <ul>
+      <li>查看企业下的用户</li>
+      <li>按用户状态筛选</li>
+      <li>查看用户详情</li>
+    </ul>
+
+    <h2 id="section21">21. 城市服务商管理</h2>
+    <h3>21.1 银行类型配置</h3>
+    <ul>
+      <li>管理支持的银行类型</li>
+      <li>配置银行编码、卡号前缀</li>
+      <li>设置单笔和日累计限额</li>
+      <li>启用/停用银行</li>
+    </ul>
+
+    <h2 id="section22">22. 站内信</h2>
+    <h3>22.1 消息查看</h3>
+    <ul>
+      <li>点击右上角铃铛图标查看消息</li>
+      <li>展示未读消息数量徽标</li>
+      <li>未读消息标题加粗显示</li>
+      <li>点击消息标记为已读</li>
+    </ul>
+    <h3>22.2 消息中心</h3>
+    <ul>
+      <li>点击"查看全部"进入消息中心</li>
+      <li>按标题、类型、状态筛选消息</li>
+      <li>批量标记已读</li>
+      <li>批量删除消息</li>
+      <li>查看消息详情</li>
+    </ul>
+    <h3>22.3 消息类型</h3>
+    <ul>
+      <li>系统通知：系统升级、维护等</li>
+      <li>任务通知：任务分配、完成等</li>
+      <li>审核通知：审核结果通知</li>
+      <li>其他：活动通知、节日祝福等</li>
+    </ul>
+
+    <h2 id="section23">23. 个人中心</h2>
+    <h3>23.1 个人信息</h3>
+    <ul>
+      <li>点击右上角头像下拉菜单</li>
+      <li>选择"个人中心"查看个人信息</li>
+      <li>展示用户名、昵称、手机号、邮箱、部门、角色、创建时间、最后登录时间</li>
+    </ul>
+    <h3>23.2 修改密码</h3>
+    <ul>
+      <li>点击右上角头像下拉菜单</li>
+      <li>选择"修改密码"</li>
+      <li>输入旧密码、新密码、确认密码</li>
+      <li>点击确定完成修改</li>
+    </ul>
+
+    <hr>
+    <h2>附录：常见问题</h2>
+    <p><strong>Q: 忘记密码怎么办？</strong><br>
+    A: 请联系系统管理员重置密码。</p>
+    <p><strong>Q: 页面显示不全怎么办？</strong><br>
+    A: 建议使用 Chrome 或 Edge 浏览器，分辨率建议 1920*1080 以上。</p>
+    <p><strong>Q: 如何导出数据？</strong><br>
+    A: 大部分列表页面都有"导出"按钮，点击即可导出 Excel 格式数据。</p>
+    <p><strong>Q: 系统提示无权限怎么办？</strong><br>
+    A: 请联系管理员分配相应的角色权限。</p>
+
+    <div class="footer">
+      民匠有约管理系统 · 产品使用手册 V1.0<br>
+      更新日期：2026-07-04<br><br>
+      <a href="./changelog.html" style="color: #409EFF;">← 返回更新日志</a>
+    </div>
+  </div>
+</div>
+<a href="#top" class="back-top" title="返回顶部">↑</a>
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民匠有约-企业后台 - 产品使用手册</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #303133;
+    background: #f5f7fa;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+  .header {
+    background: linear-gradient(135deg, #E6A23C 0%, #f0ad4e 100%);
+    color: #fff;
+    padding: 60px 50px;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    opacity: 0.9;
+  }
+  .header .version {
+    margin-top: 16px;
+    font-size: 13px;
+    opacity: 0.8;
+  }
+  .header .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .header .back-link:hover {
+    background: rgba(255,255,255,0.3);
+  }
+  .content {
+    padding: 40px 50px;
+  }
+  .content h2 {
+    font-size: 22px;
+    color: #303133;
+    margin: 24px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0ad4e;
+    font-weight: 600;
+  }
+  .content h3 {
+    font-size: 18px;
+    color: #303133;
+    margin: 20px 0 12px;
+    font-weight: 600;
+  }
+  .content h4 {
+    font-size: 16px;
+    color: #606266;
+    margin: 16px 0 8px;
+    font-weight: 500;
+  }
+  .content p {
+    color: #606266;
+    margin-bottom: 12px;
+    text-indent: 2em;
+  }
+  .content ul {
+    padding-left: 24px;
+    color: #606266;
+    margin-bottom: 16px;
+  }
+  .content li {
+    margin-bottom: 8px;
+    line-height: 1.7;
+  }
+  .content ol {
+    padding-left: 24px;
+    color: #606266;
+    margin-bottom: 16px;
+  }
+  .content ol li {
+    margin-bottom: 8px;
+    line-height: 1.7;
+  }
+  .content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .content th, .content td {
+    border: 1px solid #ebeef5;
+    padding: 10px 12px;
+    text-align: left;
+  }
+  .content th {
+    background: #fdf6ec;
+    color: #E6A23C;
+    font-weight: 600;
+  }
+  .content tr:nth-child(even) {
+    background: #fafafa;
+  }
+  .content a {
+    color: #E6A23C;
+    text-decoration: none;
+    border-bottom: 1px dashed #dcdfe6;
+    transition: all 0.2s;
+  }
+  .content a:hover {
+    color: #f0c78a;
+    border-bottom-color: #E6A23C;
+  }
+  .note {
+    background: #fdf6ec;
+    border-left: 4px solid #E6A23C;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+    color: #606266;
+  }
+  .tip {
+    background: #f0f9eb;
+    border-left: 4px solid #67C23A;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+    color: #606266;
+  }
+  .footer {
+    text-align: center;
+    padding: 30px 50px;
+    color: #909399;
+    font-size: 13px;
+    border-top: 1px solid #ebeef5;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>民匠有约-企业后台</h1>
+    <div class="subtitle">产品使用手册</div>
+    <div class="version">版本 V1.0 · 2026-07-04</div>
+    <a href="./changelog-company.html" class="back-link">← 返回企业后台更新日志</a>
+  </div>
+
+  <div class="content">
+    <h2>目 录</h2>
+    <ul>
+      <li><a href="#1">1. 系统概述</a></li>
+      <li><a href="#2">2. 登录系统</a></li>
+      <li><a href="#3">3. 企业管理</a></li>
+      <li><a href="#4">4. 首页概览</a></li>
+      <li><a href="#5">5. 任务指南</a></li>
+      <li><a href="#6">6. 任务中心</a></li>
+      <li><a href="#7">7. 结算记录</a></li>
+      <li><a href="#8">8. 打卡机数据</a></li>
+      <li><a href="#9">9. 账户管理</a></li>
+      <li><a href="#10">10. 项目管理</a></li>
+      <li><a href="#11">11. 系统管理</a></li>
+    </ul>
+
+    <h2 id="1">1. 系统概述</h2>
+    <p>民匠有约-企业后台是面向企业管理员的专用操作平台，旨在帮助企业高效管理企业信息、任务发布、人员管理、结算对账等核心业务。系统提供从企业入驻、认证审核到任务发布、人员管理、薪资结算的全流程数字化管理能力。</p>
+
+    <h3>1.1 系统特色</h3>
+    <ul>
+      <li>一站式任务管理平台，支持从工种配置到薪资结算的全流程管理</li>
+      <li>完善的企业认证流程，实时显示认证状态</li>
+      <li>灵活的任务发布功能，支持多工种、多人数任务配置</li>
+      <li>清晰的结算记录，服务费、税费明细一目了然</li>
+      <li>考勤打卡数据自动同步，工时统计准确高效</li>
+      <li>账户充值与余额实时管理，资金流向清晰透明</li>
+      <li>便捷的数据筛选与搜索功能</li>
+      <li>响应式布局，适配不同分辨率</li>
+    </ul>
+
+    <h3>1.2 适用对象</h3>
+    <table>
+      <tr><th>角色</th><th>说明</th></tr>
+      <tr><td>企业管理员</td><td>管理所属企业的全部业务与数据，包括任务发布、人员管理、结算对账等</td></tr>
+      <tr><td>企业法人</td><td>查看企业认证状态、项目信息、财务数据等</td></tr>
+    </table>
+
+    <h3>1.3 功能模块总览</h3>
+    <table>
+      <tr><th>模块名称</th><th>功能说明</th></tr>
+      <tr><td>首页概览</td><td>核心数据统计展示，任务、席位、交易流水概览</td></tr>
+      <tr><td>任务指南</td><td>任务操作流程指引，含工种配置、排期、人才库等</td></tr>
+      <tr><td>任务中心</td><td>任务发布、管理、状态跟踪</td></tr>
+      <tr><td>结算记录</td><td>薪资结算明细，服务费、税费计算</td></tr>
+      <tr><td>打卡机数据</td><td>考勤打卡数据统计与查看</td></tr>
+      <tr><td>账户管理</td><td>企业账户充值、余额管理</td></tr>
+      <tr><td>项目管理</td><td>企业项目管理，任务按项目维度分组</td></tr>
+      <tr><td>系统管理</td><td>系统基础配置与企业信息维护</td></tr>
+    </table>
+
+    <h2 id="2">2. 登录系统</h2>
+    <p>企业后台支持手机号/账号登录方式，确保账号安全与操作便捷。</p>
+
+    <h3>2.1 访问地址</h3>
+    <p>打开浏览器，访问企业后台地址：<a href="http://121.199.7.40:9093">http://121.199.7.40:9093</a></p>
+    <div class="tip">建议使用 Chrome、Edge 等主流浏览器，分辨率建议 1920×1080 及以上。</div>
+
+    <h3>2.2 登录方式</h3>
+    <h4>方式一：手机号 + 密码 + 短信验证码登录</h4>
+    <ol>
+      <li>在登录页面输入已注册的<b>手机号</b></li>
+      <li>输入对应的<b>登录密码</b></li>
+      <li>点击「获取验证码」按钮，系统将向该手机号发送<b>短信验证码</b></li>
+      <li>输入收到的短信验证码</li>
+      <li>点击「登录」按钮进入系统</li>
+    </ol>
+
+    <h4>方式二：账号 + 密码 + 短信验证码登录</h4>
+    <ol>
+      <li>在登录页面输入<b>账号</b>（非手机号时使用）</li>
+      <li>输入对应的<b>登录密码</b></li>
+      <li>点击「获取验证码」，输入收到的短信验证码</li>
+      <li>点击「登录」按钮进入系统</li>
+    </ol>
+
+    <h3>2.3 注册账号</h3>
+    <ol>
+      <li>在登录页面点击「注册账号」链接</li>
+      <li>填写手机号、密码等注册信息</li>
+      <li>获取并输入短信验证码</li>
+      <li>点击「注册」完成账号创建</li>
+    </ol>
+
+    <h3>2.4 忘记密码</h3>
+    <ol>
+      <li>在登录页面点击「忘记密码」链接</li>
+      <li>输入注册时使用的手机号</li>
+      <li>获取短信验证码并验证身份</li>
+      <li>设置新密码并确认</li>
+    </ol>
+
+    <div class="note">短信验证码有效时间有限，请及时输入。如未收到验证码，请检查手机短信拦截设置或稍后重试。</div>
+
+    <h2 id="3">3. 企业管理</h2>
+    <p>企业管理模块用于管理用户关联的所有企业信息，包括企业列表查看、认证状态管理、新增企业等功能。</p>
+
+    <h3>3.1 企业列表</h3>
+    <p>企业列表页面展示当前用户关联的所有企业信息，包括企业名称、创建时间、认证状态等。</p>
+
+    <h4>列表字段说明</h4>
+    <table>
+      <tr><th>字段名称</th><th>说明</th></tr>
+      <tr><td>企业名称</td><td>企业全称</td></tr>
+      <tr><td>创建时间</td><td>企业入驻系统的时间</td></tr>
+      <tr><td>认证状态</td><td>企业认证状态（认证通过/审核中/认证失败）</td></tr>
+    </table>
+
+    <h4>操作步骤</h4>
+    <ol>
+      <li>登录系统后，自动进入企业列表页面</li>
+      <li>浏览企业列表，查看各企业的详细信息</li>
+      <li>如需进入项目管理，点击企业对应的「进入项目」按钮</li>
+      <li>如需创建新企业，点击页面右上角「新增企业」按钮</li>
+    </ol>
+
+    <h3>3.2 企业认证</h3>
+    <p>企业认证是企业入驻系统的必要步骤，认证通过后企业才能正常使用系统功能。</p>
+
+    <h4>认证状态说明</h4>
+    <table>
+      <tr><th>状态</th><th>说明</th></tr>
+      <tr><td>认证通过</td><td>企业资质已审核通过，可正常使用系统</td></tr>
+      <tr><td>审核中</td><td>企业资质正在审核中，请耐心等待</td></tr>
+      <tr><td>认证失败</td><td>企业资质审核未通过，需重新提交资质材料</td></tr>
+    </table>
+
+    <div class="tip">认证失败时，系统会提示失败原因，请根据提示修正后重新提交。</div>
+
+    <h3>3.3 新增企业</h3>
+    <p>企业管理员可以创建新的企业信息，填写企业基本信息并上传资质材料。</p>
+
+    <h4>操作步骤</h4>
+    <ol>
+      <li>在企业列表页面，点击右上角「新增企业」按钮</li>
+      <li>填写企业基本信息：企业名称、统一社会信用代码、法人信息等</li>
+      <li>上传企业资质：营业执照扫描件、企业合同等</li>
+      <li>确认信息无误后，点击「提交」</li>
+      <li>等待系统审核企业资质</li>
+    </ol>
+
+    <h4>必填信息</h4>
+    <table>
+      <tr><th>字段名称</th><th>说明</th><th>是否必填</th></tr>
+      <tr><td>企业名称</td><td>企业全称</td><td>是</td></tr>
+      <tr><td>统一社会信用代码</td><td>企业工商识别号</td><td>是</td></tr>
+      <tr><td>法人姓名</td><td>企业法定代表人姓名</td><td>是</td></tr>
+      <tr><td>法人身份证号</td><td>企业法定代表人身份证号码</td><td>是</td></tr>
+      <tr><td>营业执照扫描件</td><td>企业营业执照的扫描件/照片</td><td>是</td></tr>
+      <tr><td>企业合同</td><td>与合作方签署的企业合同文件</td><td>是</td></tr>
+    </table>
+
+    <h2 id="4">4. 首页概览</h2>
+    <p>首页概览是企业后台的数据仪表盘，集中展示企业核心经营数据和快捷操作入口，帮助企业管理员快速了解企业运营状况。</p>
+
+    <h3>4.1 数据概览</h3>
+    <h4>账户资金概览</h4>
+    <table>
+      <tr><th>指标名称</th><th>说明</th></tr>
+      <tr><td>累计充值金额</td><td>企业账户历史累计充值的总金额</td></tr>
+      <tr><td>当前剩余金额</td><td>企业账户当前可用的余额</td></tr>
+      <tr><td>待发放金额</td><td>已计入但尚未发放的薪资金额</td></tr>
+      <tr><td>已发放金额</td><td>历史累计已发放的薪资总金额</td></tr>
+    </table>
+
+    <h4>任务管理统计</h4>
+    <table>
+      <tr><th>指标名称</th><th>说明</th></tr>
+      <tr><td>进行中任务数</td><td>当前正在进行中的任务数量</td></tr>
+      <tr><td>总发布数</td><td>历史累计发布的任务总数</td></tr>
+      <tr><td>在进行中的任务人次数</td><td>当前正在执行任务的人员数量</td></tr>
+      <tr><td>团队总人数</td><td>企业团队的总人数</td></tr>
+    </table>
+
+    <h4>席位管理统计</h4>
+    <table>
+      <tr><th>指标名称</th><th>说明</th></tr>
+      <tr><td>已购席位数</td><td>企业已购买的席位总数</td></tr>
+      <tr><td>团队总人数</td><td>企业团队的总人数</td></tr>
+      <tr><td>今日使用数</td><td>今日实际使用的席位数量</td></tr>
+    </table>
+
+    <h3>4.2 交易流水</h3>
+    <p>交易流水模块展示企业的资金流动情况，支持按时间维度筛选查看。</p>
+    <h4>操作步骤</h4>
+    <ol>
+      <li>在首页找到「交易流水」区域</li>
+      <li>点击切换时间维度：今日 / 昨日 / 上月 / 本月</li>
+      <li>查看对应时间段的发放金额、服务费、税费数据</li>
+      <li>点击「查看更多」按钮，进入详细的交易流水页面</li>
+    </ol>
+
+    <h3>4.3 发放记录排行</h3>
+    <p>发放记录排行展示薪资发放的人员排名，便于了解人员薪资分布情况。</p>
+    <table>
+      <tr><th>字段名称</th><th>说明</th></tr>
+      <tr><td>排名</td><td>按结算金额从高到低的排名</td></tr>
+      <tr><td>姓名</td><td>人员姓名</td></tr>
+      <tr><td>结算金额</td><td>该人员的薪资结算金额</td></tr>
+      <tr><td>服务费</td><td>该笔结算产生的服务费</td></tr>
+      <tr><td>税费</td><td>该笔结算产生的税费</td></tr>
+    </table>
+
+    <h3>4.4 任务列表概览</h3>
+    <p>首页展示最新的任务列表，便于快速了解任务进展情况。</p>
+    <table>
+      <tr><th>字段名称</th><th>说明</th></tr>
+      <tr><td>任务</td><td>任务名称/描述</td></tr>
+      <tr><td>状态</td><td>任务当前状态（进行中、已完成、已取消等）</td></tr>
+      <tr><td>任务周期</td><td>任务的开始日期和结束日期</td></tr>
+      <tr><td>人数</td><td>参与该任务的人员数量</td></tr>
+      <tr><td>预计结算</td><td>任务预计的薪资结算金额</td></tr>
+      <tr><td>实际结算</td><td>任务实际的薪资结算金额</td></tr>
+    </table>
+
+    <h3>4.5 操作流程指南</h3>
+    <p>首页顶部展示完整的任务操作流程，引导用户按步骤完成任务管理：</p>
+    <ol>
+      <li><b>工种配置</b>：配置任务所需的工种类型</li>
+      <li><b>任务排期</b>：规划任务时间安排</li>
+      <li><b>人才库</b>：管理企业人才资源</li>
+      <li><b>发布任务</b>：创建并发布新任务</li>
+      <li><b>任务详情</b>：查看任务详细信息</li>
+      <li><b>添加成员</b>：为任务添加执行人员</li>
+      <li><b>完成</b>：任务完成与结算</li>
+    </ol>
+
+    <div class="tip">点击首页的「发布任务」按钮，可快速进入任务发布页面，提高操作效率。</div>
+
+    <h2 id="5">5. 任务指南</h2>
+    <p>任务指南模块为企业管理员提供任务操作的完整流程指引，帮助快速上手任务管理功能。</p>
+
+    <h3>5.1 任务工种</h3>
+    <p>任务工种配置是任务管理的第一步，用于定义任务所需的各工种类型。</p>
+    <h4>操作说明</h4>
+    <ul>
+      <li>在左侧菜单点击「任务指南」→「1.任务工种」</li>
+      <li>查看和管理企业支持的工种类型</li>
+      <li>根据实际业务需求配置所需工种</li>
+    </ul>
+
+    <h3>5.2 任务排期</h3>
+    <p>任务排期用于规划任务的时间安排，确保任务按时执行。</p>
+    <h4>操作说明</h4>
+    <ul>
+      <li>在左侧菜单点击「任务指南」→「2.任务排期」</li>
+      <li>设置任务的开始时间和结束时间</li>
+      <li>合理安排任务周期，避免时间冲突</li>
+    </ul>
+
+    <h3>5.3 人才库</h3>
+    <p>人才库是企业的人才资源池，用于管理和调度企业可用的人力资源。</p>
+    <h4>操作说明</h4>
+    <ul>
+      <li>在左侧菜单点击「任务指南」→「3.人才库」</li>
+      <li>查看企业人才库中的人员信息</li>
+      <li>根据工种、技能等条件筛选合适的人员</li>
+    </ul>
+
+    <h3>5.4 任务列表</h4>
+    <p>任务列表是任务管理的核心操作页面，用于创建、查看和管理任务。</p>
+    <h4>操作说明</h4>
+    <ul>
+      <li>在左侧菜单点击「任务指南」→「4.任务列表」</li>
+      <li>查看所有任务的列表和状态</li>
+      <li>创建新任务、查看任务详情、管理任务成员</li>
+    </ul>
+
+    <h2 id="6">6. 任务中心</h2>
+    <p>任务中心是企业任务的统一管理平台，支持任务发布、状态跟踪、人员管理等全流程操作。</p>
+
+    <h3>6.1 发布任务</h3>
+    <p>企业管理员可以发布新任务，配置任务的工种、人数、时间等信息。</p>
+    <h4>操作步骤</h4>
+    <ol>
+      <li>在左侧菜单点击「任务中心」</li>
+      <li>点击「发布任务」按钮</li>
+      <li>填写任务基本信息：任务名称、任务描述等</li>
+      <li>选择任务所需的工种和各工种人数</li>
+      <li>设置任务周期（开始日期、结束日期）</li>
+      <li>确认信息无误后，点击「发布」</li>
+      <li>任务发布成功，可在任务列表中查看</li>
+    </ol>
+
+    <h3>6.2 任务状态管理</h3>
+    <p>任务在不同阶段有不同的状态，便于跟踪任务进展。</p>
+    <table>
+      <tr><th>状态</th><th>说明</th></tr>
+      <tr><td>进行中</td><td>任务正在执行过程中</td></tr>
+      <tr><td>已完成</td><td>任务已完成并结算</td></tr>
+      <tr><td>已取消</td><td>任务被取消，不再执行</td></tr>
+    </table>
+
+    <h3>6.3 任务人员管理</h3>
+    <p>任务发布后，可以为任务添加执行人员，管理人员配置。</p>
+    <h4>操作说明</h4>
+    <ul>
+      <li>在任务列表中点击目标任务，进入任务详情</li>
+      <li>查看当前任务的成员列表</li>
+      <li>添加或移除任务成员</li>
+      <li>调整各工种的人员配置</li>
+    </ul>
+
+    <div class="note">任务人员数量应与任务发布时的工人数相匹配，确保任务正常执行。</div>
+
+    <h2 id="7">7. 结算记录</h2>
+    <p>结算记录模块用于管理和查看任务薪资结算明细，包括发放金额、服务费、税费等详细信息。</p>
+
+    <h3>7.1 结算明细查看</h3>
+    <h4>操作步骤</h4>
+    <ol>
+      <li>在左侧菜单点击「结算记录」</li>
+      <li>查看所有结算记录列表</li>
+      <li>可按时间、任务、人员等条件筛选结算记录</li>
+      <li>点击具体记录查看结算详情</li>
+    </ol>
+
+    <h3>7.2 费用明细说明</h3>
+    <table>
+      <tr><th>费用项目</th><th>说明</th></tr>
+      <tr><td>发放金额</td><td>实际发放给人员的薪资金额</td></tr>
+      <tr><td>服务费</td><td>平台收取的服务费用</td></tr>
+      <tr><td>税费</td><td>按照国家规定收取的税费</td></tr>
+    </table>
+
+    <div class="tip">预计结算金额与实际结算金额可能存在差异，以实际结算金额为准。</div>
+
+    <h2 id="8">8. 打卡机数据</h2>
+    <p>打卡机数据模块用于查看和统计人员的考勤打卡数据，为工时计算和薪资结算提供依据。</p>
+
+    <h3>8.1 打卡数据查看</h3>
+    <h4>操作步骤</h4>
+    <ol>
+      <li>在左侧菜单点击「打卡机数据」</li>
+      <li>查看人员的打卡记录</li>
+      <li>可按日期、人员、工种等条件筛选</li>
+      <li>导出打卡数据用于统计分析</li>
+    </ol>
+
+    <h3>8.2 工时统计</h3>
+    <p>系统基于打卡数据自动计算人员工时，确保工时统计准确高效。</p>
+    <ul>
+      <li>上班打卡时间与下班打卡时间自动计算工时</li>
+      <li>支持加班工时的识别与统计</li>
+      <li>工时数据直接关联薪资结算</li>
+    </ul>
+
+    <h2 id="9">9. 账户管理</h2>
+    <p>账户管理模块用于管理企业的充值账户，查看余额、充值记录等资金相关信息。</p>
+
+    <h3>9.1 账户充值</h3>
+    <h4>操作步骤</h4>
+    <ol>
+      <li>在左侧菜单点击「账户管理」</li>
+      <li>点击「充值」按钮</li>
+      <li>输入充值金额</li>
+      <li>选择支付方式</li>
+      <li>完成支付，充值金额实时到账</li>
+    </ol>
+
+    <h3>9.2 余额查询</h3>
+    <p>企业账户余额实时展示，可在首页和账户管理页面查看。</p>
+    <ul>
+      <li>当前剩余金额：账户可用余额</li>
+      <li>累计充值金额：历史充值总额</li>
+      <li>已发放金额：历史发放总额</li>
+    </ul>
+
+    <h3>9.3 充值记录</h3>
+    <p>支持查看历史充值记录，包括充值时间、充值金额、支付方式等信息。</p>
+
+    <h2 id="10">10. 项目管理</h2>
+    <p>项目管理模块用于管理企业的所有项目，支持任务按项目维度进行分组管理。</p>
+
+    <h3>10.1 项目列表</h3>
+    <p>项目列表页面展示当前企业下的所有项目信息，项目列表标题会显示企业名称前缀。</p>
+
+    <h4>操作步骤</h4>
+    <ol>
+      <li>在左侧菜单点击「项目管理」</li>
+      <li>进入项目列表页面，查看当前企业下的所有项目</li>
+      <li>如需创建新项目，点击页面右上角「新增项目」按钮</li>
+    </ol>
+
+    <h3>10.2 新增项目</h3>
+    <p>企业管理员可以为企业创建新项目，便于按项目维度管理任务。</p>
+
+    <h4>操作步骤</h4>
+    <ol>
+      <li>在项目列表页面，点击右上角「新增项目」按钮</li>
+      <li>填写项目基本信息：项目名称、项目描述等</li>
+      <li>确认信息无误后，点击「提交」</li>
+      <li>项目创建成功，自动跳转到项目列表</li>
+    </ol>
+
+    <h4>必填信息</h4>
+    <table>
+      <tr><th>字段名称</th><th>说明</th><th>是否必填</th></tr>
+      <tr><td>项目名称</td><td>项目全称</td><td>是</td></tr>
+      <tr><td>项目描述</td><td>项目简要说明</td><td>否</td></tr>
+    </table>
+
+    <h3>10.3 项目与任务关联</h3>
+    <p>发布任务时可以关联项目，便于按项目维度查看和统计任务数据。</p>
+    <ul>
+      <li>任务发布时选择所属项目</li>
+      <li>在项目详情中查看该项目下的所有任务</li>
+      <li>按项目维度统计任务完成情况和结算数据</li>
+    </ul>
+
+    <div class="tip">项目名称应清晰明确，便于后续项目管理和查找。</div>
+
+    <h2 id="11">11. 系统管理</h2>
+    <p>系统管理模块用于企业的基础配置和信息维护，保障系统正常运行。</p>
+
+    <h3>11.1 企业信息管理</h3>
+    <p>企业管理员可以维护企业的基本信息，确保企业资料准确完整。</p>
+    <h4>操作步骤</h4>
+    <ol>
+      <li>在左侧菜单点击「系统管理」</li>
+      <li>进入企业信息管理页面</li>
+      <li>查看和编辑企业基本信息</li>
+      <li>修改完成后点击「保存」</li>
+    </ol>
+
+    <h3>11.2 系统设置</h3>
+    <p>系统设置提供企业的个性化配置选项。</p>
+    <ul>
+      <li>企业基本资料维护</li>
+      <li>联系人信息管理</li>
+      <li>通知设置等个性化配置</li>
+    </ul>
+
+    <div class="note">修改企业信息后，如需更新认证信息，请联系平台客服进行审核。</div>
+
+  </div>
+
+  <div class="footer">
+    民匠有约-企业后台 · 产品使用手册<br>
+    更新日期：2026-07-04
+  </div>
+</div>
+
+</body>
+</html>
