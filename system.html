@@ -215,15 +215,17 @@
   }
   .enter-btn.log:hover { background: #9B59B6; color: #fff; }
   .card-footer.triple {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
   .card-footer.triple .enter-btn {
-    flex: 1 1 calc(50% - 5px);
+    flex: none;
     font-size: 13px;
     padding: 9px 8px;
   }
   .card-footer.triple .enter-btn:last-child {
-    flex: 1 1 100%;
+    grid-column: 1 / -1;
   }
 
   /* 弹窗 */
