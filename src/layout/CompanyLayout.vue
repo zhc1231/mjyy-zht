@@ -164,9 +164,9 @@ const handleLogout = () => {
 <style scoped>
 .company-layout {
   height: 100%;
-  --primary-color: #E6A23C;
-  --primary-light: #f0ad4e;
-  --primary-bg: #fff7e6;
+  --primary-color: #409EFF;
+  --primary-light: #66b1ff;
+  --primary-bg: #ecf5ff;
 }
 
 .layout-container {
@@ -191,7 +191,7 @@ const handleLogout = () => {
   font-size: 28px;
   font-weight: 700;
   letter-spacing: 3px;
-  color: #E6A23C;
+  color: #409EFF;
 }
 
 .logo-char {
@@ -230,12 +230,12 @@ const handleLogout = () => {
 }
 
 .menu-title:hover {
-  background: #fff7e6;
-  color: #E6A23C;
+  background: #ecf5ff;
+  color: #409EFF;
 }
 
 .menu-title.active {
-  color: #E6A23C;
+  color: #409EFF;
   font-weight: 500;
   background: #fff7e6;
 }
@@ -247,7 +247,7 @@ const handleLogout = () => {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: #E6A23C;
+  background: #409EFF;
 }
 
 .menu-text {
@@ -272,12 +272,12 @@ const handleLogout = () => {
 }
 
 .sub-menu-item:hover {
-  color: #E6A23C;
-  background: #fffaf0;
+  color: #409EFF;
+  background: #f5faff;
 }
 
 .sub-menu-item.active {
-  color: #E6A23C;
+  color: #409EFF;
   font-weight: 500;
   background: #fffaf0;
 }
@@ -305,7 +305,7 @@ const handleLogout = () => {
 
 .company-selector {
   background: #fff7e6 !important;
-  color: #E6A23C !important;
+  color: #409EFF !important;
   border: 1px solid #ffd591 !important;
   border-radius: 6px;
   padding: 0 16px;

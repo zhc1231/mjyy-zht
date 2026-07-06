@@ -215,15 +215,17 @@
   }
   .enter-btn.log:hover { background: #9B59B6; color: #fff; }
   .card-footer.triple {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
   .card-footer.triple .enter-btn {
-    flex: 1 1 calc(50% - 5px);
+    flex: none;
     font-size: 13px;
     padding: 9px 8px;
   }
   .card-footer.triple .enter-btn:last-child {
-    flex: 1 1 100%;
+    grid-column: 1 / -1;
   }
 
   /* 弹窗 */
@@ -575,9 +577,10 @@
           </div>
         </div>
       </div>
-      <div class="card-footer">
+      <div class="card-footer triple">
         <a class="enter-btn prod" href="https://axy.minjiangyouyue.com" target="_blank" rel="noopener">🚀 进入生产</a>
         <a class="enter-btn test" href="http://121.199.7.40:9086" target="_blank" rel="noopener">🧪 进入测试</a>
+        <a class="enter-btn log" href="./changelog-axy.html">📜 产品更新日志</a>
       </div>
     </div>
 

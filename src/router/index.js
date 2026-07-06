@@ -122,6 +122,47 @@ const routes = [
       { path: 'project', name: 'CompanyProject', component: () => import('../views/Company/ProjectList.vue'), meta: { title: '项目管理' } },
       { path: 'system', name: 'CompanySystem', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '系统管理' } }
     ]
+  },
+  {
+    path: '/axy/login',
+    name: 'AxyLogin',
+    component: () => import('../views/Axy/Login.vue'),
+    meta: { title: '登录' }
+  },
+  {
+    path: '/axy',
+    name: 'AxyLayout',
+    component: () => import('../layout/AxyLayout.vue'),
+    redirect: '/axy/home',
+    children: [
+      { path: 'home', name: 'AxyHome', component: () => import('../views/Axy/Home.vue'), meta: { title: '首页仪表盘' } },
+      { path: 'user', name: 'AxyUser', component: () => import('../views/Axy/UserList.vue'), meta: { title: '用户管理' } },
+      { path: 'task', name: 'AxyTask', component: () => import('../views/Axy/TaskList.vue'), meta: { title: '任务管理' } },
+      { path: 'training/class', name: 'AxyTrainingClass', component: () => import('../views/Axy/TrainingClass.vue'), meta: { title: '培训班级' } },
+      { path: 'training/course', name: 'AxyTrainingCourse', component: () => import('../views/Axy/TrainingCourse.vue'), meta: { title: '在线学习' } },
+      { path: 'training/exam', name: 'AxyTrainingExam', component: () => import('../views/Axy/TrainingExam.vue'), meta: { title: '考试管理' } },
+      { path: 'training/cert', name: 'AxyTrainingCert', component: () => import('../views/Axy/TrainingCert.vue'), meta: { title: '证书管理' } },
+      { path: 'settlement', name: 'AxySettlement', component: () => import('../views/Axy/Settlement.vue'), meta: { title: '薪资结算' } },
+      { path: 'insurance', name: 'AxyInsurance', component: () => import('../views/Axy/Insurance.vue'), meta: { title: '保险管理' } },
+      { path: 'hr/roster', name: 'AxyRoster', component: () => import('../views/Axy/EmployeeRoster.vue'), meta: { title: '职工名册' } },
+      { path: 'hr/attendance', name: 'AxyAttendance', component: () => import('../views/Axy/Attendance.vue'), meta: { title: '考勤确认' } },
+      { path: 'hr/performance', name: 'AxyPerformance', component: () => import('../views/Axy/Performance.vue'), meta: { title: '绩效考核' } },
+      { path: 'hr/onboarding', name: 'AxyOnboarding', component: () => import('../views/Axy/Onboarding.vue'), meta: { title: '入职管理' } },
+      { path: 'hr/probation', name: 'AxyProbation', component: () => import('../views/Axy/Probation.vue'), meta: { title: '试用管理' } },
+      { path: 'hr/transfer', name: 'AxyTransfer', component: () => import('../views/Axy/Transfer.vue'), meta: { title: '调岗调薪' } },
+      { path: 'hr/resignation', name: 'AxyResignation', component: () => import('../views/Axy/Resignation.vue'), meta: { title: '离职管理' } },
+      { path: 'hr/change', name: 'AxyChange', component: () => import('../views/Axy/Change.vue'), meta: { title: '异动管理' } },
+      { path: 'salary/structure', name: 'AxySalaryStructure', component: () => import('../views/Axy/SalaryStructure.vue'), meta: { title: '薪酬结构' } },
+      { path: 'salary/confirm', name: 'AxySalaryConfirm', component: () => import('../views/Axy/SalaryConfirm.vue'), meta: { title: '薪资确认' } },
+      { path: 'salary/social', name: 'AxySocial', component: () => import('../views/Axy/SocialSecurity.vue'), meta: { title: '社保福利' } },
+      { path: 'document/regulation', name: 'AxyRegulation', component: () => import('../views/Axy/Regulation.vue'), meta: { title: '规章制度' } },
+      { path: 'document/contract', name: 'AxyContract', component: () => import('../views/Axy/Contract.vue'), meta: { title: '合同管理' } },
+      { path: 'document/evidence', name: 'AxyEvidence', component: () => import('../views/Axy/Evidence.vue'), meta: { title: '证据管理' } },
+      { path: 'announcement', name: 'AxyAnnouncement', component: () => import('../views/Axy/Announcement.vue'), meta: { title: '企业公告' } },
+      { path: 'message', name: 'AxyMessage', component: () => import('../views/Axy/Message.vue'), meta: { title: '消息通知' } },
+      { path: 'statistics', name: 'AxyStatistics', component: () => import('../views/Axy/Statistics.vue'), meta: { title: '数据统计' } },
+      { path: 'system', name: 'AxySystem', component: () => import('../views/Axy/System.vue'), meta: { title: '系统管理' } }
+    ]
   }
 ]
 
@@ -138,11 +179,13 @@ router.beforeEach((to, from, next) => {
       document.title = to.meta.title + ' - 城市服务商系统'
     } else if (to.path.startsWith('/company')) {
       document.title = to.meta.title + ' - 民匠有约'
+    } else if (to.path.startsWith('/axy')) {
+      document.title = to.meta.title + ' - 安心云'
     } else {
       document.title = to.meta.title + ' - 民匠有约管理系统'
     }
   }
-  if (to.path === '/login' || to.path === '/agentv2/login' || to.path === '/company/login') {
+  if (to.path === '/login' || to.path === '/agentv2/login' || to.path === '/company/login' || to.path === '/axy/login') {
     next()
   } else if (to.path === '/company/company-list') {
     if (companyToken) {
@@ -155,6 +198,12 @@ router.beforeEach((to, from, next) => {
       next()
     } else {
       next('/company/login')
+    }
+  } else if (to.path.startsWith('/axy')) {
+    if (token) {
+      next()
+    } else {
+      next('/axy/login')
     }
   } else {
     if (token) {

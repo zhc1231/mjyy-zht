@@ -192,7 +192,7 @@ const goForget = () => {
 <style scoped>
 .company-login {
   min-height: 100vh;
-  background: linear-gradient(135deg, #E6A23C 0%, #d48b1f 50%, #f0ad4e 100%);
+  background: linear-gradient(135deg, #409EFF 0%, #3a8ee6 50%, #66b1ff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -252,7 +252,7 @@ const goForget = () => {
 
 .login-left {
   width: 380px;
-  background: linear-gradient(145deg, #E6A23C 0%, #f0ad4e 100%);
+  background: linear-gradient(145deg, #409EFF 0%, #66b1ff 100%);
   padding: 50px 40px;
   display: flex;
   flex-direction: column;
@@ -436,7 +436,7 @@ const goForget = () => {
 }
 
 .form-input :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 2px rgba(230, 162, 60, 0.2) inset;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2) inset;
 }
 
 .form-input :deep(.el-input__inner) {
@@ -462,8 +462,8 @@ const goForget = () => {
   width: 120px;
   height: 44px;
   border-radius: 10px;
-  background: #fff7e6 !important;
-  color: #E6A23C !important;
+  background: #ecf5ff !important;
+  color: #409EFF !important;
   border: none !important;
   font-weight: 500;
   font-size: 13px;
@@ -471,7 +471,7 @@ const goForget = () => {
 }
 
 .code-btn:hover:not(:disabled) {
-  background: #ffecd4 !important;
+  background: #d9ecff !important;
 }
 
 .code-btn:disabled {
@@ -485,16 +485,16 @@ const goForget = () => {
   font-size: 16px;
   font-weight: 600;
   border-radius: 10px;
-  background: linear-gradient(135deg, #E6A23C 0%, #f0ad4e 100%) !important;
+  background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%) !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(230, 162, 60, 0.4);
+  box-shadow: 0 4px 15px rgba(64, 158, 255, 0.4);
   transition: all 0.3s;
   margin-top: 8px;
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(230, 162, 60, 0.5);
+  box-shadow: 0 6px 20px rgba(64, 158, 255, 0.5);
 }
 
 .submit-btn:active {
@@ -509,14 +509,14 @@ const goForget = () => {
 
 .footer-link {
   font-size: 13px;
-  color: #E6A23C;
+  color: #409EFF;
   cursor: pointer;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .footer-link:hover {
-  color: #f0ad4e;
+  color: #66b1ff;
   text-decoration: underline;
 }
 
