@@ -10,7 +10,7 @@
         <div class="stat-icon user-icon">👤</div>
         <div class="stat-content">
           <div class="stat-value">12,345</div>
-          <div class="stat-label">用户总数</div>
+          <div class="stat-label">自由职业者</div>
         </div>
       </div>
       <div class="stat-card">
@@ -28,10 +28,10 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon train-icon">📚</div>
+        <div class="stat-icon insurance-icon">🛡️</div>
         <div class="stat-content">
-          <div class="stat-value">1,567</div>
-          <div class="stat-label">培训人数</div>
+          <div class="stat-value">5,678</div>
+          <div class="stat-label">已投保人数</div>
         </div>
       </div>
     </div>
@@ -62,7 +62,7 @@
         <div class="panel">
           <div class="panel-header">
             <h3>最近任务</h3>
-            <a href="/axy/task" class="view-all">查看全部</a>
+            <a href="/axy/task/list" class="view-all">查看全部</a>
           </div>
           <div class="panel-body">
             <el-table :data="taskList" border stripe>
@@ -188,7 +188,7 @@ const companyRanking = ref([
 .user-icon { background: #ecf5ff; }
 .task-icon { background: #fdf6ec; }
 .settle-icon { background: #ecf5ff; }
-.train-icon { background: #fef0f0; }
+.insurance-icon { background: #f0f9eb; }
 .stat-content {
   flex: 1;
 }
@@ -350,6 +350,6 @@ const companyRanking = ref([
   font-size: 12px;
 }
 .status-badge.doing { background: #ecf5ff; color: #409EFF; }
-.status-badge.done { background: #ecf5ff; color: #409EFF; }
+.status-badge.done { background: #f0f9eb; color: #67C23A; }
 .status-badge.cancel { background: #fef0f0; color: #F56C6C; }
 </style>

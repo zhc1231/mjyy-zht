@@ -68,60 +68,82 @@ const username = ref(localStorage.getItem('username') || '用户')
 
 const menuList = [
   { id: 'home', name: '首页', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', path: '/axy', children: [] },
-  { id: 'user', name: '用户管理', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>', path: '/axy/user', children: [] },
-  { id: 'task', name: '任务管理', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', path: '/axy/task', children: [] },
+  { 
+    id: 'personnel', 
+    name: '人员管理', 
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>', 
+    children: [
+      { id: 'freelancer', name: '自由职业者', path: '/axy/personnel/freelancer' },
+      { id: 'employee', name: '在职员工', path: '/axy/personnel/employee' },
+      { id: 'onboarding', name: '入职申请', path: '/axy/personnel/onboarding' },
+      { id: 'resignation', name: '离职管理', path: '/axy/personnel/resignation' }
+    ]
+  },
+  { 
+    id: 'task', 
+    name: '任务管理', 
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', 
+    children: [
+      { id: 'task_list', name: '任务列表', path: '/axy/task/list' },
+      { id: 'task_publish', name: '任务发布', path: '/axy/task/publish' },
+      { id: 'task_schedule', name: '任务排期', path: '/axy/task/schedule' }
+    ]
+  },
+  { 
+    id: 'attendance', 
+    name: '考勤管理', 
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>', 
+    children: [
+      { id: 'attendance_check', name: '考勤确认', path: '/axy/attendance/check' },
+      { id: 'attendance_record', name: '打卡记录', path: '/axy/attendance/record' },
+      { id: 'attendance_stat', name: '考勤统计', path: '/axy/attendance/stat' }
+    ]
+  },
+  { 
+    id: 'settlement', 
+    name: '薪资结算', 
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>', 
+    children: [
+      { id: 'settlement_list', name: '结算单列表', path: '/axy/settlement/list' },
+      { id: 'settlement_confirm', name: '薪资确认', path: '/axy/settlement/confirm' },
+      { id: 'salary_structure', name: '薪酬规则', path: '/axy/settlement/salary-rule' }
+    ]
+  },
   { 
     id: 'training', 
     name: '培训考证', 
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>', 
     children: [
-      { id: 'training_class', name: '培训班级', path: '/axy/training/class' },
-      { id: 'training_course', name: '在线学习', path: '/axy/training/course' },
+      { id: 'training_course', name: '培训课程', path: '/axy/training/course' },
+      { id: 'training_study', name: '在线学习', path: '/axy/training/study' },
       { id: 'training_exam', name: '考试管理', path: '/axy/training/exam' },
       { id: 'training_cert', name: '证书管理', path: '/axy/training/cert' }
     ]
   },
-  { id: 'settlement', name: '薪资结算', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>', path: '/axy/settlement', children: [] },
-  { id: 'insurance', name: '保险管理', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9"/><path d="M14 17H5"/><path d="M14 12a2 2 0 0 0-2-2H7"/><path d="M14 7a2 2 0 0 0-2-2H7"/><path d="M14 17a2 2 0 0 0-2 2H7"/><path d="M20 12h-5"/></svg>', path: '/axy/insurance', children: [] },
   { 
-    id: 'hr', 
-    name: '人事业务', 
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>', 
+    id: 'insurance', 
+    name: '保险管理', 
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9"/><path d="M14 17H5"/><path d="M14 12a2 2 0 0 0-2-2H7"/><path d="M14 7a2 2 0 0 0-2-2H7"/><path d="M14 17a2 2 0 0 0-2 2H7"/><path d="M20 12h-5"/></svg>', 
     children: [
-      { id: 'roster', name: '职工名册', path: '/axy/hr/roster' },
-      { id: 'attendance', name: '考勤确认', path: '/axy/hr/attendance' },
-      { id: 'performance', name: '绩效考核', path: '/axy/hr/performance' },
-      { id: 'onboarding', name: '入职管理', path: '/axy/hr/onboarding' },
-      { id: 'probation', name: '试用管理', path: '/axy/hr/probation' },
-      { id: 'transfer', name: '调岗调薪', path: '/axy/hr/transfer' },
-      { id: 'resignation', name: '离职管理', path: '/axy/hr/resignation' },
-      { id: 'change', name: '异动管理', path: '/axy/hr/change' }
+      { id: 'insurance_policy', name: '保单管理', path: '/axy/insurance/policy' },
+      { id: 'insurance_apply', name: '投保申请', path: '/axy/insurance/apply' },
+      { id: 'social_security', name: '社保福利', path: '/axy/insurance/social' }
     ]
   },
   { 
-    id: 'salary', 
-    name: '薪酬管理', 
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>', 
-    children: [
-      { id: 'salary_structure', name: '薪酬结构', path: '/axy/salary/structure' },
-      { id: 'salary_confirm', name: '薪资确认', path: '/axy/salary/confirm' },
-      { id: 'social', name: '社保福利', path: '/axy/salary/social' }
-    ]
-  },
-  { 
-    id: 'document', 
-    name: '文档管理', 
+    id: 'contract', 
+    name: '合同管理', 
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>', 
     children: [
-      { id: 'regulation', name: '规章制度', path: '/axy/document/regulation' },
-      { id: 'contract', name: '合同管理', path: '/axy/document/contract' },
-      { id: 'evidence', name: '证据管理', path: '/axy/document/evidence' }
+      { id: 'contract_list', name: '合同列表', path: '/axy/contract/list' },
+      { id: 'contract_template', name: '合同模板', path: '/axy/contract/template' },
+      { id: 'evidence', name: '证据存证', path: '/axy/contract/evidence' }
     ]
   },
   { id: 'announcement', name: '企业公告', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>', path: '/axy/announcement', children: [] },
   { id: 'message', name: '消息通知', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>', path: '/axy/message', children: [] },
   { id: 'statistics', name: '数据统计', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>', path: '/axy/statistics', children: [] },
-  { id: 'system', name: '系统管理', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>', path: '/axy/system', children: [] }
+  { id: 'system', name: '系统设置', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>', path: '/axy/system', children: [] }
 ]
 
 const activeMenu = computed(() => {
@@ -129,28 +151,29 @@ const activeMenu = computed(() => {
   const menuMap = {
     '/axy': 'home',
     '/axy/home': 'home',
-    '/axy/user': 'user',
-    '/axy/task': 'task',
-    '/axy/training/class': 'training',
+    '/axy/personnel/freelancer': 'personnel',
+    '/axy/personnel/employee': 'personnel',
+    '/axy/personnel/onboarding': 'personnel',
+    '/axy/personnel/resignation': 'personnel',
+    '/axy/task/list': 'task',
+    '/axy/task/publish': 'task',
+    '/axy/task/schedule': 'task',
+    '/axy/attendance/check': 'attendance',
+    '/axy/attendance/record': 'attendance',
+    '/axy/attendance/stat': 'attendance',
+    '/axy/settlement/list': 'settlement',
+    '/axy/settlement/confirm': 'settlement',
+    '/axy/settlement/salary-rule': 'settlement',
     '/axy/training/course': 'training',
+    '/axy/training/study': 'training',
     '/axy/training/exam': 'training',
     '/axy/training/cert': 'training',
-    '/axy/settlement': 'settlement',
-    '/axy/insurance': 'insurance',
-    '/axy/hr/roster': 'hr',
-    '/axy/hr/attendance': 'hr',
-    '/axy/hr/performance': 'hr',
-    '/axy/hr/onboarding': 'hr',
-    '/axy/hr/probation': 'hr',
-    '/axy/hr/transfer': 'hr',
-    '/axy/hr/resignation': 'hr',
-    '/axy/hr/change': 'hr',
-    '/axy/salary/structure': 'salary',
-    '/axy/salary/confirm': 'salary',
-    '/axy/salary/social': 'salary',
-    '/axy/document/regulation': 'document',
-    '/axy/document/contract': 'document',
-    '/axy/document/evidence': 'document',
+    '/axy/insurance/policy': 'insurance',
+    '/axy/insurance/apply': 'insurance',
+    '/axy/insurance/social': 'insurance',
+    '/axy/contract/list': 'contract',
+    '/axy/contract/template': 'contract',
+    '/axy/contract/evidence': 'contract',
     '/axy/announcement': 'announcement',
     '/axy/message': 'message',
     '/axy/statistics': 'statistics',
@@ -164,32 +187,33 @@ const currentPageTitle = computed(() => {
   const titleMap = {
     '/axy': '首页仪表盘',
     '/axy/home': '首页仪表盘',
-    '/axy/user': '用户管理',
-    '/axy/task': '任务管理',
-    '/axy/training/class': '培训班级',
-    '/axy/training/course': '在线学习',
+    '/axy/personnel/freelancer': '自由职业者',
+    '/axy/personnel/employee': '在职员工',
+    '/axy/personnel/onboarding': '入职申请',
+    '/axy/personnel/resignation': '离职管理',
+    '/axy/task/list': '任务列表',
+    '/axy/task/publish': '任务发布',
+    '/axy/task/schedule': '任务排期',
+    '/axy/attendance/check': '考勤确认',
+    '/axy/attendance/record': '打卡记录',
+    '/axy/attendance/stat': '考勤统计',
+    '/axy/settlement/list': '结算单列表',
+    '/axy/settlement/confirm': '薪资确认',
+    '/axy/settlement/salary-rule': '薪酬规则',
+    '/axy/training/course': '培训课程',
+    '/axy/training/study': '在线学习',
     '/axy/training/exam': '考试管理',
     '/axy/training/cert': '证书管理',
-    '/axy/settlement': '薪资结算',
-    '/axy/insurance': '保险管理',
-    '/axy/hr/roster': '职工名册',
-    '/axy/hr/attendance': '考勤确认',
-    '/axy/hr/performance': '绩效考核',
-    '/axy/hr/onboarding': '入职管理',
-    '/axy/hr/probation': '试用管理',
-    '/axy/hr/transfer': '调岗调薪',
-    '/axy/hr/resignation': '离职管理',
-    '/axy/hr/change': '异动管理',
-    '/axy/salary/structure': '薪酬结构',
-    '/axy/salary/confirm': '薪资确认',
-    '/axy/salary/social': '社保福利',
-    '/axy/document/regulation': '规章制度',
-    '/axy/document/contract': '合同管理',
-    '/axy/document/evidence': '证据管理',
+    '/axy/insurance/policy': '保单管理',
+    '/axy/insurance/apply': '投保申请',
+    '/axy/insurance/social': '社保福利',
+    '/axy/contract/list': '合同列表',
+    '/axy/contract/template': '合同模板',
+    '/axy/contract/evidence': '证据存证',
     '/axy/announcement': '企业公告',
     '/axy/message': '消息通知',
     '/axy/statistics': '数据统计',
-    '/axy/system': '系统管理'
+    '/axy/system': '系统设置'
   }
   return titleMap[path] || '安心云'
 })
