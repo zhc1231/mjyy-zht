@@ -69,14 +69,11 @@ const username = ref(localStorage.getItem('username') || '用户')
 const menuList = [
   { id: 'home', name: '首页', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', path: '/axy', children: [] },
   { 
-    id: 'personnel', 
-    name: '人员管理', 
+    id: 'user', 
+    name: '用户', 
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>', 
     children: [
-      { id: 'freelancer', name: '自由职业者', path: '/axy/personnel/freelancer' },
-      { id: 'employee', name: '在职员工', path: '/axy/personnel/employee' },
-      { id: 'onboarding', name: '入职申请', path: '/axy/personnel/onboarding' },
-      { id: 'resignation', name: '离职管理', path: '/axy/personnel/resignation' }
+      { id: 'user_list', name: '人员列表', path: '/axy/user/list' }
     ]
   },
   { 
@@ -101,12 +98,12 @@ const menuList = [
   },
   { 
     id: 'settlement', 
-    name: '薪资结算', 
+    name: '费用结算', 
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>', 
     children: [
       { id: 'settlement_list', name: '结算单列表', path: '/axy/settlement/list' },
-      { id: 'settlement_confirm', name: '薪资确认', path: '/axy/settlement/confirm' },
-      { id: 'salary_structure', name: '薪酬规则', path: '/axy/settlement/salary-rule' }
+      { id: 'settlement_confirm', name: '费用确认', path: '/axy/settlement/confirm' },
+      { id: 'salary_structure', name: '费用规则', path: '/axy/settlement/salary-rule' }
     ]
   },
   { 
@@ -151,10 +148,7 @@ const activeMenu = computed(() => {
   const menuMap = {
     '/axy': 'home',
     '/axy/home': 'home',
-    '/axy/personnel/freelancer': 'personnel',
-    '/axy/personnel/employee': 'personnel',
-    '/axy/personnel/onboarding': 'personnel',
-    '/axy/personnel/resignation': 'personnel',
+    '/axy/user/list': 'user',
     '/axy/task/list': 'task',
     '/axy/task/publish': 'task',
     '/axy/task/schedule': 'task',
@@ -187,10 +181,7 @@ const currentPageTitle = computed(() => {
   const titleMap = {
     '/axy': '首页仪表盘',
     '/axy/home': '首页仪表盘',
-    '/axy/personnel/freelancer': '自由职业者',
-    '/axy/personnel/employee': '在职员工',
-    '/axy/personnel/onboarding': '入职申请',
-    '/axy/personnel/resignation': '离职管理',
+    '/axy/user/list': '人员列表',
     '/axy/task/list': '任务列表',
     '/axy/task/publish': '任务发布',
     '/axy/task/schedule': '任务排期',
@@ -198,8 +189,8 @@ const currentPageTitle = computed(() => {
     '/axy/attendance/record': '打卡记录',
     '/axy/attendance/stat': '考勤统计',
     '/axy/settlement/list': '结算单列表',
-    '/axy/settlement/confirm': '薪资确认',
-    '/axy/settlement/salary-rule': '薪酬规则',
+    '/axy/settlement/confirm': '费用确认',
+    '/axy/settlement/salary-rule': '费用规则',
     '/axy/training/course': '培训课程',
     '/axy/training/study': '在线学习',
     '/axy/training/exam': '考试管理',
