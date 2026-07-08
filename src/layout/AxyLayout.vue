@@ -123,8 +123,7 @@ const menuList = [
     icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9"/><path d="M14 17H5"/><path d="M14 12a2 2 0 0 0-2-2H7"/><path d="M14 7a2 2 0 0 0-2-2H7"/><path d="M14 17a2 2 0 0 0-2 2H7"/><path d="M20 12h-5"/></svg>', 
     children: [
       { id: 'insurance_policy', name: '保单管理', path: '/axy/insurance/policy' },
-      { id: 'insurance_apply', name: '投保申请', path: '/axy/insurance/apply' },
-      { id: 'social_security', name: '社保福利', path: '/axy/insurance/social' }
+      { id: 'insurance_apply', name: '投保申请', path: '/axy/insurance/apply' }
     ]
   },
   { 
@@ -164,7 +163,6 @@ const activeMenu = computed(() => {
     '/axy/training/cert': 'training',
     '/axy/insurance/policy': 'insurance',
     '/axy/insurance/apply': 'insurance',
-    '/axy/insurance/social': 'insurance',
     '/axy/contract/list': 'contract',
     '/axy/contract/template': 'contract',
     '/axy/contract/evidence': 'contract',
@@ -197,7 +195,6 @@ const currentPageTitle = computed(() => {
     '/axy/training/cert': '证书管理',
     '/axy/insurance/policy': '保单管理',
     '/axy/insurance/apply': '投保申请',
-    '/axy/insurance/social': '社保福利',
     '/axy/contract/list': '合同列表',
     '/axy/contract/template': '合同模板',
     '/axy/contract/evidence': '证据存证',

@@ -152,7 +152,6 @@ const routes = [
       { path: 'training/cert', name: 'AxyTrainingCert', component: () => import('../views/Axy/TrainingCert.vue'), meta: { title: '证书管理' } },
       { path: 'insurance/policy', name: 'AxyInsurancePolicy', component: () => import('../views/Axy/Insurance.vue'), meta: { title: '保单管理' } },
       { path: 'insurance/apply', name: 'AxyInsuranceApply', component: () => import('../views/Axy/Insurance.vue'), meta: { title: '投保申请' } },
-      { path: 'insurance/social', name: 'AxySocialSecurity', component: () => import('../views/Axy/SocialSecurity.vue'), meta: { title: '社保福利' } },
       { path: 'contract/list', name: 'AxyContractList', component: () => import('../views/Axy/Contract.vue'), meta: { title: '合同列表' } },
       { path: 'contract/template', name: 'AxyContractTemplate', component: () => import('../views/Axy/Contract.vue'), meta: { title: '合同模板' } },
       { path: 'contract/evidence', name: 'AxyContractEvidence', component: () => import('../views/Axy/Evidence.vue'), meta: { title: '证据存证' } },
