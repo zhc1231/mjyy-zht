@@ -195,6 +195,10 @@
             <el-icon><ShoppingCart /></el-icon>
             <span>订单管理</span>
           </el-menu-item>
+          <el-menu-item index="/mini/home">
+            <el-icon><Iphone /></el-icon>
+            <span>小程序预览</span>
+          </el-menu-item>
           <el-sub-menu index="/enterprise">
             <template #title>
               <el-icon><OfficeBuilding /></el-icon>
@@ -319,7 +323,7 @@ import { ref, computed, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { 
   HomeFilled, Setting, Monitor, Notebook, Wallet, List, User, 
-  Location, SetUp, EditPen, PieChart, Promotion, ShoppingCart, OfficeBuilding, MapLocation, Bell
+  Location, SetUp, EditPen, PieChart, Promotion, ShoppingCart, OfficeBuilding, MapLocation, Bell, Iphone
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
@@ -380,6 +384,7 @@ const breadcrumbs = computed(() => {
       '/statistics': '统计报表',
       '/operation': '运营',
       '/order': '订单管理',
+      '/mini': '小程序预览',
       '/enterprise': '企业管理后台',
       '/city-service': '城市服务商管理'
     }
@@ -484,7 +489,11 @@ const getMenuName = (path) => {
     '/order': '订单管理',
     '/enterprise/audit': '审核信息',
     '/enterprise/user': '用户列表',
-    '/city-service/bank-config': '银行类型配置'
+    '/city-service/bank-config': '银行类型配置',
+    '/mini/home': '民匠有约',
+    '/mini/task-list': '我的任务',
+    '/mini/settlement': '结算收入明细',
+    '/mini/profile': '个人中心'
   }
   return map[path] || ''
 }

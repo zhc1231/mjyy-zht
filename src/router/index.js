@@ -169,6 +169,19 @@ const routes = [
     ]
   },
   {
+    path: '/mini',
+    name: 'MiniLayout',
+    component: () => import('../layout/MiniLayout.vue'),
+    redirect: '/mini/home',
+    meta: { title: '民匠有约小程序' },
+    children: [
+      { path: 'home', name: 'MiniHome', component: () => import('../views/Mini/Home.vue'), meta: { title: '民匠有约' } },
+      { path: 'task-list', name: 'MiniTaskList', component: () => import('../views/Mini/TaskList.vue'), meta: { title: '我的任务' } },
+      { path: 'settlement', name: 'MiniSettlement', component: () => import('../views/Mini/Settlement.vue'), meta: { title: '结算收入明细' } },
+      { path: 'profile', name: 'MiniProfile', component: () => import('../views/Mini/Profile.vue'), meta: { title: '个人中心' } }
+    ]
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('../views/Error404.vue'),
@@ -185,7 +198,9 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   const companyToken = localStorage.getItem('company_token')
   if (to.meta.title) {
-    if (to.path.startsWith('/agentv2')) {
+    if (to.path.startsWith('/mini')) {
+      document.title = to.meta.title + ' - 民匠有约小程序'
+    } else if (to.path.startsWith('/agentv2')) {
       document.title = to.meta.title + ' - 城市服务商系统'
     } else if (to.path.startsWith('/company')) {
       document.title = to.meta.title + ' - 民匠有约'
@@ -196,6 +211,8 @@ router.beforeEach((to, from, next) => {
     }
   }
   if (to.path === '/login' || to.path === '/agentv2/login' || to.path === '/company/login' || to.path === '/axy/login') {
+    next()
+  } else if (to.path.startsWith('/mini')) {
     next()
   } else if (to.path === '/company/company-list') {
     if (companyToken) {
