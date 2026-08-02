@@ -1,37 +1,32 @@
 <template>
   <div class="mini-settlement">
-    <div class="tab-header">
-      <div 
-        v-for="tab in tabs" 
-        :key="tab.key" 
-        class="tab-item"
-        :class="{ active: activeTab === tab.key }"
-        @click="activeTab = tab.key"
-      >
-        {{ tab.label }}
-      </div>
-    </div>
-
     <div class="balance-summary">
-      <span class="label">总提现金额：</span>
-      <span class="amount">¥ {{ totalWithdraw }}</span>
+      <div class="summary-item">
+        <span class="label">累计结算收入</span>
+        <span class="amount income">¥ {{ totalIncome }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="label">累计提现金额</span>
+        <span class="amount withdraw">¥ {{ totalWithdraw }}</span>
+      </div>
     </div>
 
     <div class="record-list">
       <div 
-        v-for="record in filteredRecords" 
+        v-for="record in displayRecords" 
         :key="record.id" 
         class="record-card"
         @click="showDetail(record)"
       >
         <div class="record-header">
-          <div class="record-icon">
+          <div class="record-icon" :class="record.type">
             <span v-if="record.type === 'withdraw'">💳</span>
             <span v-else>💰</span>
           </div>
           <div class="record-info">
             <div class="record-title">
-              {{ record.type === 'withdraw' ? '银行卡' : '结算收入' }}
+              {{ record.type === 'withdraw' ? '提现到银行卡' : record.taskName }}
             </div>
             <div class="record-time">{{ record.time }}</div>
           </div>
@@ -39,24 +34,25 @@
             <span v-if="record.type === 'income'">+</span>¥ {{ record.amount }}
           </div>
         </div>
-        <div class="record-remark" v-if="record.remark">
+        <div class="record-remark" v-if="record.type === 'income' && record.remark">
           <span class="remark-label">备注：</span>{{ record.remark }}
         </div>
         <div class="record-meta">
-          <span v-if="record.taskName" class="task-tag">📋 {{ record.taskName }}</span>
-          <span v-if="record.settleNo" class="settle-no">结算单号：{{ record.settleNo }}</span>
+          <span v-if="record.settleNo" class="settle-no">单号：{{ record.settleNo }}</span>
+          <span v-if="record.type === 'income'" class="status-tag" :class="record.status">{{ record.statusText }}</span>
+          <span v-if="record.type === 'withdraw'" class="status-tag success">提现成功</span>
         </div>
       </div>
     </div>
 
-    <div class="load-more" v-if="!showAll" @click="showAll = true">
+    <div class="load-more" v-if="!showAll && records.length > 3" @click="showAll = true">
       加载更多
     </div>
     <div class="no-more" v-else-if="records.length > 3">
       —— 没有更多了 ——
     </div>
 
-    <div class="empty-state" v-if="filteredRecords.length === 0">
+    <div class="empty-state" v-if="records.length === 0">
       <div class="empty-icon">📭</div>
       <div class="empty-text">暂无结算记录</div>
     </div>
@@ -69,12 +65,14 @@
         </div>
         <div class="modal-body" v-if="currentRecord">
           <div class="detail-row">
-            <span class="row-label">结算类型</span>
+            <span class="row-label">类型</span>
             <span class="row-value">{{ currentRecord.type === 'withdraw' ? '提现到银行卡' : '任务结算收入' }}</span>
           </div>
           <div class="detail-row">
             <span class="row-label">金额</span>
-            <span class="row-value amount">¥ {{ currentRecord.amount }}</span>
+            <span class="row-value amount" :class="currentRecord.type">
+              <span v-if="currentRecord.type === 'income'">+</span>¥ {{ currentRecord.amount }}
+            </span>
           </div>
           <div class="detail-row">
             <span class="row-label">时间</span>
@@ -96,13 +94,17 @@
             <span class="row-label">日薪标准</span>
             <span class="row-value">¥ {{ currentRecord.dailySalary }}/天</span>
           </div>
-          <div class="detail-row" v-if="currentRecord.remark">
+          <div class="detail-row" v-if="currentRecord.type === 'income' && currentRecord.remark">
             <span class="row-label">备注</span>
             <span class="row-value remark">{{ currentRecord.remark }}</span>
           </div>
-          <div class="detail-row" v-if="currentRecord.status">
+          <div class="detail-row" v-if="currentRecord.type === 'income' && currentRecord.status">
             <span class="row-label">状态</span>
             <span class="row-value" :class="currentRecord.status">{{ currentRecord.statusText }}</span>
+          </div>
+          <div class="detail-row" v-if="currentRecord.type === 'withdraw'">
+            <span class="row-label">状态</span>
+            <span class="row-value done">提现成功</span>
           </div>
         </div>
       </div>
@@ -113,15 +115,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-const activeTab = ref('withdraw')
 const showAll = ref(false)
 const detailVisible = ref(false)
 const currentRecord = ref(null)
-
-const tabs = [
-  { key: 'withdraw', label: '提现记录' },
-  { key: 'income', label: '收入明细' }
-]
 
 const records = ref([
   { 
@@ -129,7 +125,6 @@ const records = ref([
     type: 'withdraw', 
     amount: '9,813', 
     time: '2026-07-30 19:35:24',
-    remark: '7月份工资结算',
     status: 'success',
     statusText: '提现成功'
   },
@@ -148,6 +143,14 @@ const records = ref([
   },
   { 
     id: 3, 
+    type: 'withdraw', 
+    amount: '2,450', 
+    time: '2026-07-26 10:15:00',
+    status: 'success',
+    statusText: '提现成功'
+  },
+  { 
+    id: 4, 
     type: 'income', 
     amount: '1,200', 
     time: '2026-07-25 11:05:33',
@@ -160,15 +163,6 @@ const records = ref([
     statusText: '已结算'
   },
   { 
-    id: 4, 
-    type: 'withdraw', 
-    amount: '2,450', 
-    time: '2026-07-26 10:15:00',
-    remark: '结算到账',
-    status: 'success',
-    statusText: '提现成功'
-  },
-  { 
     id: 5, 
     type: 'income', 
     amount: '1,800', 
@@ -177,7 +171,7 @@ const records = ref([
     settleNo: 'ST20260722003',
     workDays: 3,
     dailySalary: 600,
-    remark: '华能电力设备安装 备注：配合施工进度',
+    remark: '华能电力设备安装，配合施工进度',
     status: 'done',
     statusText: '已结算'
   },
@@ -196,12 +190,18 @@ const records = ref([
   }
 ])
 
-const filteredRecords = computed(() => {
-  let list = records.value.filter(r => r.type === activeTab.value)
-  if (!showAll.value && list.length > 3) {
-    list = list.slice(0, 3)
+const displayRecords = computed(() => {
+  if (!showAll.value && records.value.length > 3) {
+    return records.value.slice(0, 3)
   }
-  return list
+  return records.value
+})
+
+const totalIncome = computed(() => {
+  return records.value
+    .filter(r => r.type === 'income')
+    .reduce((sum, r) => sum + parseFloat(r.amount.replace(/,/g, '')), 0)
+    .toLocaleString()
 })
 
 const totalWithdraw = computed(() => {
@@ -222,56 +222,45 @@ const showDetail = (record) => {
   padding: 0 16px 20px;
 }
 
-.tab-header {
+.balance-summary {
   display: flex;
+  align-items: center;
   background: #fff;
-  border-radius: 0;
-  margin: 0 -16px;
-  padding: 0 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
 }
 
-.tab-item {
+.summary-item {
   flex: 1;
   text-align: center;
-  padding: 12px 0;
-  font-size: 14px;
-  color: #666;
-  cursor: pointer;
-  position: relative;
 }
 
-.tab-item.active {
-  color: #409EFF;
-  font-weight: 600;
-}
-
-.tab-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 3px;
-  background: #409EFF;
-  border-radius: 2px;
-}
-
-.balance-summary {
-  padding: 14px 4px;
-  font-size: 13px;
-  color: #666;
-}
-
-.balance-summary .label {
+.summary-item .label {
+  display: block;
+  font-size: 12px;
   color: #999;
+  margin-bottom: 6px;
 }
 
-.balance-summary .amount {
+.summary-item .amount {
   font-size: 18px;
   font-weight: 700;
-  color: #1f2937;
+}
+
+.summary-item .amount.income {
+  color: #10b981;
+}
+
+.summary-item .amount.withdraw {
+  color: #ef4444;
+}
+
+.summary-divider {
+  width: 1px;
+  height: 32px;
+  background: #f0f0f0;
+  margin: 0 12px;
 }
 
 .record-list {
@@ -305,10 +294,16 @@ const showDetail = (record) => {
   justify-content: center;
   font-size: 20px;
   margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.record-icon.withdraw {
+  background: linear-gradient(135deg, #fef2f2, #fecaca);
 }
 
 .record-info {
   flex: 1;
+  min-width: 0;
 }
 
 .record-title {
@@ -316,6 +311,9 @@ const showDetail = (record) => {
   color: #333;
   font-weight: 500;
   margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .record-time {
@@ -326,6 +324,7 @@ const showDetail = (record) => {
 .record-amount {
   font-size: 16px;
   font-weight: 600;
+  flex-shrink: 0;
 }
 
 .record-amount.income {
@@ -355,9 +354,29 @@ const showDetail = (record) => {
   margin-top: 8px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   font-size: 11px;
+}
+
+.settle-no {
   color: #aaa;
+}
+
+.status-tag {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.status-tag.done,
+.status-tag.success {
+  color: #10b981;
+  background: #d1fae5;
+}
+
+.status-tag.pending {
+  color: #f59e0b;
+  background: #fef3c7;
 }
 
 .load-more,
@@ -454,7 +473,14 @@ const showDetail = (record) => {
 .row-value.amount {
   font-size: 18px;
   font-weight: 700;
+}
+
+.row-value.amount.income {
   color: #10b981;
+}
+
+.row-value.amount.withdraw {
+  color: #ef4444;
 }
 
 .row-value.remark {
