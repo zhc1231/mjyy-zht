@@ -1,26 +1,47 @@
 <template>
   <div class="message-page">
-    <div class="page-header">
-      <h2>消息通知</h2>
-      <div class="header-actions">
-        <el-button @click="handleReadAll">全部已读</el-button>
-        <el-button type="primary" @click="handleAdd">发送通知</el-button>
+    <div class="page-head">
+      <div class="page-title">
+        <h2>消息通知</h2>
+        <p>管理系统消息、通知及任务提醒</p>
+      </div>
+      <div class="page-actions">
+        <el-button @click="handleReadAll" plain>
+          <span>📖</span> 全部已读
+        </el-button>
+        <el-button type="primary" @click="handleAdd">
+          <span>📨</span> 发送通知
+        </el-button>
       </div>
     </div>
 
     <div class="info-banner">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      <p>通过系统消息、短信、邮件等方式通知员工查阅通知或者签署文件，会记录员工是否查阅以及查阅的时间。对于没有及时查阅的消息系统会多次重发下发消息提醒，并形成电子证据。</p>
+      <div class="banner-icon">ℹ️</div>
+      <div class="banner-content">
+        <p>通过系统消息、短信、邮件等方式通知员工查阅通知或者签署文件，会记录员工是否查阅以及查阅的时间。对于没有及时查阅的消息系统会多次重发下发消息提醒，并形成电子证据。</p>
+      </div>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-item"><span class="stat-num">{{ msgStats.total }}</span><span class="stat-label">总消息</span></div>
-      <div class="stat-item"><span class="stat-num pending">{{ msgStats.unread }}</span><span class="stat-label">未读</span></div>
-      <div class="stat-item"><span class="stat-num doing">{{ msgStats.read }}</span><span class="stat-label">已读</span></div>
-      <div class="stat-item"><span class="stat-num cancel">{{ msgStats.fail }}</span><span class="stat-label">失败</span></div>
+    <div class="stats-cards">
+      <div class="stat-mini-card blue">
+        <span class="stat-num">{{ msgStats.total }}</span>
+        <span class="stat-label">总消息</span>
+      </div>
+      <div class="stat-mini-card orange">
+        <span class="stat-num">{{ msgStats.unread }}</span>
+        <span class="stat-label">未读</span>
+      </div>
+      <div class="stat-mini-card green">
+        <span class="stat-num">{{ msgStats.read }}</span>
+        <span class="stat-label">已读</span>
+      </div>
+      <div class="stat-mini-card gray">
+        <span class="stat-num">{{ msgStats.fail }}</span>
+        <span class="stat-label">失败</span>
+      </div>
     </div>
 
-    <div class="panel">
+    <div class="table-panel">
       <div class="panel-tabs">
         <button :class="['tab-btn', { active: activeTab === 'all' }]" @click="activeTab = 'all'">全部</button>
         <button :class="['tab-btn', { active: activeTab === 'unread' }]" @click="activeTab = 'unread'">未读</button>
@@ -38,8 +59,8 @@
               </div>
               <div class="msg-desc">{{ item.content }}</div>
               <div class="msg-meta">
-                <span>{{ item.time }}</span>
-                <span>接收人：{{ item.receiver }}</span>
+                <span class="meta-item">🕐 {{ item.time }}</span>
+                <span class="meta-item">👤 接收人：{{ item.receiver }}</span>
               </div>
             </div>
             <div class="msg-actions">
@@ -51,7 +72,7 @@
       </div>
     </div>
 
-    <el-dialog v-model="dialogVisible" title="发送通知" width="540px">
+    <el-dialog v-model="dialogVisible" title="发送通知" width="540px" destroy-on-close>
       <el-form :model="formData" :rules="formRules" ref="formRef" label-width="100px">
         <el-form-item label="接收人" prop="receiver">
           <el-input v-model="formData.receiver" placeholder="多个接收人以逗号分隔" />
@@ -143,34 +164,266 @@ const handleSubmit = () => {
 </script>
 
 <style scoped>
-.message-page { padding-bottom: 24px; }
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.page-header h2 { font-size: 22px; font-weight: 600; color: #303133; margin: 0; }
-.header-actions { display: flex; gap: 12px; }
-.info-banner { display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px; background: #ecf5ff; border-left: 4px solid #409EFF; border-radius: 4px; margin-bottom: 20px; }
-.info-banner svg { width: 20px; height: 20px; color: #409EFF; flex-shrink: 0; }
-.info-banner p { font-size: 13px; color: #606266; line-height: 1.6; margin: 0; }
-.stats-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-.stat-item { background: #fff; border-radius: 8px; padding: 20px 30px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); min-width: 120px; flex: 1; }
-.stat-num { font-size: 28px; font-weight: 600; color: #303133; }
-.stat-num.pending { color: #E6A23C; }
-.stat-num.doing { color: #409EFF; }
-.stat-num.cancel { color: #F56C6C; }
-.stat-label { font-size: 13px; color: #909399; margin-top: 4px; }
-.panel { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.panel-tabs { display: flex; gap: 8px; padding: 16px 20px; border-bottom: 1px solid #ebeef5; }
-.tab-btn { padding: 6px 16px; border: none; background: #f5f7fa; border-radius: 4px; font-size: 13px; color: #606266; cursor: pointer; }
-.tab-btn.active { background: #409EFF; color: #fff; }
-.panel-body { padding: 20px; }
-.message-list { display: flex; flex-direction: column; gap: 12px; }
-.message-item { display: flex; align-items: flex-start; gap: 16px; padding: 16px; border: 1px solid #ebeef5; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
-.message-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.message-item.unread { background: #ecf5ff; border-color: #b3d8ff; }
-.msg-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; background: #f5f7fa; }
-.msg-content { flex: 1; }
-.msg-title { font-size: 15px; font-weight: 500; color: #303133; display: flex; align-items: center; gap: 8px; }
-.msg-dot { width: 8px; height: 8px; background: #F56C6C; border-radius: 50%; }
-.msg-desc { font-size: 13px; color: #606266; line-height: 1.6; margin-top: 4px; }
-.msg-meta { font-size: 12px; color: #909399; margin-top: 8px; display: flex; gap: 16px; }
-.msg-actions { display: flex; gap: 4px; }
+.message-page {
+  padding-bottom: 24px;
+}
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.page-title h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+}
+
+.page-title p {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.page-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.page-actions .el-button {
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-weight: 500;
+}
+
+.info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #ecf5ff;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.info-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #409EFF, #66b1ff);
+}
+
+.banner-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.banner-content p {
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-mini-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-mini-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.stat-mini-card.blue::before { background: linear-gradient(180deg, #409EFF, #66b1ff); }
+.stat-mini-card.green::before { background: linear-gradient(180deg, #10b981, #34d399); }
+.stat-mini-card.orange::before { background: linear-gradient(180deg, #f59e0b, #fbbf24); }
+.stat-mini-card.gray::before { background: linear-gradient(180deg, #6b7280, #9ca3af); }
+
+.stat-num {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.table-panel {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+
+.panel-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.tab-btn {
+  padding: 8px 20px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #6b7280;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #66b1ff, #409EFF);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+}
+
+.panel-body {
+  padding: 20px;
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: #fff;
+}
+
+.message-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-color: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.message-item.unread {
+  background: #f0f7ff;
+  border-color: #b3d8ff;
+}
+
+.message-item.unread:hover {
+  background: #ecf5ff;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.15);
+}
+
+.msg-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #ecf5ff, #d9ecff);
+}
+
+.msg-icon.system { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
+.msg-icon.task { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+.msg-icon.notify { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+.msg-icon.sign { background: linear-gradient(135deg, #ede9fe, #ddd6fe); }
+
+.msg-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.msg-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.msg-dot {
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.msg-desc {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.msg-meta {
+  font-size: 12px;
+  color: #9ca3af;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.msg-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.message-item:hover .msg-actions {
+  opacity: 1;
+}
 </style>

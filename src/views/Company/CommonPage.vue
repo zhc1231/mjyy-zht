@@ -1,14 +1,20 @@
 <template>
   <div class="company-common-page">
-    <div class="page-header">
-      <h2 class="page-title">{{ pageTitle }}</h2>
-    </div>
-    <div class="page-content">
-      <el-empty :description="pageTitle + '功能开发中'">
-        <template #image>
-          <el-icon class="empty-icon"><Document /></el-icon>
-        </template>
-      </el-empty>
+    <div class="box-card">
+      <div class="card-header">
+        <span class="card-title">{{ pageTitle }}</span>
+      </div>
+      <div class="page-content">
+        <div class="empty-wrap">
+          <div class="empty-icon">
+            <svg viewBox="0 0 64 64" width="80" height="80">
+              <circle cx="32" cy="32" r="30" fill="#f5f7fa" stroke="#e4e7ed" stroke-width="2"/>
+              <path d="M20 24h24v4H20zm0 8h24v4H20zm0 8h16v4H20z" fill="#c0c4cc"/>
+            </svg>
+          </div>
+          <p class="empty-text">{{ pageTitle }}功能开发中</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -16,7 +22,6 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { Document } from '@element-plus/icons-vue'
 
 const route = useRoute()
 
@@ -25,29 +30,44 @@ const pageTitle = computed(() => route.meta.title || '页面')
 
 <style scoped>
 .company-common-page {
-  padding: 20px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.page-header {
-  margin-bottom: 20px;
+.box-card {
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid #EBEEF5;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.page-title {
-  font-size: 18px;
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.card-title {
+  font-size: 15px;
   font-weight: 600;
   color: #303133;
-  margin: 0;
 }
 
 .page-content {
-  background: #fff;
-  border-radius: 10px;
   padding: 40px 20px;
   min-height: 400px;
 }
 
+.empty-wrap {
+  text-align: center;
+}
+
 .empty-icon {
-  font-size: 80px;
-  color: #dcdfe6;
+  margin-bottom: 16px;
+}
+
+.empty-text {
+  font-size: 14px;
+  color: #909399;
+  margin: 0;
 }
 </style>

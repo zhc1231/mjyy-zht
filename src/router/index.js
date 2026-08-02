@@ -115,12 +115,18 @@ const routes = [
       { path: 'task-schedule', name: 'CompanyTaskSchedule', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '任务排期' } },
       { path: 'talent-pool', name: 'CompanyTalentPool', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '人才库' } },
       { path: 'task-list-guide', name: 'CompanyTaskListGuide', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '任务列表' } },
-      { path: 'task-center', name: 'CompanyTaskCenter', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '任务中心' } },
+      { path: 'task-center', name: 'CompanyTaskCenter', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '任务管理' } },
       { path: 'settlement', name: 'CompanySettlement', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '结算记录' } },
-      { path: 'attendance', name: 'CompanyAttendance', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '打卡机数据' } },
-      { path: 'account', name: 'CompanyAccount', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '账户管理' } },
+      { path: 'attendance', name: 'CompanyAttendance', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '对账单' } },
+      { path: 'account', name: 'CompanyAccount', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '账户总览' } },
+      { path: 'bill-detail', name: 'CompanyBillDetail', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '账单明细' } },
+      { path: 'invoice-info', name: 'CompanyInvoiceInfo', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '开票信息' } },
+      { path: 'basic-info', name: 'CompanyBasicInfo', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '基本信息' } },
+      { path: 'account-setting', name: 'CompanyAccountSetting', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '账户设置' } },
+      { path: 'user-list', name: 'CompanyUserList', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '用户列表' } },
       { path: 'project', name: 'CompanyProject', component: () => import('../views/Company/ProjectList.vue'), meta: { title: '项目管理' } },
-      { path: 'system', name: 'CompanySystem', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '系统管理' } }
+      { path: 'system', name: 'CompanySystem', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '角色管理' } },
+      { path: 'notice', name: 'CompanyNotice', component: () => import('../views/Company/CommonPage.vue'), meta: { title: '系统公告' } }
     ]
   },
   {
@@ -160,6 +166,12 @@ const routes = [
       { path: 'statistics', name: 'AxyStatistics', component: () => import('../views/Axy/Statistics.vue'), meta: { title: '数据统计' } },
       { path: 'system', name: 'AxySystem', component: () => import('../views/Axy/System.vue'), meta: { title: '系统设置' } }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../views/Error404.vue'),
+    meta: { title: '页面不存在' }
   }
 ]
 

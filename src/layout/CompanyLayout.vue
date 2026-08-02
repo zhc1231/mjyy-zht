@@ -1,39 +1,45 @@
 <template>
   <div class="company-layout">
-    <el-container class="layout-container">
-      <el-aside width="220px" class="sidebar">
+    <div class="layout-header">
+      <div class="header-left">
         <div class="logo-area">
-          <div class="logo-text">
-            <span class="logo-char">民</span>
-            <span class="logo-char">匠</span>
-            <span class="logo-char">有</span>
-            <span class="logo-char">约</span>
+          <span class="logo-char" v-for="(ch, i) in '民匠有约'" :key="i">{{ ch }}</span>
+        </div>
+        <div class="guide-banner">
+          <span class="guide-icon">📖</span>
+          <span class="guide-text">操作流程<span class="guide-highlight">指南</span>:</span>
+        </div>
+        <div class="steps-flow">
+          <div class="step-unit" v-for="(step, i) in steps" :key="i">
+            <div v-if="i > 0" class="connector" :class="{ done: i <= activeStep }"></div>
+            <div class="step-body">
+              <div class="step-circle" :class="{ done: i < activeStep, active: i === activeStep, todo: i > activeStep }">
+                <span v-if="i >= activeStep">{{ i + 1 }}</span>
+                <span v-else>✓</span>
+              </div>
+              <span class="step-title" :class="{ done: i < activeStep, active: i === activeStep, todo: i > activeStep }">{{ step }}</span>
+            </div>
           </div>
         </div>
-        <div class="menu-area">
-          <div 
-            v-for="menu in menuList" 
-            :key="menu.id"
-            class="menu-item"
+      </div>
+    </div>
+    <div class="layout-body">
+      <div class="navBar">
+        <div v-for="menu in menuList" :key="menu.id" class="nav-group">
+          <div
+            class="navTitle"
+            :class="{ active: activeMenu === menu.id }"
+            @click="handleMenuClick(menu)"
           >
-            <div 
-              class="menu-title"
-              :class="{ active: activeMenu === menu.id }"
-              @click="handleMenuClick(menu)"
-            >
-              <span class="menu-text">{{ menu.name }}</span>
-              <el-icon v-if="menu.children && menu.children.length > 0" class="menu-arrow">
-                <ArrowDown />
-              </el-icon>
-            </div>
-            <div 
-              v-if="menu.children && menu.children.length > 0 && expandedMenus.includes(menu.id)"
-              class="sub-menu"
-            >
-              <div 
-                v-for="child in menu.children" 
+            <img v-if="menu.icon" :src="menu.icon" class="navImage" />
+            <span class="navText" :class="{ spanAct: activeMenu === menu.id }">{{ menu.name }}</span>
+          </div>
+          <div v-if="menu.children && menu.children.length > 0" class="nav-item-group">
+            <div class="nav-item-row">
+              <div
+                v-for="child in menu.children"
                 :key="child.id"
-                class="sub-menu-item"
+                class="nav-item-text"
                 :class="{ active: isChildActive(child.path) }"
                 @click="handleSubMenuClick(child.path)"
               >
@@ -42,39 +48,11 @@
             </div>
           </div>
         </div>
-      </el-aside>
-      <el-container class="main-container">
-        <el-header class="header">
-          <div class="header-left">
-            <el-button class="company-selector" @click="showCompanyList">
-              <span>操作流程指南:</span>
-              <el-icon class="arrow-icon"><ArrowDown /></el-icon>
-            </el-button>
-          </div>
-          <div class="header-right">
-            <el-dropdown trigger="click" class="user-dropdown">
-              <span class="user-info">
-                <el-button class="company-name-btn">
-                  {{ currentCompany }}
-                  <el-icon class="arrow-icon"><ArrowDown /></el-icon>
-                </el-button>
-              </span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="handleLogout">
-                    <el-icon><SwitchButton /></el-icon>
-                    退出登录
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </el-header>
-        <el-main class="main-content">
-          <router-view />
-        </el-main>
-      </el-container>
-    </el-container>
+      </div>
+      <div class="main-content">
+        <router-view />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -82,31 +60,56 @@
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowDown, SwitchButton } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
-const expandedMenus = ref(['taskGuide'])
-const currentCompany = ref('陕西火车侠建设工程有限公司')
+const activeStep = ref(3)
+
+const steps = ['工种配置', '任务排期', '人才库', '发布任务', '任务详情', '添加成员', '完成']
 
 const menuList = [
-  { id: 'home', name: '首页', path: '/company/home', children: [] },
-  { 
-    id: 'taskGuide', 
-    name: '任务指南',
+  { id: 'home', name: '首页', icon: 'https://lqjoss.oss-cn-hangzhou.aliyuncs.com/images/54acb41c7cf4476f93301f71851d5157.png', path: '/company/home', children: [] },
+  {
+    id: 'taskCenter',
+    name: '任务中心',
+    icon: 'https://lqjoss.oss-cn-hangzhou.aliyuncs.com/images/c2cf78e53cd544bab5d9ce0add4f5065.png',
     children: [
-      { id: 'workType', name: '1.任务工种', path: '/company/work-type' },
-      { id: 'taskSchedule', name: '2.任务排期', path: '/company/task-schedule' },
-      { id: 'talentPool', name: '3.人才库', path: '/company/talent-pool' },
-      { id: 'taskListGuide', name: '4.任务列表', path: '/company/task-list-guide' }
+      { id: 'taskList', name: '任务列表', path: '/company/task-list-guide' },
+      { id: 'settlement', name: '结算记录', path: '/company/settlement' },
+      { id: 'taskManage', name: '任务管理', path: '/company/task-center' },
+      { id: 'talentPool', name: '人才库', path: '/company/talent-pool' }
     ]
   },
-  { id: 'taskCenter', name: '任务中心', path: '/company/task-center', children: [] },
-  { id: 'settlement', name: '结算记录', path: '/company/settlement', children: [] },
-  { id: 'attendance', name: '打卡机数据', path: '/company/attendance', children: [] },
-  { id: 'account', name: '账户管理', path: '/company/account', children: [] },
-  { id: 'project', name: '项目管理', path: '/company/project', children: [] },
-  { id: 'system', name: '系统管理', path: '/company/system', children: [] }
+  {
+    id: 'finance',
+    name: '财务管理',
+    icon: 'https://lqjoss.oss-cn-hangzhou.aliyuncs.com/images/7e79be6d82004754b29a86e4b2523a82.png',
+    children: [
+      { id: 'account', name: '账户总览', path: '/company/account' },
+      { id: 'reconciliation', name: '对账单', path: '/company/attendance' },
+      { id: 'billDetail', name: '账单明细', path: '/company/bill-detail' },
+      { id: 'invoiceInfo', name: '开票信息', path: '/company/invoice-info' }
+    ]
+  },
+  {
+    id: 'accountMgr',
+    name: '账号管理',
+    icon: 'https://lqjoss.oss-cn-hangzhou.aliyuncs.com/images/c2cf78e53cd544bab5d9ce0add4f5065.png',
+    children: [
+      { id: 'basicInfo', name: '基本信息', path: '/company/basic-info' },
+      { id: 'accountSetting', name: '账户设置', path: '/company/account-setting' },
+      { id: 'userList', name: '用户列表', path: '/company/user-list' }
+    ]
+  },
+  {
+    id: 'system',
+    name: '系统管理',
+    icon: 'https://lqjoss.oss-cn-hangzhou.aliyuncs.com/images/7e79be6d82004754b29a86e4b2523a82.png',
+    children: [
+      { id: 'role', name: '角色管理', path: '/company/system' },
+      { id: 'notice', name: '系统公告', path: '/company/notice' }
+    ]
+  }
 ]
 
 const activeMenu = computed(() => {
@@ -114,16 +117,16 @@ const activeMenu = computed(() => {
   const menuMap = {
     '/company': 'home',
     '/company/home': 'home',
-    '/company/work-type': 'taskGuide',
-    '/company/task-schedule': 'taskGuide',
-    '/company/talent-pool': 'taskGuide',
-    '/company/task-list-guide': 'taskGuide',
+    '/company/task-list-guide': 'taskCenter',
+    '/company/settlement': 'taskCenter',
     '/company/task-center': 'taskCenter',
-    '/company/settlement': 'settlement',
-    '/company/attendance': 'attendance',
-    '/company/account': 'account',
-    '/company/project': 'project',
-    '/company/system': 'system'
+    '/company/talent-pool': 'taskCenter',
+    '/company/work-type': 'taskCenter',
+    '/company/task-schedule': 'taskCenter',
+    '/company/account': 'finance',
+    '/company/attendance': 'finance',
+    '/company/system': 'system',
+    '/company/project': 'home'
   }
   return menuMap[path] || 'home'
 })
@@ -133,24 +136,13 @@ const isChildActive = (path) => {
 }
 
 const handleMenuClick = (menu) => {
-  if (menu.children && menu.children.length > 0) {
-    const index = expandedMenus.value.indexOf(menu.id)
-    if (index > -1) {
-      expandedMenus.value.splice(index, 1)
-    } else {
-      expandedMenus.value.push(menu.id)
-    }
-  } else if (menu.path) {
+  if (menu.path) {
     router.push(menu.path)
   }
 }
 
 const handleSubMenuClick = (path) => {
   router.push(path)
-}
-
-const showCompanyList = () => {
-  router.push('/company/company-list')
 }
 
 const handleLogout = () => {
@@ -164,198 +156,229 @@ const handleLogout = () => {
 <style scoped>
 .company-layout {
   height: 100%;
-  --primary-color: #409EFF;
-  --primary-light: #66b1ff;
-  --primary-bg: #ecf5ff;
-}
-
-.layout-container {
-  height: 100%;
-}
-
-.sidebar {
-  background: #fff;
-  border-right: 1px solid #ebeef5;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  background: #EFEFF4;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.logo-area {
-  padding: 24px 20px;
-  border-bottom: 1px solid #f0f0f0;
-  text-align: center;
-}
-
-.logo-text {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  color: #409EFF;
-}
-
-.logo-char {
-  display: inline-block;
-}
-
-.menu-area {
-  flex: 1;
-  padding: 12px 0;
-  overflow-y: auto;
-}
-
-.menu-area::-webkit-scrollbar {
-  width: 4px;
-}
-
-.menu-area::-webkit-scrollbar-thumb {
-  background: #dcdfe6;
-  border-radius: 2px;
-}
-
-.menu-item {
-  margin-bottom: 2px;
-}
-
-.menu-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 24px;
-  font-size: 14px;
-  color: #606266;
-  cursor: pointer;
-  transition: all 0.3s;
-  position: relative;
-}
-
-.menu-title:hover {
-  background: #ecf5ff;
-  color: #409EFF;
-}
-
-.menu-title.active {
-  color: #409EFF;
-  font-weight: 500;
-  background: #fff7e6;
-}
-
-.menu-title.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: #409EFF;
-}
-
-.menu-text {
-  flex: 1;
-}
-
-.menu-arrow {
-  font-size: 12px;
-  transition: transform 0.3s;
-}
-
-.sub-menu {
-  padding: 4px 0 8px;
-}
-
-.sub-menu-item {
-  padding: 10px 24px 10px 44px;
-  font-size: 13px;
-  color: #909399;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.sub-menu-item:hover {
-  color: #409EFF;
-  background: #f5faff;
-}
-
-.sub-menu-item.active {
-  color: #409EFF;
-  font-weight: 500;
-  background: #fffaf0;
-}
-
-.main-container {
-  display: flex;
-  flex-direction: column;
-  background: #f5f7fa;
-}
-
-.header {
+/* Header */
+.layout-header {
   height: 60px;
   background: #fff;
-  border-bottom: 1px solid #ebeef5;
-  padding: 0 24px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
 }
 
 .header-left {
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
-.company-selector {
-  background: #fff7e6 !important;
-  color: #409EFF !important;
-  border: 1px solid #ffd591 !important;
-  border-radius: 6px;
-  padding: 0 16px;
+/* Logo */
+.logo-area {
+  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.logo-char {
+  font-size: 26px;
+  color: #5077E8;
+  font-weight: 700;
+  margin: 0 1px;
+}
+
+/* Guide Banner */
+.guide-banner {
+  background: #0B70FF;
+  color: #fff;
+  padding: 8px 18px 8px 8px;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
   font-size: 13px;
-  height: 36px;
 }
 
-.company-selector:hover {
-  background: #ffecd4 !important;
+.guide-icon {
+  font-size: 14px;
 }
 
-.arrow-icon {
-  margin-left: 6px;
-  font-size: 12px;
+.guide-highlight {
+  color: #FFD700;
 }
 
-.header-right {
+/* Steps Flow */
+.steps-flow {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px 6px 4px;
+}
+
+.step-unit {
   display: flex;
   align-items: center;
 }
 
-.user-dropdown {
-  cursor: pointer;
+.step-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
-.company-name-btn {
-  background: #f5f7fa !important;
-  color: #303133 !important;
-  border: none !important;
-  border-radius: 6px;
-  padding: 0 16px;
-  font-size: 14px;
-  height: 36px;
+.step-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
   font-weight: 500;
 }
 
-.company-name-btn:hover {
-  background: #ebeef5 !important;
+.step-circle.done {
+  background: #0B70FF;
+  color: #fff;
 }
 
-.main-content {
+.step-circle.active {
+  background: #0B70FF;
+  color: #fff;
+}
+
+.step-circle.todo {
+  background: #E4E7ED;
+  color: #909399;
+}
+
+.step-title {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.step-title.done {
+  color: #303133;
+}
+
+.step-title.active {
+  color: #0B70FF;
+  font-weight: 500;
+}
+
+.step-title.todo {
+  color: #909399;
+}
+
+.connector {
+  width: 20px;
+  height: 2px;
+  background: #E4E7ED;
+  margin: 0 4px;
+  margin-bottom: 16px;
+}
+
+.connector.done {
+  background: #0B70FF;
+}
+
+/* Body Layout */
+.layout-body {
   flex: 1;
-  padding: 0;
+  display: flex;
   overflow: hidden;
 }
 
-:deep(.el-dropdown-menu__item) {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  font-size: 13px !important;
+/* NavBar (Sidebar) */
+.navBar {
+  width: 238px;
+  background: #fff;
+  padding: 5px 16px 16px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.navBar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.navBar::-webkit-scrollbar-thumb {
+  background: #dcdfe6;
+  border-radius: 2px;
+}
+
+.nav-group {
+  margin-bottom: 8px;
+}
+
+.navTitle {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #030217;
+  transition: color 0.2s;
+}
+
+.navTitle:hover {
+  color: #5077E8;
+}
+
+.navImage {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+}
+
+.navText {
+  font-size: 14px;
+}
+
+.navText.spanAct {
+  color: #5077E8;
+}
+
+.nav-item-group {
+  padding-left: 22px;
+}
+
+.nav-item-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.nav-item-text {
+  font-size: 14px;
+  color: #666;
+  padding: 4px 8px 4px 0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.nav-item-text:hover {
+  color: #5077E8;
+}
+
+.nav-item-text.active {
+  color: #5077E8;
+  font-weight: 500;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background: #EFEFF4;
 }
 </style>

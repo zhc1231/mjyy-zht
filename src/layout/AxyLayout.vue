@@ -21,15 +21,15 @@
             <span v-if="item.children && item.children.length" class="menu-arrow">▾</span>
           </div>
           <div v-if="item.children && item.children.length && openedMenus.includes(item.id)" class="sub-menu">
-            <a 
+            <div 
               v-for="child in item.children" 
               :key="child.id"
-              :href="child.path"
               class="sub-menu-item"
               :class="{ 'is-active': route.path === child.path }"
+              @click="handleSubMenuClick(child)"
             >
               {{ child.name }}
-            </a>
+            </div>
           </div>
         </div>
       </nav>
@@ -218,6 +218,12 @@ const handleMenuClick = (item) => {
   }
 }
 
+const handleSubMenuClick = (child) => {
+  if (child.path) {
+    router.push(child.path)
+  }
+}
+
 const handleLogout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('username')
@@ -230,59 +236,73 @@ const handleLogout = () => {
 .axy-layout {
   display: flex;
   min-height: 100vh;
-  background: #f5f7fa;
+  background: #f0f2f5;
 }
 .sidebar {
-  width: 220px;
-  background: #304156;
+  width: 240px;
+  background: linear-gradient(180deg, #001529 0%, #002140 100%);
   color: #fff;
   flex-shrink: 0;
-  transition: width 0.3s;
+  transition: width 0.3s ease;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
 }
 .sidebar-header {
-  padding: 20px;
-  border-bottom: 1px solid #435266;
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.2);
 }
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 .logo-icon {
-  font-size: 28px;
+  font-size: 32px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 .logo-text {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fff 0%, #91d5ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
 }
 .menu {
-  padding: 16px 0;
+  padding: 12px 8px;
 }
 .menu-item {
   cursor: pointer;
+  margin-bottom: 4px;
 }
 .menu-link {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  gap: 12px;
-  color: #bfcbd9;
-  transition: all 0.2s;
+  padding: 14px 16px;
+  gap: 14px;
+  color: rgba(255,255,255,0.75);
+  transition: all 0.25s ease;
+  border-radius: 8px;
+  font-weight: 500;
 }
 .menu-link:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
   color: #fff;
+  transform: translateX(2px);
 }
-.menu-item.is-active .menu-link {
-  background: #409EFF;
+.menu-item.is-active > .menu-link {
+  background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
   color: #fff;
+  box-shadow: 0 4px 12px rgba(64,158,255,0.3);
 }
 .menu-icon {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 18px;
 }
 .menu-name {
   flex: 1;
@@ -290,102 +310,136 @@ const handleLogout = () => {
 }
 .menu-arrow {
   font-size: 10px;
-  transition: transform 0.2s;
+  transition: transform 0.25s ease;
+  opacity: 0.6;
 }
 .menu-item.is-opened .menu-arrow {
   transform: rotate(180deg);
 }
 .sub-menu {
-  background: #263445;
+  padding: 4px 0 8px 8px;
+  margin-left: 20px;
+  border-left: 2px solid rgba(64,158,255,0.3);
 }
 .sub-menu-item {
   display: block;
-  padding: 10px 20px 10px 52px;
-  color: #bfcbd9;
-  text-decoration: none;
+  padding: 11px 16px 11px 20px;
+  color: rgba(255,255,255,0.6);
   font-size: 13px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 2px;
 }
 .sub-menu-item:hover {
-  background: rgba(255,255,255,0.05);
-  color: #fff;
+  background: rgba(64,158,255,0.1);
+  color: #91d5ff;
 }
 .sub-menu-item.is-active {
   color: #409EFF;
-  background: rgba(64,158,255,0.1);
+  background: rgba(64,158,255,0.15);
+  font-weight: 500;
 }
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 .top-bar {
-  height: 60px;
+  height: 64px;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
-  border-bottom: 1px solid #ebeef5;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 0 32px;
+  border-bottom: 1px solid #e8e8e8;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 .top-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 .toggle-btn {
-  background: none;
+  background: #f5f7fa;
   border: none;
   font-size: 18px;
   cursor: pointer;
   color: #606266;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.toggle-btn:hover {
+  background: #ecf5ff;
+  color: #409EFF;
 }
 .page-title {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
-  color: #303133;
+  color: #1f2937;
 }
 .top-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 }
 .user-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 24px;
+  background: #f5f7fa;
+  transition: all 0.2s ease;
+}
+.user-info:hover {
+  background: #ecf5ff;
 }
 .user-name {
   font-size: 14px;
-  color: #606266;
+  color: #374151;
+  font-weight: 500;
 }
 .user-avatar {
   width: 36px;
   height: 36px;
-  background: #409EFF;
+  background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
+  box-shadow: 0 2px 8px rgba(64,158,255,0.25);
 }
 .logout-btn {
-  padding: 6px 16px;
-  border: 1px solid #f56c6c;
-  border-radius: 4px;
-  color: #f56c6c;
+  padding: 8px 20px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #ef4444;
   background: #fff;
   font-size: 13px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 .logout-btn:hover {
-  background: #fef0f0;
+  background: #fef2f2;
+  border-color: #ef4444;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239,68,68,0.15);
 }
 .content-wrapper {
   flex: 1;
-  padding: 24px;
+  padding: 24px 32px;
   overflow-y: auto;
 }
 </style>

@@ -1,8 +1,11 @@
 <template>
-  <div class="attendance-stat-page">
-    <div class="page-header">
-      <h2>考勤统计</h2>
-      <div class="header-actions">
+  <div class="list-page">
+    <div class="page-head">
+      <div class="page-title">
+        <h2>考勤统计</h2>
+        <p>查看人员出勤、迟到、早退等考勤数据统计</p>
+      </div>
+      <div class="page-actions">
         <el-select v-model="filterMonth" placeholder="选择月份" style="width: 150px;">
           <el-option label="2026年7月" value="2026-07" />
           <el-option label="2026年6月" value="2026-06" />
@@ -14,58 +17,44 @@
           <el-option label="保洁服务" value="保洁服务" />
           <el-option label="物流搬运" value="物流搬运" />
         </el-select>
-        <el-button @click="handleRefresh">刷新数据</el-button>
+        <el-button type="primary" @click="handleRefresh">
+          <span>🔄</span> 刷新数据
+        </el-button>
       </div>
     </div>
 
-    <div class="stats-card">
-      <div class="stat-item">
-        <div class="stat-icon total">👥</div>
-        <div class="stat-info">
-          <div class="stat-value">256</div>
-          <div class="stat-label">出勤人数</div>
-        </div>
+    <div class="stats-cards">
+      <div class="stat-mini-card blue">
+        <span class="stat-num">256</span>
+        <span class="stat-label">出勤人数</span>
       </div>
-      <div class="stat-item">
-        <div class="stat-icon normal">✓</div>
-        <div class="stat-info">
-          <div class="stat-value">92.3%</div>
-          <div class="stat-label">正常率</div>
-        </div>
+      <div class="stat-mini-card green">
+        <span class="stat-num">92.3%</span>
+        <span class="stat-label">正常率</span>
       </div>
-      <div class="stat-item">
-        <div class="stat-icon late">⏰</div>
-        <div class="stat-info">
-          <div class="stat-value">18</div>
-          <div class="stat-label">迟到次数</div>
-        </div>
+      <div class="stat-mini-card orange">
+        <span class="stat-num">18</span>
+        <span class="stat-label">迟到次数</span>
       </div>
-      <div class="stat-item">
-        <div class="stat-icon early">🚶</div>
-        <div class="stat-info">
-          <div class="stat-value">12</div>
-          <div class="stat-label">早退次数</div>
-        </div>
+      <div class="stat-mini-card orange">
+        <span class="stat-num">12</span>
+        <span class="stat-label">早退次数</span>
       </div>
-      <div class="stat-item">
-        <div class="stat-icon absent">✗</div>
-        <div class="stat-info">
-          <div class="stat-value">5</div>
-          <div class="stat-label">旷工人数</div>
-        </div>
+      <div class="stat-mini-card gray">
+        <span class="stat-num">5</span>
+        <span class="stat-label">旷工人数</span>
       </div>
-      <div class="stat-item">
-        <div class="stat-icon overtime">⌛</div>
-        <div class="stat-info">
-          <div class="stat-value">1,256h</div>
-          <div class="stat-label">加班时长</div>
-        </div>
+      <div class="stat-mini-card blue">
+        <span class="stat-num">1,256h</span>
+        <span class="stat-label">加班时长</span>
       </div>
     </div>
 
     <div class="chart-section">
       <div class="chart-card">
-        <h3>每日出勤趋势</h3>
+        <div class="chart-header">
+          <h3>每日出勤趋势</h3>
+        </div>
         <div class="bar-chart">
           <div v-for="(item, index) in dailyStats" :key="index" class="bar-item">
             <div class="bar" :style="{ height: item.percent + '%' }">
@@ -76,7 +65,9 @@
         </div>
       </div>
       <div class="chart-card">
-        <h3>工种出勤对比</h3>
+        <div class="chart-header">
+          <h3>工种出勤对比</h3>
+        </div>
         <div class="pie-chart">
           <div class="pie" :style="{ background: pieGradient }"></div>
           <div class="pie-legend">
@@ -90,9 +81,11 @@
       </div>
     </div>
 
-    <div class="table-section">
-      <h3>人员考勤排行</h3>
-      <el-table :data="rankList" border style="width: 100%;">
+    <div class="table-panel">
+      <div class="table-header">
+        <h3>人员考勤排行</h3>
+      </div>
+      <el-table :data="rankList" stripe>
         <el-table-column prop="rank" label="排名" width="80">
           <template #default="scope">
             <el-tag v-if="scope.row.rank <= 3" :type="scope.row.rank === 1 ? 'danger' : scope.row.rank === 2 ? 'warning' : 'success'">{{ scope.row.rank }}</el-tag>
@@ -105,7 +98,7 @@
         <el-table-column prop="absentDays" label="缺勤天数" width="100" />
         <el-table-column prop="lateCount" label="迟到次数" width="100" />
         <el-table-column prop="workHours" label="工作时长" width="100" />
-        <el-table-column prop="rate" label="出勤率" width="100">
+        <el-table-column prop="rate" label="出勤率" width="120">
           <template #default="scope">
             <el-progress :percentage="scope.row.rate" :stroke-width="12" :text-inside="true" />
           </template>
@@ -161,98 +154,132 @@ const handleRefresh = () => {}
 </script>
 
 <style scoped>
-.attendance-stat-page {
-  padding: 24px;
+.list-page {
+  padding-bottom: 24px;
 }
 
-.page-header {
+.page-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  align-items: flex-start;
+  margin-bottom: 20px;
 }
 
-.page-header h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #303133;
+.page-title h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+}
+
+.page-title p {
+  font-size: 13px;
+  color: #9ca3af;
   margin: 0;
 }
 
-.header-actions {
+.page-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
+  align-items: center;
 }
 
-.stats-card {
+.page-actions .el-button {
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-weight: 500;
+}
+
+.stats-cards {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
-.stat-item {
+.stat-mini-card {
   background: #fff;
+  border-radius: 12px;
   padding: 20px;
-  border-radius: 8px;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
 }
 
-.stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 24px;
+.stat-mini-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
 }
 
-.stat-icon.total { background: #ecf5ff; }
-.stat-icon.normal { background: #f0f9eb; }
-.stat-icon.late { background: #fdf6ec; }
-.stat-icon.early { background: #fdf6ec; }
-.stat-icon.absent { background: #fef0f0; }
-.stat-icon.overtime { background: #f5f0ff; }
+.stat-mini-card.blue::before { background: linear-gradient(180deg, #409EFF, #66b1ff); }
+.stat-mini-card.green::before { background: linear-gradient(180deg, #10b981, #34d399); }
+.stat-mini-card.orange::before { background: linear-gradient(180deg, #f59e0b, #fbbf24); }
+.stat-mini-card.gray::before { background: linear-gradient(180deg, #6b7280, #9ca3af); }
 
-.stat-value {
-  font-size: 24px;
+.stat-num {
+  font-size: 26px;
   font-weight: 700;
-  color: #303133;
+  color: #1f2937;
 }
 
 .stat-label {
-  font-size: 12px;
-  color: #909399;
+  font-size: 13px;
+  color: #6b7280;
 }
 
 .chart-section {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .chart-card {
   background: #fff;
-  padding: 24px;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
 }
 
-.chart-card h3 {
-  font-size: 16px;
+.chart-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.chart-header h3 {
+  font-size: 15px;
   font-weight: 600;
-  color: #303133;
-  margin: 0 0 20px 0;
+  color: #1f2937;
+  margin: 0;
+  position: relative;
+  padding-left: 12px;
+}
+
+.chart-header h3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 16px;
+  background: linear-gradient(180deg, #409EFF, #66b1ff);
+  border-radius: 2px;
 }
 
 .bar-chart {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  height: 200px;
+  height: 220px;
+  padding: 24px 20px;
 }
 
 .bar-item {
@@ -263,7 +290,7 @@ const handleRefresh = () => {}
 }
 
 .bar {
-  width: 30px;
+  width: 28px;
   background: linear-gradient(to top, #409EFF, #66b1ff);
   border-radius: 4px 4px 0 0;
   display: flex;
@@ -274,27 +301,30 @@ const handleRefresh = () => {}
 
 .bar-value {
   position: absolute;
-  top: -24px;
+  top: -22px;
   font-size: 12px;
   font-weight: 600;
+  color: #4b5563;
 }
 
 .bar-label {
-  margin-top: 8px;
+  margin-top: 10px;
   font-size: 12px;
-  color: #909399;
+  color: #9ca3af;
 }
 
 .pie-chart {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 24px;
+  padding: 24px 20px;
 }
 
 .pie {
-  width: 150px;
-  height: 150px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .pie-legend {
@@ -304,36 +334,63 @@ const handleRefresh = () => {}
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 12px;
 }
 
+.legend-item:last-child {
+  margin-bottom: 0;
+}
+
 .legend-color {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
 }
 
 .legend-label {
   flex: 1;
-  font-size: 14px;
+  font-size: 13px;
+  color: #6b7280;
 }
 
 .legend-value {
   font-size: 14px;
   font-weight: 600;
+  color: #1f2937;
 }
 
-.table-section {
+.table-panel {
   background: #fff;
-  padding: 24px;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
 }
 
-.table-section h3 {
-  font-size: 16px;
+.table-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.table-header h3 {
+  font-size: 15px;
   font-weight: 600;
-  color: #303133;
-  margin: 0 0 16px 0;
+  color: #1f2937;
+  margin: 0;
+  position: relative;
+  padding-left: 12px;
+}
+
+.table-header h3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 16px;
+  background: linear-gradient(180deg, #409EFF, #66b1ff);
+  border-radius: 2px;
 }
 </style>
