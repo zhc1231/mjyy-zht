@@ -29,6 +29,21 @@
   .header h1 { font-size: 32px; margin-bottom: 12px; font-weight: 600; }
   .header .subtitle { font-size: 15px; opacity: 0.9; }
   .header .version { margin-top: 16px; font-size: 13px; opacity: 0.8; }
+  .header .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .header .back-link:hover {
+    background: rgba(255,255,255,0.3);
+  }
 
   .toc {
     background: #f8f9fc;
@@ -223,6 +238,7 @@
     <h1 id="top">民匠有约管理系统</h1>
     <div class="subtitle">产品流程图</div>
     <div class="version">版本 V1.0 · 2026-07-04</div>
+    <a href="./changelog.html" class="back-link">← 返回更新日志</a>
   </div>
 
   <div class="toc">
