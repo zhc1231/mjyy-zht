@@ -63,7 +63,6 @@
 
           <div class="batch-btns">
             <el-button type="primary" @click="onPreSettle">预结算</el-button>
-            <el-button type="primary" @click="onConfirmSettle">确认结算</el-button>
             <el-button type="primary" plain @click="onAddMember">添加成员</el-button>
             <el-button type="primary" plain @click="onQrInvite">二维码邀请</el-button>
             <el-button type="primary" plain @click="onExportAttendance">导出打卡</el-button>
@@ -118,6 +117,9 @@
                 <el-link v-else-if="row.workerConfirmStatus === '已拒绝'" type="danger" :underline="false" style="font-weight:500" @click="onToggleWorkerConfirm(row)">
                   <el-icon style="vertical-align:-2px"><Minus /></el-icon> 已拒绝
                 </el-link>
+                <el-link v-else-if="row.workerConfirmStatus === '无需确认'" type="info" :underline="false" style="font-weight:500" @click="onToggleWorkerConfirm(row)">
+                  无需确认
+                </el-link>
               </template>
             </el-table-column>
             <el-table-column label="备注" prop="remark" min-width="120">
@@ -126,9 +128,8 @@
                 <span v-else style="color:#a0a4ab">-</span>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="200" fixed="right">
+            <el-table-column label="操作" width="160" fixed="right">
               <template #default="{ row }">
-                <el-button link type="primary" size="small" @click="onSettle(row)">结算</el-button>
                 <el-button link type="primary" size="small" @click="onSuspend(row)">挂起</el-button>
                 <el-button link type="primary" size="small" @click="onConfirmArrival(row)">到场确认</el-button>
               </template>
@@ -137,6 +138,88 @@
 
           <div class="table-footer">
             <span>共 {{ filteredMemberList.length }} 条</span>
+          </div>
+        </div>
+
+        <div v-show="activeTab === 'attendance'" class="tab-content">
+          <el-empty description="暂无打卡数据" />
+        </div>
+
+        <div v-show="activeTab === 'confirm-settle'" class="tab-content">
+          <div class="settle-search-row">
+            <div class="settle-search-item">
+              <span class="lbl">姓名：</span>
+              <el-input v-model="confirmSettleSearch.name" placeholder="请输入姓名" clearable style="width:180px" />
+            </div>
+            <div class="settle-search-item">
+              <span class="lbl">灵工确认：</span>
+              <el-select v-model="confirmSettleSearch.confirmStatus" placeholder="全部" clearable style="width:140px">
+                <el-option label="待确认" value="待确认" />
+                <el-option label="已确认" value="已确认" />
+                <el-option label="已拒绝" value="已拒绝" />
+                <el-option label="无需确认" value="无需确认" />
+              </el-select>
+            </div>
+          </div>
+          <div class="settle-search-actions">
+            <el-button type="primary" @click="onConfirmSettleSearch"><el-icon><Search /></el-icon> 搜索</el-button>
+            <el-button @click="onConfirmSettleClearSearch"><el-icon><RefreshLeft /></el-icon> 清空</el-button>
+          </div>
+
+          <div class="settle-toolbar">
+            <div class="settle-stats" style="width:100%">
+              <div class="stat-item"><span class="stat-label">结算人数</span><span class="stat-value">{{ filteredConfirmSettleList.length }}</span></div>
+              <div class="stat-item"><span class="stat-label">已确认</span><span class="stat-value" style="color:#00b578">{{ confirmSettleStats.confirmed }}</span></div>
+              <div class="stat-item"><span class="stat-label">待确认</span><span class="stat-value" style="color:#ff9500">{{ confirmSettleStats.pending }}</span></div>
+              <div class="stat-item"><span class="stat-label">已拒绝</span><span class="stat-value" style="color:#ff4d4f">{{ confirmSettleStats.rejected }}</span></div>
+              <div class="stat-item"><span class="stat-label">无需确认</span><span class="stat-value" style="color:#86909c">{{ confirmSettleStats.noNeed }}</span></div>
+              <div class="stat-item"><span class="stat-label">预结算总额</span><span class="stat-value">{{ totalConfirmSettle.toFixed(2) }}</span></div>
+              <div class="stat-item"><span class="stat-label">支付总计</span><span class="stat-value">{{ totalConfirmSettle.toFixed(2) }}</span></div>
+            </div>
+          </div>
+
+          <el-table :data="filteredConfirmSettleList" border @selection-change="onConfirmSettleSelectionChange">
+            <el-table-column type="selection" width="45" :selectable="isConfirmSettleSelectable" />
+            <el-table-column label="姓名" prop="name" min-width="80" />
+            <el-table-column label="身份证号" prop="idCard" min-width="170" />
+            <el-table-column label="预结算金额" prop="preSettleAmount" min-width="110" align="right">
+              <template #default="{ row }">{{ Number(row.preSettleAmount).toFixed(2) }}</template>
+            </el-table-column>
+            <el-table-column label="备注" prop="remark" min-width="120">
+              <template #default="{ row }">
+                <span v-if="row.remark">{{ row.remark }}</span>
+                <span v-else style="color:#a0a4ab">-</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="灵工确认" prop="workerConfirmStatus" min-width="100" align="center">
+              <template #default="{ row }">
+                <span v-if="!row.workerConfirmStatus" style="color:#a0a4ab">-</span>
+                <el-tag v-else-if="row.workerConfirmStatus === '待确认'" type="warning" size="small">待确认</el-tag>
+                <el-tag v-else-if="row.workerConfirmStatus === '已确认'" type="success" size="small">已确认</el-tag>
+                <el-tag v-else-if="row.workerConfirmStatus === '已拒绝'" type="danger" size="small">已拒绝</el-tag>
+                <el-tag v-else-if="row.workerConfirmStatus === '无需确认'" type="info" size="small">无需确认</el-tag>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <div class="confirm-settle-form-section">
+            <div class="form-row">
+              <el-input v-model="confirmSettleForm.phone" placeholder="请输入手机号" style="width:200px" :prefix-icon="Iphone" />
+              <el-input v-model="confirmSettleForm.code" placeholder="请输入验证码" style="width:180px" />
+              <el-button type="primary" plain :disabled="confirmSettleCodeCountdown > 0" @click="onGetConfirmSettleCode">
+                {{ confirmSettleCodeCountdown > 0 ? `${confirmSettleCodeCountdown}s` : '获取验证码' }}
+              </el-button>
+              <span class="code-tip">验证码5分钟内有效</span>
+            </div>
+          </div>
+
+          <div class="settle-bottom">
+            <div class="settle-balance">
+              <span>当前余额</span>
+              <span class="balance-amount">100,000.00</span>
+              <span>元</span>
+            </div>
+            <el-button type="primary" size="large" @click="submitConfirmSettle"><el-icon><Check /></el-icon> 提交结算</el-button>
           </div>
         </div>
       </div>
@@ -196,81 +279,6 @@
       </div>
     </el-dialog>
 
-    <!-- 确认结算弹窗 -->
-    <el-dialog v-model="confirmSettleVisible" title="确认结算" width="900px" destroy-on-close :close-on-click-modal="false">
-      <div class="settle-search-row">
-        <div class="settle-search-item">
-          <span class="lbl">姓名：</span>
-          <el-input v-model="confirmSettleSearch.name" placeholder="请输入姓名" clearable style="width:180px" />
-        </div>
-        <div class="settle-search-item">
-          <span class="lbl">灵工确认：</span>
-          <el-select v-model="confirmSettleSearch.confirmStatus" placeholder="全部" clearable style="width:140px">
-            <el-option label="待确认" value="待确认" />
-            <el-option label="已确认" value="已确认" />
-            <el-option label="已拒绝" value="已拒绝" />
-            <el-option label="无需确认" value="无需确认" />
-          </el-select>
-        </div>
-      </div>
-      <div class="settle-search-actions">
-        <el-button type="primary" @click="onConfirmSettleSearch"><el-icon><Search /></el-icon> 搜索</el-button>
-        <el-button @click="onConfirmSettleClearSearch"><el-icon><RefreshLeft /></el-icon> 清空</el-button>
-      </div>
-
-      <div class="settle-toolbar">
-        <div class="settle-stats" style="width:100%">
-          <div class="stat-item"><span class="stat-label">结算人数</span><span class="stat-value">{{ filteredConfirmSettleList.length }}</span></div>
-          <div class="stat-item"><span class="stat-label">已确认</span><span class="stat-value" style="color:#00b578">{{ confirmSettleStats.confirmed }}</span></div>
-          <div class="stat-item"><span class="stat-label">待确认</span><span class="stat-value" style="color:#ff9500">{{ confirmSettleStats.pending }}</span></div>
-          <div class="stat-item"><span class="stat-label">已拒绝</span><span class="stat-value" style="color:#ff4d4f">{{ confirmSettleStats.rejected }}</span></div>
-          <div class="stat-item"><span class="stat-label">预结算总额</span><span class="stat-value">{{ totalConfirmSettle.toFixed(2) }}</span></div>
-          <div class="stat-item"><span class="stat-label">支付总计</span><span class="stat-value">{{ totalConfirmSettle.toFixed(2) }}</span></div>
-        </div>
-      </div>
-
-      <el-table :data="filteredConfirmSettleList" border @selection-change="onConfirmSettleSelectionChange">
-        <el-table-column type="selection" width="45" :selectable="isConfirmSettleSelectable" />
-        <el-table-column label="姓名" prop="name" min-width="80" />
-        <el-table-column label="身份证号" prop="idCard" min-width="170" />
-        <el-table-column label="预结算金额" prop="preSettleAmount" min-width="110" align="right">
-          <template #default="{ row }">{{ Number(row.preSettleAmount).toFixed(2) }}</template>
-        </el-table-column>
-        <el-table-column label="备注" prop="remark" min-width="120">
-          <template #default="{ row }">
-            <span v-if="row.remark">{{ row.remark }}</span>
-            <span v-else style="color:#a0a4ab">-</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="灵工确认" prop="workerConfirmStatus" min-width="100" align="center">
-          <template #default="{ row }">
-            <span v-if="!row.workerConfirmStatus" style="color:#a0a4ab">-</span>
-            <el-tag v-else-if="row.workerConfirmStatus === '待确认'" type="warning" size="small">待确认</el-tag>
-            <el-tag v-else-if="row.workerConfirmStatus === '已确认'" type="success" size="small">已确认</el-tag>
-            <el-tag v-else-if="row.workerConfirmStatus === '已拒绝'" type="danger" size="small">已拒绝</el-tag>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <div class="settle-bottom">
-        <div class="settle-bottom-form">
-          <el-input v-model="confirmSettleForm.phone" placeholder="请输入手机号" style="width:180px" :prefix-icon="Iphone" />
-          <el-input v-model="confirmSettleForm.code" placeholder="请输入验证码" style="width:150px" />
-          <el-button type="primary" plain :disabled="confirmSettleCodeCountdown > 0" @click="onGetConfirmSettleCode">
-            {{ confirmSettleCodeCountdown > 0 ? `${confirmSettleCodeCountdown}s` : '获取验证码' }}
-          </el-button>
-          <span class="code-tip">验证码5分钟内有效</span>
-        </div>
-        <el-button type="primary" size="large" @click="submitConfirmSettle"><el-icon><Check /></el-icon> 提交</el-button>
-      </div>
-
-      <div class="settle-balance">
-        <span>当前余额</span>
-        <span class="balance-amount">100,000.00</span>
-        <span>元</span>
-      </div>
-    </el-dialog>
-
     <!-- 添加成员弹窗 -->
     <el-dialog v-model="addMemberVisible" title="添加成员" width="500px">
       <el-form :model="newMember" label-width="100px">
@@ -304,6 +312,7 @@ const router = useRouter()
 const tabs = [
   { key: 'members', label: '人员列表' },
   { key: 'attendance', label: '打卡保险' },
+  { key: 'confirm-settle', label: '确认结算' }
 ]
 const activeTab = ref('members')
 
@@ -340,18 +349,6 @@ const onPreSettle = () => {
   preSettleVisible.value = true
 }
 
-const onConfirmSettle = () => {
-  const canSettleList = memberList.value.filter(m => m.memberStatus === '已加入' && Number(m.preSettleAmount || 0) > 0 && (!m.workerConfirmStatus || m.workerConfirmStatus === '已确认'))
-  if (!canSettleList.length) {
-    ElMessage.warning('当前没有可结算的人员，请等待灵工确认结算单')
-    return
-  }
-  confirmSettleSearch.name = ''
-  confirmSettleSearch.confirmStatus = ''
-  buildConfirmSettleList()
-  confirmSettleVisible.value = true
-}
-
 const onAddMember = () => { addMemberVisible.value = true }
 const onQrInvite = () => { ElMessageBox.alert('二维码邀请功能开发中', '提示') }
 const onExportAttendance = () => { ElMessage.success('导出打卡记录') }
@@ -377,18 +374,6 @@ const confirmAddMember = () => {
 }
 
 /* ========== Row Actions ========== */
-const onSettle = (row) => {
-  ElMessageBox.prompt(`确认结算 ${row.name} ?`, '结算', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消'
-  }).then(() => {
-    row.actualSettle = row.preSettleAmount || row.expectSettle
-    row.settleTime = new Date().toISOString().slice(0, 10)
-    row.workerConfirmStatus = ''
-    ElMessage.success(`已结算 ${row.name}`)
-  }).catch(() => {})
-}
-
 const onSuspend = (row) => {
   ElMessageBox.confirm(`确定要挂起 ${row.name} 吗？`, '挂起', {
     type: 'warning'
@@ -411,6 +396,9 @@ const onToggleWorkerConfirm = (row) => {
     row.workerConfirmStatus = '已拒绝'
     ElMessage.warning(`${row.name} 已拒绝结算单`)
   } else if (row.workerConfirmStatus === '已拒绝') {
+    row.workerConfirmStatus = '无需确认'
+    ElMessage.info(`${row.name} 标记为无需确认`)
+  } else if (row.workerConfirmStatus === '无需确认' || !row.workerConfirmStatus) {
     row.workerConfirmStatus = '待确认'
     ElMessage.info(`${row.name} 恢复为待确认`)
   }
@@ -421,6 +409,7 @@ const preSettleVisible = ref(false)
 const preSettleSearch = reactive({ name: '' })
 const preSettleForm = reactive({ needWorkerConfirm: false })
 const preSettleList = ref([])
+const preSettleSelected = ref([])
 
 const buildPreSettleList = () => {
   preSettleList.value = selectedRows.value.map(m => ({
@@ -428,6 +417,7 @@ const buildPreSettleList = () => {
     preSettleAmount: m.preSettleAmount || m.expectSettle || 0,
     remark: m.remark || ''
   }))
+  preSettleSelected.value = []
 }
 
 const filteredPreSettleList = computed(() => {
@@ -444,7 +434,7 @@ const totalPreSettle = computed(() => {
 const onPreSettleSearch = () => { ElMessage.success('搜索成功') }
 const onPreSettleClearSearch = () => { preSettleSearch.name = '' }
 
-const onPreSettleSelectionChange = () => {}
+const onPreSettleSelectionChange = (rows) => { preSettleSelected.value = rows }
 
 /* Excel download */
 const onDownloadPreTemplate = () => {
@@ -471,17 +461,23 @@ const onPreSettleFileChange = (e) => {
       const wb = XLSX.read(ev.target.result, { type: 'array' })
       const ws = wb.Sheets[wb.SheetNames[0]]
       const data = XLSX.utils.sheet_to_json(ws)
+      const hasSelection = preSettleSelected.value.length > 0
+      const targets = hasSelection ? preSettleSelected.value : preSettleList.value
       let updated = 0
       data.forEach(row => {
         const idCard = row['身份证号']
-        const target = preSettleList.value.find(m => m.idCard === idCard)
+        const target = targets.find(m => m.idCard === idCard)
         if (target) {
           if (row['预结算金额'] !== undefined) target.preSettleAmount = Number(row['预结算金额']) || 0
           if (row['备注'] !== undefined) target.remark = row['备注']
           updated++
         }
       })
-      ElMessage.success(`已更新 ${updated} 条预结算数据`)
+      if (hasSelection) {
+        ElMessage.success(`已更新选中的 ${updated} 条预结算数据`)
+      } else {
+        ElMessage.success(`已更新 ${updated} 条预结算数据`)
+      }
     } catch (err) {
       ElMessage.error('文件解析失败，请上传正确的 Excel 文件')
     }
@@ -505,10 +501,13 @@ const confirmPreSettle = () => {
   })
   preSettleVisible.value = false
   ElMessage.success(preSettleForm.needWorkerConfirm ? '预结算已提交，等待灵工确认' : '预结算已提交')
+  confirmSettleSearch.name = ''
+  confirmSettleSearch.confirmStatus = ''
+  buildConfirmSettleList()
+  activeTab.value = 'confirm-settle'
 }
 
 /* ========== Confirm Settle ========== */
-const confirmSettleVisible = ref(false)
 const confirmSettleSearch = reactive({ name: '', confirmStatus: '' })
 const confirmSettleList = ref([])
 
@@ -524,7 +523,7 @@ const filteredConfirmSettleList = computed(() => {
     if (confirmSettleSearch.confirmStatus) {
       const status = confirmSettleSearch.confirmStatus
       if (status === '无需确认') {
-        if (r.workerConfirmStatus) return false
+        if (r.workerConfirmStatus !== '无需确认' && r.workerConfirmStatus !== '') return false
       } else {
         if (r.workerConfirmStatus !== status) return false
       }
@@ -538,7 +537,8 @@ const confirmSettleStats = computed(() => {
   return {
     confirmed: list.filter(r => r.workerConfirmStatus === '已确认').length,
     pending: list.filter(r => r.workerConfirmStatus === '待确认').length,
-    rejected: list.filter(r => r.workerConfirmStatus === '已拒绝').length
+    rejected: list.filter(r => r.workerConfirmStatus === '已拒绝').length,
+    noNeed: list.filter(r => r.workerConfirmStatus === '无需确认' || !r.workerConfirmStatus).length
   }
 })
 
@@ -582,7 +582,7 @@ const submitConfirmSettle = () => {
       target.workerConfirmStatus = ''
     }
   })
-  confirmSettleVisible.value = false
+  activeTab.value = 'members'
   ElMessage.success(`已结算 ${confirmSettleSelected.value.length} 名成员`)
   confirmSettleSelected.value = []
 }
