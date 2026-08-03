@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { ElMessage } from 'element-plus'
 
 const commonRoutes = [
   '/system/config-type', '/system/config-table', '/system/notice',
@@ -125,6 +126,7 @@ const routes = [
       { path: 'basic-info', name: 'CompanyBasicInfo', component: () => import('../views/Company/BasicInfo.vue'), meta: { title: '基本信息' } },
       { path: 'account-setting', name: 'CompanyAccountSetting', component: () => import('../views/Company/AccountSetting.vue'), meta: { title: '账户设置' } },
       { path: 'user-list', name: 'CompanyUserList', component: () => import('../views/Company/UserList.vue'), meta: { title: '用户列表' } },
+      { path: 'project-manage', name: 'CompanyProjectManage', component: () => import('../views/Company/ProjectManage.vue'), meta: { title: '项目管理', needMaster: true } },
       { path: 'project', name: 'CompanyProject', component: () => import('../views/Company/ProjectList.vue'), meta: { title: '项目管理' } },
       { path: 'system', name: 'CompanySystem', component: () => import('../views/Company/Role.vue'), meta: { title: '角色管理' } },
       { path: 'notice', name: 'CompanyNotice', component: () => import('../views/Company/Notice.vue'), meta: { title: '系统公告' } }
@@ -222,6 +224,15 @@ router.beforeEach((to, from, next) => {
     }
   } else if (to.path.startsWith('/company')) {
     if (companyToken) {
+      // 主账号权限校验
+      if (to.meta?.needMaster) {
+        const role = localStorage.getItem('company_role') || 'master'
+        if (role !== 'master') {
+          ElMessage.warning('该功能仅主账号可访问')
+          next('/company/home')
+          return
+        }
+      }
       next()
     } else {
       next('/company/login')

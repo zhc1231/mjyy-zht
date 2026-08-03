@@ -34,10 +34,10 @@
             <img v-if="menu.icon" :src="menu.icon" class="navImage" />
             <span class="navText" :class="{ spanAct: activeMenu === menu.id }">{{ menu.name }}</span>
           </div>
-          <div v-if="menu.children && menu.children.length > 0" class="nav-item-group">
+          <div v-if="menu.children && visibleChildren(menu.children).length > 0" class="nav-item-group">
             <div class="nav-item-row">
               <div
-                v-for="child in menu.children"
+                v-for="child in visibleChildren(menu.children)"
                 :key="child.id"
                 class="nav-item-text"
                 :class="{ active: isChildActive(child.path) }"
@@ -98,7 +98,8 @@ const menuList = [
     children: [
       { id: 'basicInfo', name: '基本信息', path: '/company/basic-info' },
       { id: 'accountSetting', name: '账户设置', path: '/company/account-setting' },
-      { id: 'userList', name: '用户列表', path: '/company/user-list' }
+      { id: 'userList', name: '用户列表', path: '/company/user-list' },
+      { id: 'projectManage', name: '项目管理', path: '/company/project-manage', needMaster: true }
     ]
   },
   {
@@ -126,13 +127,25 @@ const activeMenu = computed(() => {
     '/company/account': 'finance',
     '/company/attendance': 'finance',
     '/company/system': 'system',
-    '/company/project': 'home'
+    '/company/project': 'home',
+    '/company/project-manage': 'accountMgr'
   }
   return menuMap[path] || 'home'
 })
 
 const isChildActive = (path) => {
   return route.path === path
+}
+
+// 模拟账号角色：master=主账号，sub=子账号；真实场景从接口/本地存储读取
+const accountRole = computed(() => {
+  return localStorage.getItem('company_role') || 'master'
+})
+const isMasterAccount = computed(() => accountRole.value === 'master')
+
+const visibleChildren = (children) => {
+  if (!children) return []
+  return children.filter(c => !c.needMaster || isMasterAccount.value)
 }
 
 const handleMenuClick = (menu) => {
