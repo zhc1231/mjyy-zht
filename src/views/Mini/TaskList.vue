@@ -146,7 +146,7 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn-cancel" @click="settlementModalVisible = false">取消</button>
+          <button class="btn-reject" @click="rejectSettlement">拒绝</button>
           <button 
             class="btn-confirm" 
             :disabled="!agreed"
@@ -303,6 +303,11 @@ const confirmSettlement = () => {
   if (!agreed.value) return
   settlementModalVisible.value = false
   ElMessage.success('结算单已确认，金额即将到账')
+}
+
+const rejectSettlement = () => {
+  settlementModalVisible.value = false
+  ElMessage.warning('已拒绝结算单，系统将重新核算')
 }
 </script>
 
@@ -707,7 +712,7 @@ const confirmSettlement = () => {
   flex-shrink: 0;
 }
 
-.btn-cancel,
+.btn-reject,
 .btn-confirm {
   flex: 1;
   padding: 14px;
@@ -716,9 +721,10 @@ const confirmSettlement = () => {
   border: none;
 }
 
-.btn-cancel {
-  background: #f9fafb;
-  color: #666;
+.btn-reject {
+  background: #fef2f2;
+  color: #ef4444;
+  font-weight: 600;
 }
 
 .btn-confirm {
