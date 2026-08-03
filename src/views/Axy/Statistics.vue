@@ -86,7 +86,7 @@
         <el-table-column prop="totalAmount" label="结算金额" width="130">
           <template #default="{ row }"><strong style="color: #f59e0b;">¥{{ row.totalAmount }}</strong></template>
         </el-table-column>
-        <el-table-column prop="avgSalary" label="平均日薪" width="110">
+        <el-table-column prop="avgSalary" label="平均佣金" width="110">
           <template #default="{ row }">¥{{ row.avgSalary }}</template>
         </el-table-column>
       </el-table>

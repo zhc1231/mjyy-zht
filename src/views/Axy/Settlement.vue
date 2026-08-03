@@ -82,7 +82,7 @@
         </el-table-column>
         <el-table-column prop="taskName" label="任务名称" min-width="160" />
         <el-table-column prop="workDays" label="工作天数" width="100" />
-        <el-table-column prop="dailySalary" label="日薪" width="100">
+        <el-table-column prop="dailySalary" label="佣金" width="100">
           <template #default="{ row }">¥{{ row.dailySalary }}</template>
         </el-table-column>
         <el-table-column prop="amount" label="结算金额" width="120">
@@ -135,7 +135,7 @@
             <div class="detail-item"><span class="label">手机号</span><span class="value">{{ currentRow.phone }}</span></div>
             <div class="detail-item"><span class="label">任务名称</span><span class="value">{{ currentRow.taskName }}</span></div>
             <div class="detail-item"><span class="label">工作天数</span><span class="value">{{ currentRow.workDays }} 天</span></div>
-            <div class="detail-item"><span class="label">日薪</span><span class="value">¥{{ currentRow.dailySalary }}</span></div>
+            <div class="detail-item"><span class="label">佣金</span><span class="value">¥{{ currentRow.dailySalary }}</span></div>
             <div class="detail-item"><span class="label">创建时间</span><span class="value">{{ currentRow.createTime }}</span></div>
           </div>
         </div>
