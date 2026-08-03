@@ -56,7 +56,7 @@
 
         <div class="task-actions" v-if="activeMainTab === 'accept'">
           <div 
-            v-if="task.status === 'settled'" 
+            v-if="task.status === 'ongoing'" 
             class="btn-settle-detail"
             @click="openSettlementModal(task)"
           >
@@ -191,7 +191,7 @@ import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 
 const activeMainTab = ref('accept')
-const activeFilterTab = ref('settled')
+const activeFilterTab = ref('ongoing')
 const settlementModalVisible = ref(false)
 const costModalVisible = ref(false)
 const currentTask = ref(null)
