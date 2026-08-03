@@ -84,10 +84,10 @@
           <el-table-column label="账户类型" width="100" align="center">
             <template #default="{ row }">
               <el-tag v-if="row.type === 'master'" type="danger" effect="dark" size="small">
-                <el-icon style="vertical-align:-2px"><Crown /></el-icon> 主账号
+                <el-icon style="vertical-align:-2px"><Promotion /></el-icon> 主账号
               </el-tag>
               <el-tag v-else type="primary" size="small">
-                <el-icon style="vertical-align:-2px"><Folder /></el-icon> 子项目
+                <el-icon style="vertical-align:-2px"><Check /></el-icon> 子项目
               </el-tag>
             </template>
           </el-table-column>
@@ -272,7 +272,7 @@
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import {
-  Search, RefreshLeft, Crown, Folder, Switch, List, InfoFilled, Right, Check
+  Search, RefreshLeft, Switch, List, InfoFilled, Right, Check, Promotion
 } from '@element-plus/icons-vue'
 
 const showRoleTester = ref(true)
