@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民匠有约-服务商系统 - 产品更新日志</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #303133;
+    background: #f5f7fa;
+  }
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+  /* 头部 */
+  .header {
+    background: linear-gradient(135deg, #67C23A 0%, #5cb85c 100%);
+    color: #fff;
+    padding: 60px 50px;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    opacity: 0.9;
+  }
+  .header .version {
+    margin-top: 16px;
+    font-size: 13px;
+    opacity: 0.8;
+  }
+  .header .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .header .back-link:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
+  /* 入口卡片 */
+  .entries {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    padding: 40px 50px;
+    align-items: stretch;
+  }
+  .entry-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    background: #fff;
+    border: 1px solid #ebeef5;
+    border-radius: 8px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .entry-card .entry-icon { flex-shrink: 0; }
+  .entry-card h3 { flex-shrink: 0; }
+  .entry-card p {
+    flex-grow: 1;
+    margin-bottom: 16px;
+  }
+  .entry-card .entry-btn { flex-shrink: 0; }
+  .entry-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(103,194,58,0.15);
+    border-color: #67C23A;
+  }
+  .entry-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+  .entry-card.system::before  { background: linear-gradient(90deg, #67C23A, #5cb85c); }
+  .entry-card.enterprise::before { background: linear-gradient(90deg, #E6A23C, #f0ad4e); }
+  .entry-card.finance::before { background: linear-gradient(90deg, #F56C6C, #ff8a80); }
+  .entry-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #fff;
+  }
+  .entry-card.system .entry-icon  { background: linear-gradient(135deg, #67C23A, #5cb85c); }
+  .entry-card.enterprise .entry-icon { background: linear-gradient(135deg, #E6A23C, #f0ad4e); }
+  .entry-card.finance .entry-icon { background: linear-gradient(135deg, #F56C6C, #ff8a80); }
+  .entry-card h3 {
+    font-size: 18px;
+    color: #303133;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .entry-card p {
+    font-size: 13px;
+    color: #909399;
+    margin-bottom: 16px;
+  }
+  .entry-card .entry-btn {
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #fff;
+  }
+  .entry-card.system .entry-btn  { background: #67C23A; }
+  .entry-card.enterprise .entry-btn { background: #E6A23C; }
+  .entry-card.finance .entry-btn { background: #F56C6C; }
+
+  /* 更新日志 */
+  .content {
+    padding: 0 50px 40px;
+  }
+  .content h2 {
+    font-size: 24px;
+    color: #303133;
+    margin: 20px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #ebeef5;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .content h2 .icon { color: #67C23A; }
+
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: #ebeef5;
+  }
+  .version-item {
+    position: relative;
+    margin-bottom: 32px;
+  }
+  .version-item::before {
+    content: '';
+    position: absolute;
+    left: -32px;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #67C23A;
+    z-index: 1;
+  }
+  .version-item.major::before {
+    border-color: #F56C6C;
+  }
+  .version-item.minor::before {
+    border-color: #E6A23C;
+  }
+  .version-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .version-tag {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .version-tag.major { background: #F56C6C; }
+  .version-tag.minor { background: #E6A23C; }
+  .version-tag.patch { background: #67C23A; }
+  .version-date {
+    color: #909399;
+    font-size: 13px;
+  }
+  .version-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+  }
+  .version-body {
+    background: #f8f9fc;
+    border-radius: 6px;
+    padding: 16px 24px;
+  }
+  .version-body h4 {
+    font-size: 14px;
+    margin: 12px 0 8px;
+    font-weight: 600;
+  }
+  .version-body h4:first-child { margin-top: 0; }
+  .version-body ul {
+    padding-left: 20px;
+    color: #606266;
+    font-size: 14px;
+  }
+  .version-body li {
+    margin-bottom: 6px;
+    line-height: 1.7;
+  }
+  .badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-right: 6px;
+    font-weight: 500;
+  }
+  .badge-new     { background: #f0f9eb; color: #67C23A; }
+  .badge-fix     { background: #fef0f0; color: #F56C6C; }
+  .badge-update  { background: #ecf5ff; color: #409EFF; }
+  .badge-opt     { background: #fdf6ec; color: #E6A23C; }
+
+  .version-body a {
+    color: #67C23A;
+    text-decoration: none;
+    border-bottom: 1px dashed #c0c4cc;
+    transition: all 0.2s;
+  }
+  .version-body a:hover {
+    color: #85ce61;
+    border-bottom-color: #67C23A;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 30px 50px;
+    color: #909399;
+    font-size: 13px;
+    border-top: 1px solid #ebeef5;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 id="top">民匠有约-服务商系统</h1>
+    <div class="subtitle">代理商2.0 · 产品更新日志</div>
+    <div class="version">版本 V1.0 · 2026-07-04</div>
+    <a href="./system.html" class="back-link">← 返回平台登陆入口</a>
+  </div>
+
+  <!-- 三个功能入口 -->
+  <div class="entries">
+    <a href="#enterprise" class="entry-card enterprise">
+      <div class="entry-icon">🏢</div>
+      <h3>企业管理</h3>
+      <p>企业信息、个人代理、企业列表管理</p>
+      <span class="entry-btn">查看详情</span>
+    </a>
+    <a href="#finance" class="entry-card finance">
+      <div class="entry-icon">💰</div>
+      <h3>财务管理</h3>
+      <p>购买明细、结算明细、激励奖励</p>
+      <span class="entry-btn">查看详情</span>
+    </a>
+    <a href="#system" class="entry-card system">
+      <div class="entry-icon">⚙️</div>
+      <h3>系统功能</h3>
+      <p>登录系统、个人中心、密码管理</p>
+      <span class="entry-btn">查看详情</span>
+    </a>
+  </div>
+
+  <!-- 更新日志 -->
+  <div class="content">
+    <h2 id="system"><span class="icon">📜</span> 更新日志</h2>
+
+    <div class="timeline">
+
+      <div class="version-item">
+        <div class="version-header">
+          <span class="version-tag patch">V1.0.3</span>
+          <span class="version-title">数据导出与筛选优化</span>
+          <span class="version-date">2026-07-04</span>
+        </div>
+        <div class="version-body">
+          <h4>📤 导出功能</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">购买明细</a>数据导出功能，支持 Excel 格式导出</li>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">结算明细</a>数据导出功能，支持按时间范围导出</li>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">激励奖励</a>数据导出功能，支持按奖励类型筛选导出</li>
+          </ul>
+          <h4>🔍 筛选优化</h4>
+          <ul>
+            <li><span class="badge badge-opt">优化</span>企业列表筛选条件增加"注册地"下拉选择</li>
+            <li><span class="badge badge-opt">优化</span>购买明细增加"产品类型"筛选</li>
+            <li><span class="badge badge-opt">优化</span>结算明细增加"时间选择"区间筛选</li>
+            <li><span class="badge badge-opt">优化</span>所有列表页增加"重置"按钮，一键清空筛选条件</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-item">
+        <div class="version-header">
+          <span class="version-tag patch">V1.0.2</span>
+          <span class="version-title">激励奖励体系完善</span>
+          <span class="version-date">2026-07-04</span>
+        </div>
+        <div class="version-body">
+          <h4 id="finance">🎁 激励奖励</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">激励奖励列表</a>，展示所有奖励记录</li>
+            <li><span class="badge badge-new">新增</span>激励奖励总金额统计卡片，实时显示累计收益</li>
+            <li><span class="badge badge-new">新增</span>奖励类型分类：服务激励、拉新激励、落地服务激励等</li>
+            <li><span class="badge badge-new">新增</span>奖励类目：如意宝推广、福运宝推广、安心云推广</li>
+            <li><span class="badge badge-new">新增</span>结算时间字段，清晰展示奖励到账时间</li>
+          </ul>
+          <h4>📊 统计展示</h4>
+          <ul>
+            <li><span class="badge badge-update">更新</span>企业列表页增加"激励奖励金额总计"统计</li>
+            <li><span class="badge badge-update">更新</span>购买明细增加"交易成功总金额"和"笔数"统计</li>
+            <li><span class="badge badge-update">更新</span>结算明细增加"交易结算总金额"统计</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-item minor">
+        <div class="version-header">
+          <span class="version-tag minor">V1.0.1</span>
+          <span class="version-title">企业管理功能优化</span>
+          <span class="version-date">2026-07-04</span>
+        </div>
+        <div class="version-body">
+          <h4 id="enterprise">🏢 企业信息</h4>
+          <ul>
+            <li><span class="badge badge-opt">优化</span><a href="http://agentv2.zjmjyy.com/#/home">企业信息</a>页面布局优化，信息展示更清晰</li>
+            <li><span class="badge badge-opt">优化</span>代理区域、企业Id、邀请码、组织类型信息突出展示</li>
+            <li><span class="badge badge-opt">优化</span>营业执照扫描件预览展示</li>
+            <li><span class="badge badge-opt">优化</span>企业合同状态展示</li>
+          </ul>
+          <h4>👤 个人代理</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">个人代理列表</a>，管理所有业务员</li>
+            <li><span class="badge badge-new">新增</span>新增业务员功能，支持添加个人代理</li>
+            <li><span class="badge badge-new">新增</span>业务员搜索功能，支持按姓名、手机号搜索</li>
+            <li><span class="badge badge-new">新增</span>业务员信息展示：邀请码、姓名、身份证号码、手机号、归属企业、类别</li>
+          </ul>
+          <h4>📋 企业列表</h4>
+          <ul>
+            <li><span class="badge badge-opt">优化</span><a href="http://agentv2.zjmjyy.com/#/home">企业列表</a>表格列增加"如意宝（席位）"、"福运宝（结算）"、"安心云（席位）"产品统计</li>
+            <li><span class="badge badge-opt">优化</span>企业列表展示信息丰富：注册地、拉新方邀请码、拉新方、企业名称、工商识别号、法人姓名、注册手机号、落地服务邀请码、落地服务方</li>
+            <li><span class="badge badge-opt">优化</span>分页组件优化，支持跳转到指定页</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="version-item major">
+        <div class="version-header">
+          <span class="version-tag major">V1.0.0</span>
+          <span class="version-title">代理商2.0初始版本发布</span>
+          <span class="version-date">2026-07-04</span>
+        </div>
+        <div class="version-body">
+          <h4>🔐 登录系统</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/login">手机号/账号登录</a>：手机号 + 密码 + 短信验证码登录</li>
+            <li><span class="badge badge-new">新增</span>注册账号入口，支持新用户注册</li>
+            <li><span class="badge badge-new">新增</span>忘记密码功能，支持密码找回</li>
+            <li><span class="badge badge-new">新增</span>获取验证码功能，60秒倒计时防重复发送</li>
+            <li><span class="badge badge-new">新增</span>ICP备案信息展示</li>
+          </ul>
+          <h4>🏢 企业管理</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">企业信息</a>：展示代理区域、企业Id、邀请码、组织类型、营业执照、企业合同、法定代表人等信息</li>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">个人代理</a>：业务员列表管理，支持新增、搜索、查看详情</li>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">企业列表</a>：所有关联企业列表，含注册地、拉新方、落地服务方、产品统计、激励奖励等</li>
+          </ul>
+          <h4>💰 财务管理</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">购买明细</a>：所有企业购买记录，含购买时间、拉新方、企业名称、落地服务、产品、价格、数量、付款金额</li>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">结算明细</a>：任务结算记录，含任务编号、姓名、身份证号、付款金额、税率、税费、到账金额、任务完成时间</li>
+            <li><span class="badge badge-new">新增</span><a href="http://agentv2.zjmjyy.com/#/home">激励奖励</a>：奖励记录，含拉新方、落地服务、产品、奖励类目、奖励类型、激励奖励金额、结算时间</li>
+          </ul>
+          <h4>⚙️ 个人中心</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>右上角用户信息展示</li>
+            <li><span class="badge badge-new">新增</span>修改密码功能</li>
+            <li><span class="badge badge-new">新增</span>退出登录功能</li>
+          </ul>
+          <h4>🎨 界面设计</h4>
+          <ul>
+            <li><span class="badge badge-new">新增</span>城市服务商系统专属顶部 Logo 动效</li>
+            <li><span class="badge badge-new">新增</span>左侧导航菜单，带图标展示</li>
+            <li><span class="badge badge-new">新增</span>响应式布局，适配不同分辨率</li>
+            <li><span class="badge badge-new">新增</span>绿色主题配色，体现服务商系统特色</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    民匠有约-服务商系统（代理商2.0） · 产品更新日志<br>
+    更新日期：2026-07-04
+  </div>
+</div>
+
+</body>
+</html>
