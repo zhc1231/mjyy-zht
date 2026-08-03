@@ -129,7 +129,8 @@ const routes = [
       { path: 'project-manage', name: 'CompanyProjectManage', component: () => import('../views/Company/ProjectManage.vue'), meta: { title: '项目管理', needMaster: true } },
       { path: 'project', name: 'CompanyProject', component: () => import('../views/Company/ProjectList.vue'), meta: { title: '项目管理' } },
       { path: 'system', name: 'CompanySystem', component: () => import('../views/Company/Role.vue'), meta: { title: '角色管理' } },
-      { path: 'notice', name: 'CompanyNotice', component: () => import('../views/Company/Notice.vue'), meta: { title: '系统公告' } }
+      { path: 'notice', name: 'CompanyNotice', component: () => import('../views/Company/Notice.vue'), meta: { title: '系统公告' } },
+      { path: 'messages', name: 'CompanyMessages', component: () => import('../views/Company/Messages.vue'), meta: { title: '站内信' } }
     ]
   },
   {

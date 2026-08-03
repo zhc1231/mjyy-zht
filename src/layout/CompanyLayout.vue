@@ -22,6 +22,93 @@
           </div>
         </div>
       </div>
+
+      <!-- 右上角：站内信铃铛 + 用户 -->
+      <div class="header-right">
+        <el-popover
+          v-model:visible="bellVisible"
+          placement="bottom-end"
+          :width="420"
+          trigger="click"
+          popper-class="msg-popover"
+        >
+          <template #reference>
+            <div class="bell-wrap" @click="onBellClick">
+              <el-badge :value="unreadCount" :max="99" :hidden="unreadCount === 0" type="danger">
+                <el-icon class="bell-icon"><Bell /></el-icon>
+              </el-badge>
+            </div>
+          </template>
+
+          <div class="msg-panel">
+            <div class="msg-panel-head">
+              <span class="mp-title">消息通知</span>
+              <el-button link type="primary" size="small" @click="onMarkAllRead" :disabled="unreadCount === 0">全部已读</el-button>
+            </div>
+
+            <el-tabs v-model="bellTab" class="msg-tabs">
+              <el-tab-pane name="all">
+                <template #label>
+                  <span>全部<el-badge :value="unreadCount" :max="99" :hidden="unreadCount === 0" type="danger" /></span>
+                </template>
+              </el-tab-pane>
+              <el-tab-pane name="recharge">
+                <template #label>
+                  <span>充值<el-badge :value="unreadCountByType('recharge')" :max="99" :hidden="unreadCountByType('recharge') === 0" type="danger" /></span>
+                </template>
+              </el-tab-pane>
+              <el-tab-pane name="settle">
+                <template #label>
+                  <span>结算<el-badge :value="unreadCountByType('settle')" :max="99" :hidden="unreadCountByType('settle') === 0" type="danger" /></span>
+                </template>
+              </el-tab-pane>
+              <el-tab-pane name="insurance">
+                <template #label>
+                  <span>保险<el-badge :value="unreadCountByType('insurance')" :max="99" :hidden="unreadCountByType('insurance') === 0" type="danger" /></span>
+                </template>
+              </el-tab-pane>
+            </el-tabs>
+
+            <div class="msg-list">
+              <div
+                v-for="m in bellList"
+                :key="m.id"
+                class="msg-item"
+                :class="{ unread: !m.read }"
+                @click="onMsgClick(m)"
+              >
+                <div class="msg-item-icon" :class="m.type">
+                  <el-icon><component :is="typeIcon(m.type)" /></el-icon>
+                </div>
+                <div class="msg-item-body">
+                  <div class="msg-item-head">
+                    <span class="msg-item-title">{{ m.title }}</span>
+                    <span class="msg-item-time">{{ m.time }}</span>
+                  </div>
+                  <div class="msg-item-content">{{ m.content }}</div>
+                  <div class="msg-item-foot">
+                    <el-tag :type="typeColor(m.type)" size="small" effect="light">{{ m.typeLabel }}</el-tag>
+                    <span v-if="m.amount" class="msg-item-amount" :style="{ color: m.type === 'recharge' ? '#00b578' : '#ff4d4f' }">
+                      {{ m.type === 'recharge' ? '+' : '-' }}¥{{ Number(m.amount).toFixed(2) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <el-empty v-if="bellList.length === 0" description="暂无消息" :image-size="80" />
+            </div>
+
+            <div class="msg-panel-foot" @click="goMessageCenter">
+              <span>查看全部消息</span>
+              <el-icon><Right /></el-icon>
+            </div>
+          </div>
+        </el-popover>
+
+        <div class="user-wrap">
+          <el-icon><User /></el-icon>
+          <span class="username">{{ username }}</span>
+        </div>
+      </div>
     </div>
     <div class="layout-body">
       <div class="navBar">
@@ -60,12 +147,56 @@
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { Bell, User, Right, Wallet, Money, Umbrella, Document } from '@element-plus/icons-vue'
+import { useMessageStore } from '@/stores/messageStore'
 
 const router = useRouter()
 const route = useRoute()
 const activeStep = ref(3)
 
 const steps = ['工种配置', '任务排期', '人才库', '发布任务', '任务详情', '添加成员', '完成']
+
+// 站内信
+const {
+  unreadCount,
+  unreadCountByType,
+  getList,
+  markRead,
+  markAllRead,
+  state: msgState
+} = useMessageStore()
+
+const bellVisible = ref(false)
+const bellTab = ref('all')
+const username = ref(localStorage.getItem('company_username') || '管理员')
+
+const bellList = computed(() => getList({ type: bellTab.value, read: 'all' }).slice(0, 10))
+
+const typeColor = (type) => {
+  const map = { recharge: 'success', settle: 'primary', insurance: 'warning', task: 'info', system: 'info' }
+  return map[type] || 'info'
+}
+const typeIcon = (type) => {
+  const map = { recharge: Wallet, settle: Money, insurance: Umbrella, task: Document, system: Bell }
+  return map[type] || Bell
+}
+
+const onBellClick = () => {}
+const onMarkAllRead = () => {
+  markAllRead()
+  ElMessage.success('全部已读')
+}
+const onMsgClick = (m) => {
+  if (!m.read) markRead(m.id)
+  if (m.link) {
+    bellVisible.value = false
+    router.push(m.link)
+  }
+}
+const goMessageCenter = () => {
+  bellVisible.value = false
+  router.push('/company/messages')
+}
 
 const menuList = [
   { id: 'home', name: '首页', icon: 'https://lqjoss.oss-cn-hangzhou.aliyuncs.com/images/54acb41c7cf4476f93301f71851d5157.png', path: '/company/home', children: [] },
@@ -108,7 +239,8 @@ const menuList = [
     icon: 'https://lqjoss.oss-cn-hangzhou.aliyuncs.com/images/7e79be6d82004754b29a86e4b2523a82.png',
     children: [
       { id: 'role', name: '角色管理', path: '/company/system' },
-      { id: 'notice', name: '系统公告', path: '/company/notice' }
+      { id: 'notice', name: '系统公告', path: '/company/notice' },
+      { id: 'messages', name: '站内信', path: '/company/messages' }
     ]
   }
 ]
@@ -128,7 +260,8 @@ const activeMenu = computed(() => {
     '/company/attendance': 'finance',
     '/company/system': 'system',
     '/company/project': 'home',
-    '/company/project-manage': 'accountMgr'
+    '/company/project-manage': 'accountMgr',
+    '/company/messages': 'system'
   }
   return menuMap[path] || 'home'
 })
@@ -182,7 +315,43 @@ const handleLogout = () => {
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding-right: 24px;
 }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.bell-wrap {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.bell-wrap:hover {
+  background: #f2f3f5;
+}
+.bell-icon {
+  font-size: 22px;
+  color: #4e5969;
+}
+
+.user-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #4e5969;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.user-wrap:hover { background: #f2f3f5; }
+.username { font-weight: 500; }
 
 .header-left {
   display: flex;
@@ -394,4 +563,140 @@ const handleLogout = () => {
   overflow-y: auto;
   background: #EFEFF4;
 }
+</style>
+
+<!-- 站内信 popover 全局样式（非 scoped，因 popover 渲染在 body） -->
+<style>
+.msg-popover.el-popover.el-popper {
+  padding: 0 !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12) !important;
+}
+
+.msg-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 540px;
+}
+
+.msg-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px 6px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.mp-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2329;
+}
+
+.msg-tabs {
+  padding: 0 8px;
+}
+.msg-tabs .el-tabs__header {
+  margin: 0 8px;
+}
+.msg-tabs .el-tabs__nav-wrap::after {
+  background: #f0f0f0;
+}
+.msg-tabs .el-badge__content {
+  transform: translateY(-50%) translateX(80%);
+}
+
+.msg-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 360px;
+  padding: 4px 0;
+}
+.msg-list::-webkit-scrollbar { width: 4px; }
+.msg-list::-webkit-scrollbar-thumb { background: #e5e6eb; border-radius: 2px; }
+
+.msg-item {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f7f8fa;
+}
+.msg-item:hover { background: #f7f9ff; }
+.msg-item.unread { background: #fff7e6; }
+.msg-item.unread:hover { background: #fff1cc; }
+
+.msg-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
+}
+.msg-item-icon.recharge { background: linear-gradient(135deg, #00b578, #14c98a); }
+.msg-item-icon.settle { background: linear-gradient(135deg, #1e6bff, #36bffb); }
+.msg-item-icon.insurance { background: linear-gradient(135deg, #ff9500, #ffb55a); }
+.msg-item-icon.task { background: linear-gradient(135deg, #7b61ff, #a78bfa); }
+.msg-item-icon.system { background: linear-gradient(135deg, #86909c, #a0a4ab); }
+
+.msg-item-body { flex: 1; min-width: 0; }
+.msg-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.msg-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2329;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.msg-item.unread .msg-item-title { color: #ff7a45; }
+.msg-item-time {
+  font-size: 11px;
+  color: #a0a4ab;
+  flex-shrink: 0;
+}
+.msg-item-content {
+  font-size: 12px;
+  color: #4e5969;
+  margin-top: 4px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.msg-item-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.msg-item-amount {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.msg-panel-foot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border-top: 1px solid #f0f0f0;
+  color: #1e6bff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.msg-panel-foot:hover { background: #f7f9ff; }
 </style>
