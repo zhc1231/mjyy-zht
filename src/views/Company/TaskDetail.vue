@@ -204,7 +204,7 @@
 
           <div class="confirm-settle-form-section">
             <div class="form-row">
-              <el-input v-model="confirmSettleForm.phone" placeholder="请输入手机号" style="width:200px" :prefix-icon="Iphone" />
+              <el-input v-model="confirmSettleForm.phone" placeholder="默认财务账号" style="width:200px" :prefix-icon="Iphone" disabled />
               <el-input v-model="confirmSettleForm.code" placeholder="请输入验证码" style="width:180px" />
               <el-button type="primary" plain :disabled="confirmSettleCodeCountdown > 0" @click="onGetConfirmSettleCode">
                 {{ confirmSettleCodeCountdown > 0 ? `${confirmSettleCodeCountdown}s` : '获取验证码' }}
@@ -556,11 +556,11 @@ const onConfirmSettleSelectionChange = (rows) => { confirmSettleSelected.value =
 const onConfirmSettleSearch = () => { ElMessage.success('搜索成功') }
 const onConfirmSettleClearSearch = () => { confirmSettleSearch.name = ''; confirmSettleSearch.confirmStatus = '' }
 
-const confirmSettleForm = reactive({ phone: '', code: '', balance: 100000 })
+const confirmSettleForm = reactive({ phone: '13888888888', code: '', balance: 100000 })
 const confirmSettleCodeCountdown = ref(0)
 const onGetConfirmSettleCode = () => {
   if (!confirmSettleForm.phone) { ElMessage.warning('请输入手机号'); return }
-  ElMessage.success('验证码已发送')
+  ElMessage.success('验证码已发送至财务账号')
   confirmSettleCodeCountdown.value = 60
   const timer = setInterval(() => {
     confirmSettleCodeCountdown.value--
