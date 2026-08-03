@@ -209,6 +209,14 @@
             placeholder="请输入划拨备注（选填）"
           />
         </el-form-item>
+        <el-form-item label="验证手机">
+          <el-input
+            v-model="userPhone"
+            disabled
+            placeholder="登录账号手机号"
+          />
+          <div style="margin-top:4px;color:#86909c;font-size:12px">验证码将发送至此手机号</div>
+        </el-form-item>
         <el-form-item label="安全验证">
           <el-input v-model="transferForm.code" placeholder="请输入短信验证码" style="width:200px;margin-right:8px" />
           <el-button type="primary" plain :disabled="codeCountdown > 0" @click="onSendCode">
@@ -371,6 +379,7 @@ const transferFormRef = ref(null)
 const transferForm = reactive({
   fromId: '', toId: '', amount: null, remark: '', code: ''
 })
+const userPhone = computed(() => localStorage.getItem('company_username') || '138****8888')
 const codeCountdown = ref(0)
 
 const transferableFromList = computed(() => accountList.value.filter(a => a.status === '正常'))
