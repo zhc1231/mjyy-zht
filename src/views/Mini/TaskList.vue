@@ -56,11 +56,23 @@
 
         <div class="task-actions" v-if="activeMainTab === 'accept'">
           <div 
-            v-if="task.status === 'ongoing'" 
+            v-if="task.status === 'ongoing' && (!task.settlementStatus || task.settlementStatus === 'pending')" 
             class="btn-settle-detail"
             @click="openSettlementModal(task)"
           >
             结算单确认
+          </div>
+          <div 
+            v-else-if="task.status === 'ongoing' && task.settlementStatus === 'confirmed'" 
+            class="btn-confirmed"
+          >
+            ✓ 已确认
+          </div>
+          <div 
+            v-else-if="task.status === 'ongoing' && task.settlementStatus === 'rejected'" 
+            class="btn-rejected"
+          >
+            ✗ 已拒绝
           </div>
           <div 
             v-else 
@@ -301,11 +313,19 @@ const openCostDetail = (task) => {
 
 const confirmSettlement = () => {
   if (!agreed.value) return
+  if (currentTask.value) {
+    const task = tasks.value.find(t => t.id === currentTask.value.id)
+    if (task) task.settlementStatus = 'confirmed'
+  }
   settlementModalVisible.value = false
   ElMessage.success('结算单已确认，金额即将到账')
 }
 
 const rejectSettlement = () => {
+  if (currentTask.value) {
+    const task = tasks.value.find(t => t.id === currentTask.value.id)
+    if (task) task.settlementStatus = 'rejected'
+  }
   settlementModalVisible.value = false
   ElMessage.warning('已拒绝结算单，系统将重新核算')
 }
@@ -519,6 +539,26 @@ const rejectSettlement = () => {
 .btn-settle-detail {
   background: linear-gradient(135deg, #10b981, #34d399);
   color: #fff;
+}
+
+.btn-confirmed {
+  background: #ecfdf5;
+  color: #10b981;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: 16px;
+  text-align: center;
+  border: 1px solid #a7f3d0;
+}
+
+.btn-rejected {
+  background: #fef2f2;
+  color: #ef4444;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: 16px;
+  text-align: center;
+  border: 1px solid #fecaca;
 }
 
 .btn-cost {
