@@ -91,7 +91,7 @@
             <span class="row-value">{{ currentRecord.workDays }} 天</span>
           </div>
           <div class="detail-row" v-if="currentRecord.dailySalary">
-            <span class="row-label">日薪标准</span>
+            <span class="row-label">佣金标准</span>
             <span class="row-value">¥ {{ currentRecord.dailySalary }}/天</span>
           </div>
           <div class="detail-row" v-if="currentRecord.type === 'income' && currentRecord.remark">

@@ -115,7 +115,7 @@
               <span class="item-value">{{ currentTask.workDays || 7 }} 天</span>
             </div>
             <div class="item-row">
-              <span class="item-label">日薪标准</span>
+              <span class="item-label">佣金标准</span>
               <span class="item-value">¥ {{ currentTask.salary }}/天</span>
             </div>
             <div class="item-row">
