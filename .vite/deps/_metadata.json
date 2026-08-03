@@ -7,19 +7,19 @@
     "vue": {
       "src": "../../node_modules/vue/dist/vue.runtime.esm-bundler.js",
       "file": "vue.js",
-      "fileHash": "27193ffc",
+      "fileHash": "0c5b1fcb",
       "needsInterop": false
     },
     "element-plus": {
       "src": "../../node_modules/element-plus/es/index.mjs",
       "file": "element-plus.js",
-      "fileHash": "6d35ca40",
+      "fileHash": "ec63eb79",
       "needsInterop": false
     },
     "vue-router": {
       "src": "../../node_modules/vue-router/dist/vue-router.mjs",
       "file": "vue-router.js",
-      "fileHash": "e8e705e8",
+      "fileHash": "af5d6f04",
       "needsInterop": false
     }
   },
