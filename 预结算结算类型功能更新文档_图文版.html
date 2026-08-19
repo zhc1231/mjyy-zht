@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>预结算结算类型功能更新文档（v4）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: #f5f6f8;
+    color: #1f2329;
+    line-height: 1.8;
+    padding: 40px 20px;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+
+  /* 标题 */
+  .doc-header {
+    background: linear-gradient(135deg, #1e6bff 0%, #36bffb 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 32px 40px;
+    margin-bottom: 32px;
+  }
+  .doc-header h1 { font-size: 28px; margin-bottom: 8px; }
+  .doc-header .meta { font-size: 14px; opacity: 0.85; }
+  .doc-header .meta span { margin-right: 20px; }
+
+  /* 章节 */
+  .section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .section h2 {
+    font-size: 20px;
+    color: #1f2329;
+    border-left: 4px solid #1e6bff;
+    padding-left: 12px;
+    margin-bottom: 16px;
+  }
+  .section h3 { font-size: 16px; color: #4e5969; margin: 20px 0 10px; }
+
+  /* 表格 */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th { background: #f2f3f5; color: #4e5969; font-weight: 600; }
+  th, td { border: 1px solid #e5e6eb; padding: 8px 12px; text-align: left; }
+  tr:nth-child(even) td { background: #fafbfc; }
+
+  /* 代码块 */
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 12px 0;
+  }
+  code { font-family: 'Fira Code', 'Consolas', 'Monaco', monospace; }
+
+  /* 高亮 */
+  .highlight { background: #fffbe6; padding: 1px 4px; border-radius: 3px; color: #d48806; font-weight: 600; }
+  .new-badge { display: inline-block; background: #ff4d4f; color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+
+  /* ===== 模拟 UI ===== */
+
+  /* 预结算弹窗底部按钮 */
+  .mock-dialog-bottom {
+    background: #f7f8fa;
+    border: 1px solid #e5e6eb;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .mock-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: default;
+  }
+  .mock-btn-warning { background: #e6a23c; color: #fff; border: 1px solid #e6a23c; }
+  .mock-btn-primary { background: #409eff; color: #fff; border: 1px solid #409eff; }
+  .mock-btn-icon { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; }
+
+  /* 表格模拟 */
+  .mock-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+  .mock-table th {
+    background: #f2f3f5;
+    border: 1px solid #d9dce3;
+    padding: 6px 10px;
+    font-weight: 600;
+    color: #4e5969;
+    white-space: nowrap;
+  }
+  .mock-table td {
+    border: 1px solid #e5e6eb;
+    padding: 6px 10px;
+    text-align: center;
+  }
+  .mock-table .col-highlight {
+    background: #ecf5ff !important;
+    border-color: #409eff !important;
+    position: relative;
+  }
+  .mock-table .col-highlight th { background: #d9ecff !important; }
+  .mock-table .col-highlight-label::after {
+    content: 'NEW';
+    display: inline-block;
+    background: #ff4d4f;
+    color: #fff;
+    font-size: 9px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  /* 标签 */
+  .mock-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .tag-primary { background: #ecf5ff; color: #409eff; border: 1px solid #d9ecff; }
+  .tag-warning { background: #fdf6ec; color: #e6a23c; border: 1px solid #faecd8; }
+  .tag-success { background: #f0f9eb; color: #67c23a; border: 1px solid #e1f3d8; }
+  .tag-danger { background: #fef0f0; color: #f56c6c; border: 1px solid #fde2e2; }
+  .tag-info { background: #f4f4f5; color: #909399; border: 1px solid #e9e9eb; }
+  .tag-none { color: #a0a4ab; font-size: 12px; }
+
+  /* 流程图 */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .flow-node {
+    background: #fff;
+    border: 2px solid #e5e6eb;
+    border-radius: 8px;
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 13px;
+    min-width: 120px;
+  }
+  .flow-node.start { border-color: #1e6bff; background: #ecf5ff; }
+  .flow-node.warning { border-color: #e6a23c; background: #fdf6ec; }
+  .flow-node.primary { border-color: #409eff; background: #ecf5ff; }
+  .flow-node.success { border-color: #67c23a; background: #f0f9eb; }
+  .flow-arrow {
+    color: #86909c;
+    font-size: 24px;
+    margin: 0 8px;
+  }
+  .flow-branch { display: flex; flex-direction: column; gap: 12px; }
+
+  /* 统计卡片 */
+  .card-row { display: flex; gap: 14px; margin: 16px 0; flex-wrap: wrap; }
+  .info-card {
+    flex: 1;
+    min-width: 180px;
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid #e5e6eb;
+  }
+  .info-card .title { font-size: 13px; color: #86909c; margin-bottom: 6px; }
+  .info-card .desc { font-size: 13px; color: #4e5969; }
+
+  /* 列位置图 */
+  .col-flow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+  }
+  .col-chip {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    border: 1px solid #d9dce3;
+    background: #fafbfc;
+    white-space: nowrap;
+  }
+  .col-chip.new { background: #ecf5ff; border-color: #409eff; color: #409eff; font-weight: 600; }
+  .col-arrow { color: #c0c4cc; font-size: 14px; }
+
+  /* 提示框 */
+  .tip-box {
+    background: #ecf5ff;
+    border-left: 4px solid #409eff;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 14px;
+    color: #4e5969;
+  }
+  .tip-box.warning { background: #fdf6ec; border-color: #e6a23c; }
+  .tip-box.success { background: #f0f9eb; border-color: #67c23a; }
+
+  /* 箭头标注 */
+  .arrow-note {
+    position: relative;
+    margin: 16px 0;
+    padding-left: 24px;
+    font-size: 13px;
+    color: #86909c;
+  }
+  .arrow-note::before {
+    content: '←';
+    position: absolute;
+    left: 0;
+    color: #ff4d4f;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 文档头部 -->
+  <div class="doc-header">
+    <h1>预结算结算类型功能更新文档（v4）</h1>
+    <div class="meta">
+      <span>📅 更新日期：2026-08-19</span>
+      <span>🔖 版本：v4</span>
+      <span>📁 文件：TaskDetail.vue</span>
+    </div>
+  </div>
+
+  <!-- 一、更新概览 -->
+  <div class="section">
+    <h2>一、更新概览</h2>
+    <p>本次更新围绕「预结算」和「结算类型」功能展开，核心改动是在预结算弹窗中新增「部分预结算」按钮，并在三个列表中新增「结算类型」列。</p>
+    <table>
+      <tr><th>模块</th><th>文件</th><th>更新内容</th></tr>
+      <tr><td>预结算弹窗</td><td>TaskDetail.vue</td><td>新增「部分预结算」按钮 <span class="new-badge">NEW</span></td></tr>
+      <tr><td>人员列表</td><td>TaskDetail.vue</td><td>新增「结算类型」列 <span class="new-badge">NEW</span></td></tr>
+      <tr><td>确认结算列表</td><td>TaskDetail.vue</td><td>新增「结算类型」列 <span class="new-badge">NEW</span></td></tr>
+      <tr><td>结算确认弹窗</td><td>TaskDetail.vue</td><td>新增「结算类型」列 <span class="new-badge">NEW</span></td></tr>
+      <tr><td>提交逻辑</td><td>TaskDetail.vue</td><td><code>confirmPreSettle</code> 函数支持结算类型参数</td></tr>
+      <tr><td>数据结构</td><td>TaskDetail.vue</td><td>成员数据新增 <code>settleType</code> 字段</td></tr>
+    </table>
+    <div class="tip-box">
+      🔗 访问地址：<a href="https://zhc1231.github.io/mjyy-zht/#/company/task-detail/1" style="color:#409eff">https://zhc1231.github.io/mjyy-zht/#/company/task-detail/1</a>
+    </div>
+  </div>
+
+  <!-- 二、预结算弹窗按钮 -->
+  <div class="section">
+    <h2>二、预结算弹窗 - 新增「部分预结算」按钮</h2>
+    <p>预结算弹窗底部从原来的 1 个按钮扩展为 2 个按钮，左右并排：</p>
+
+    <!-- 模拟弹窗底部 -->
+    <div class="mock-dialog-bottom">
+      <div class="mock-btn mock-btn-warning">
+        <span class="mock-btn-icon">👛</span> 部分预结算
+      </div>
+      <div class="mock-btn mock-btn-primary">
+        <span class="mock-btn-icon">✓</span> 提交预结算
+      </div>
+    </div>
+
+    <div class="arrow-note" style="margin-left: 200px;">新增按钮：部分预结算（橙色）</div>
+    <div class="arrow-note" style="margin-left: 350px;">原按钮：提交预结算（蓝色），改为全部结算类型</div>
+
+    <h3>按钮对照</h3>
+    <table>
+      <tr><th>按钮</th><th>类型</th><th>颜色</th><th>图标</th><th>调用函数</th><th>结算类型</th></tr>
+      <tr>
+        <td><b>部分预结算</b> <span class="new-badge">NEW</span></td>
+        <td>warning</td>
+        <td><span class="mock-tag tag-warning">橙色</span></td>
+        <td>Wallet 👛</td>
+        <td><code>confirmPreSettle('部分结算')</code></td>
+        <td><span class="mock-tag tag-warning">部分结算</span></td>
+      </tr>
+      <tr>
+        <td><b>提交预结算</b></td>
+        <td>primary</td>
+        <td><span class="mock-tag tag-primary">蓝色</span></td>
+        <td>Check ✓</td>
+        <td><code>confirmPreSettle('全部结算')</code></td>
+        <td><span class="mock-tag tag-primary">全部结算</span></td>
+      </tr>
+    </table>
+
+    <h3>按钮代码</h3>
+<pre><code>&lt;div class="settle-bottom"&gt;
+  &lt;el-button type="warning" size="large" @click="confirmPreSettle('部分结算')"&gt;
+    &lt;el-icon&gt;&lt;Wallet /&gt;&lt;/el-icon&gt; 部分预结算
+  &lt;/el-button&gt;
+  &lt;el-button type="primary" size="large" @click="confirmPreSettle('全部结算')"&gt;
+    &lt;el-icon&gt;&lt;Check /&gt;&lt;/el-icon&gt; 提交预结算
+  &lt;/el-button&gt;
+&lt;/div&gt;</code></pre>
+  </div>
+
+  <!-- 三、结算类型字段 -->
+  <div class="section">
+    <h2>三、结算类型字段定义</h2>
+
+    <h3>字段说明</h3>
+    <table>
+      <tr><th>字段名</th><th>类型</th><th>可选值</th><th>说明</th></tr>
+      <tr>
+        <td><code>settleType</code></td>
+        <td>String</td>
+        <td>
+          <span class="mock-tag tag-primary">全部结算</span>
+          <span class="mock-tag tag-warning">部分结算</span>
+          <span class="tag-none">（空）</span>
+        </td>
+        <td>标记该人员的结算类型，空值表示未预结算</td>
+      </tr>
+    </table>
+
+    <h3>初始数据示例</h3>
+    <table>
+      <tr><th>人员</th><th>预结算金额</th><th>settleType</th><th>开户状态</th><th>说明</th></tr>
+      <tr>
+        <td>赵宏程</td>
+        <td style="color:#1e6bff;font-weight:600">6,000.00</td>
+        <td><span class="mock-tag tag-primary">全部结算</span></td>
+        <td><span class="mock-tag tag-success">已开户</span></td>
+        <td>任务负责人</td>
+      </tr>
+      <tr>
+        <td>张三</td>
+        <td style="color:#1e6bff">150.00</td>
+        <td><span class="mock-tag tag-primary">全部结算</span></td>
+        <td><span class="mock-tag tag-success">已开户</span></td>
+        <td>设计</td>
+      </tr>
+      <tr>
+        <td>李四</td>
+        <td style="color:#1e6bff">180.00</td>
+        <td><span class="tag-none">-</span></td>
+        <td><span class="mock-tag tag-warning">未开户</span></td>
+        <td>未开户无法结算</td>
+      </tr>
+      <tr>
+        <td>王五</td>
+        <td style="color:#a0a4ab">0.00</td>
+        <td><span class="tag-none">-</span></td>
+        <td><span class="mock-tag tag-warning">未开户</span></td>
+        <td>未预结算</td>
+      </tr>
+      <tr>
+        <td>赵六</td>
+        <td style="color:#a0a4ab">0.00</td>
+        <td><span class="mock-tag tag-primary">全部结算</span></td>
+        <td><span class="mock-tag tag-success">已开户</span></td>
+        <td>已结算完成</td>
+      </tr>
+    </table>
+
+    <div class="tip-box warning">
+      📌 新增成员默认 <code>settleType: ''</code>（空值），预结算提交后才写入对应类型
+    </div>
+  </div>
+
+  <!-- 四、列表新增列 -->
+  <div class="section">
+    <h2>四、三个列表新增「结算类型」列</h2>
+
+    <!-- 4.1 人员列表 -->
+    <h3>4.1 人员列表（members tab）</h3>
+    <p>在「实结金额」列之后、「结算时间」列之前新增「结算类型」列：</p>
+
+    <div class="col-flow">
+      <span class="col-chip">姓名</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">手机号</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">身份证号</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">工种</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">加入时间</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">成员状态</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">任务状态</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">应结算</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">预结算</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">实结金额</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip new">结算类型 NEW</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">结算时间</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">灵工确认</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">是否开户</span>
+      <span class="col-arrow">→ ···</span>
+    </div>
+
+    <!-- 模拟表格 -->
+    <table class="mock-table">
+      <tr>
+        <th>姓名</th>
+        <th>预结算</th>
+        <th>实结金额</th>
+        <th class="col-highlight col-highlight-label">结算类型</th>
+        <th>结算时间</th>
+      </tr>
+      <tr>
+        <td>赵宏程</td>
+        <td style="color:#1e6bff">6,000.00</td>
+        <td style="color:#a0a4ab">-</td>
+        <td class="col-highlight"><span class="mock-tag tag-primary">全部结算</span></td>
+        <td style="color:#a0a4ab">-</td>
+      </tr>
+      <tr>
+        <td>张三</td>
+        <td style="color:#1e6bff">150.00</td>
+        <td style="color:#a0a4ab">-</td>
+        <td class="col-highlight"><span class="mock-tag tag-primary">全部结算</span></td>
+        <td style="color:#a0a4ab">-</td>
+      </tr>
+      <tr>
+        <td>李四</td>
+        <td style="color:#1e6bff">180.00</td>
+        <td style="color:#a0a4ab">-</td>
+        <td class="col-highlight"><span class="tag-none">-</span></td>
+        <td style="color:#a0a4ab">-</td>
+      </tr>
+      <tr>
+        <td>赵六</td>
+        <td style="color:#a0a4ab">0.00</td>
+        <td style="color:#00b578">100.00</td>
+        <td class="col-highlight"><span class="mock-tag tag-primary">全部结算</span></td>
+        <td>2026-08-01</td>
+      </tr>
+    </table>
+
+    <!-- 4.2 确认结算列表 -->
+    <h3>4.2 确认结算列表（confirm-settle tab）</h3>
+    <p>在「预结算金额」列之后、「增值税及附加」列之前新增「结算类型」列：</p>
+
+    <div class="col-flow">
+      <span class="col-chip">选择</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">姓名</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">身份证号</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">预结算金额</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip new">结算类型 NEW</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">增值税及附加</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">个税金额</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">到账金额</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">实付金额</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">备注</span>
+      <span class="col-arrow">→</span>
+      <span class="col-chip">灵工确认</span>
+    </div>
+
+    <table class="mock-table">
+      <tr>
+        <th>姓名</th>
+        <th>预结算金额</th>
+        <th class="col-highlight col-highlight-label">结算类型</th>
+        <th>增值税及附加</th>
+        <th>个税金额</th>
+        <th>到账金额</th>
+        <th>实付金额</th>
+      </tr>
+      <tr>
+        <td>赵宏程</td>
+        <td>6,000.00</td>
+        <td class="col-highlight"><span class="mock-tag tag-primary">全部结算</span></td>
+        <td>60.00</td>
+        <td style="color:#ff4d4f">24.00</td>
+        <td style="color:#ff9500;font-weight:600">5,976.00</td>
+        <td style="color:#00b578;font-weight:600">6,060.00</td>
+      </tr>
+    </table>
+
+    <!-- 4.3 结算确认弹窗 -->
+    <h3>4.3 结算确认弹窗</h3>
+    <p>与确认结算列表保持一致，在「预结算金额」列之后新增「结算类型」列：</p>
+
+    <table class="mock-table">
+      <tr>
+        <th>姓名</th>
+        <th>身份证号</th>
+        <th>预结算金额</th>
+        <th class="col-highlight col-highlight-label">结算类型</th>
+        <th>增值税及附加</th>
+        <th>个税金额</th>
+        <th>到账金额</th>
+        <th>实付金额</th>
+      </tr>
+      <tr>
+        <td>赵宏程</td>
+        <td>331002****1234</td>
+        <td>6,000.00</td>
+        <td class="col-highlight"><span class="mock-tag tag-primary">全部结算</span></td>
+        <td>60.00</td>
+        <td style="color:#ff4d4f">24.00</td>
+        <td style="color:#ff9500;font-weight:600">5,976.00</td>
+        <td style="color:#00b578;font-weight:600">6,060.00</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 五、标签样式 -->
+  <div class="section">
+    <h2>五、结算类型标签样式</h2>
+    <p>三个列表中的「结算类型」列使用 Element Plus 的 <code>el-tag</code> 组件渲染：</p>
+
+    <table>
+      <tr><th>结算类型</th><th>标签样式</th><th>type 属性</th><th>颜色</th><th>效果</th></tr>
+      <tr>
+        <td>全部结算</td>
+        <td><span class="mock-tag tag-primary">全部结算</span></td>
+        <td><code>type="primary"</code></td>
+        <td>蓝底蓝字</td>
+        <td><span class="mock-tag tag-primary">全部结算</span></td>
+      </tr>
+      <tr>
+        <td>部分结算</td>
+        <td><span class="mock-tag tag-warning">部分结算</span></td>
+        <td><code>type="warning"</code></td>
+        <td>橙底橙字</td>
+        <td><span class="mock-tag tag-warning">部分结算</span></td>
+      </tr>
+      <tr>
+        <td>无（空值）</td>
+        <td><span class="tag-none">-</span></td>
+        <td>不渲染标签</td>
+        <td>灰色文字</td>
+        <td><span class="tag-none">-</span></td>
+      </tr>
+    </table>
+
+    <h3>渲染代码</h3>
+<pre><code>&lt;el-table-column label="结算类型" prop="settleType" min-width="100" align="center"&gt;
+  &lt;template #default="{ row }"&gt;
+    &lt;el-tag v-if="row.settleType === '全部结算'" type="primary" size="small"&gt;全部结算&lt;/el-tag&gt;
+    &lt;el-tag v-else-if="row.settleType === '部分结算'" type="warning" size="small"&gt;部分结算&lt;/el-tag&gt;
+    &lt;span v-else style="color:#a0a4ab"&gt;-&lt;/span&gt;
+  &lt;/template&gt;
+&lt;/el-table-column&gt;</code></pre>
+  </div>
+
+  <!-- 六、提交流程 -->
+  <div class="section">
+    <h2>六、预结算提交流程图</h2>
+    <p>点击不同按钮后，系统执行相同的提交流程，区别仅在于写入的结算类型不同：</p>
+
+    <div class="flow-diagram">
+      <div class="flow-node start">
+        打开预结算弹窗<br><small>编辑预结算金额</small>
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-branch">
+        <div class="flow-node warning">
+          点击「部分预结算」<br><small>settleType = '部分结算'</small>
+        </div>
+        <div class="flow-node primary">
+          点击「提交预结算」<br><small>settleType = '全部结算'</small>
+        </div>
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">
+        写入人员数据<br><small>target.settleType = settleType</small>
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">
+        构建确认结算列表<br><small>buildConfirmSettleList()</small>
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-branch">
+        <div class="flow-node">
+          需灵工确认<br><small>提示：等待灵工确认</small>
+        </div>
+        <div class="flow-node success">
+          无需确认<br><small>跳转确认结算 tab</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 七、提交逻辑 -->
+  <div class="section">
+    <h2>七、预结算提交逻辑更新</h2>
+
+    <h3>函数签名变更</h3>
+    <table>
+      <tr><th>版本</th><th>函数签名</th><th>说明</th></tr>
+      <tr>
+        <td>修改前</td>
+        <td><code>const confirmPreSettle = () =&gt; { ... }</code></td>
+        <td>无参数，默认全部结算</td>
+      </tr>
+      <tr>
+        <td>修改后</td>
+        <td><code>const confirmPreSettle = (settleType = '全部结算') =&gt; { ... }</code></td>
+        <td>接收结算类型参数，默认值「全部结算」</td>
+      </tr>
+    </table>
+
+    <h3>核心代码</h3>
+<pre><code>const confirmPreSettle = (settleType = '全部结算') =&gt; {
+  filteredPreSettleList.value.forEach(settle =&gt; {
+    const target = memberList.value.find(m =&gt; m.idCard === settle.idCard)
+    if (target) {
+      target.preSettleAmount = Number(settle.preSettleAmount || 0)
+      target.remark = settle.remark || ''
+      target.bankAccount = settle.bankAccount || ''
+      target.bankType = settle.bankType || ''
+      target.bankBranch = settle.bankBranch || ''
+      target.bankPhone = settle.bankPhone || ''
+      target.bankCode = settle.bankCode || ''
+      target.isAccountOpened = !!settle.isAccountOpened
+      <span style="color:#f9e2af">target.settleType = settleType  // ← 新增：写入结算类型</span>
+      if (preSettleForm.needWorkerConfirm && target.preSettleAmount &gt; 0) {
+        target.workerConfirmStatus = '待确认'
+      } else if (!preSettleForm.needWorkerConfirm) {
+        target.workerConfirmStatus = '无需确认'
+      }
+    }
+  })
+  preSettleVisible.value = false
+  confirmSettleSearch.name = ''
+  buildConfirmSettleList()
+  if (preSettleForm.needWorkerConfirm) {
+    ElMessage.success(`预结算已提交（${settleType}），等待灵工确认`)
+  } else {
+    ElMessage.success(`预结算已提交（${settleType}）`)
+    onTabChange('confirm-settle')
+  }
+}</code></pre>
+
+    <div class="tip-box success">
+      ✅ 成功提示消息包含结算类型：
+      <br>• 需灵工确认：<code>预结算已提交（全部结算），等待灵工确认</code>
+      <br>• 无需确认：<code>预结算已提交（部分结算）</code>
+    </div>
+  </div>
+
+  <!-- 八、文件清单 -->
+  <div class="section">
+    <h2>八、涉及文件清单</h2>
+    <table>
+      <tr><th>文件路径</th><th>序号</th><th>修改内容</th></tr>
+      <tr><td rowspan="7"><code>src/views/Company/TaskDetail.vue</code></td><td>1</td><td>预结算弹窗底部新增「部分预结算」按钮（warning + Wallet 图标）</td></tr>
+      <tr><td>2</td><td>人员列表新增「结算类型」列（实结金额后）</td></tr>
+      <tr><td>3</td><td>确认结算列表新增「结算类型」列（预结算金额后）</td></tr>
+      <tr><td>4</td><td>结算确认弹窗新增「结算类型」列（预结算金额后）</td></tr>
+      <tr><td>5</td><td><code>confirmPreSettle</code> 函数新增 <code>settleType</code> 参数</td></tr>
+      <tr><td>6</td><td>5 条成员数据新增 <code>settleType</code> 字段</td></tr>
+      <tr><td>7</td><td>新增成员默认 <code>settleType: ''</code></td></tr>
+    </table>
+  </div>
+
+  <!-- 九、测试验证 -->
+  <div class="section">
+    <h2>九、测试验证要点</h2>
+    <div class="card-row">
+      <div class="info-card" style="background:#fdf6ec;border-color:#faecd8">
+        <div class="title">① 预结算弹窗</div>
+        <div class="desc">底部显示 2 个按钮<br>「部分预结算」橙色在左<br>「提交预结算」蓝色在右</div>
+      </div>
+      <div class="info-card" style="background:#fdf6ec;border-color:#faecd8">
+        <div class="title">② 部分预结算</div>
+        <div class="desc">点击后提交<br>结算类型列显示<br><span class="mock-tag tag-warning">部分结算</span></div>
+      </div>
+      <div class="info-card" style="background:#ecf5ff;border-color:#d9ecff">
+        <div class="title">③ 提交预结算</div>
+        <div class="desc">点击后提交<br>结算类型列显示<br><span class="mock-tag tag-primary">全部结算</span></div>
+      </div>
+      <div class="info-card" style="background:#f7f8fa">
+        <div class="title">④ 未预结算人员</div>
+        <div class="desc">结算类型列显示<br><span class="tag-none">-</span>（灰色）</div>
+      </div>
+    </div>
+    <div class="card-row">
+      <div class="info-card" style="background:#f0f9eb;border-color:#e1f3d8">
+        <div class="title">⑤ 结算确认弹窗</div>
+        <div class="desc">打开后列表包含结算类型列<br>与确认结算列表一致</div>
+      </div>
+      <div class="info-card" style="background:#f7f8fa">
+        <div class="title">⑥ 新增成员</div>
+        <div class="desc">添加新成员后<br>结算类型列为 <span class="tag-none">-</span></div>
+      </div>
+      <div class="info-card" style="background:#ecf5ff;border-color:#d9ecff">
+        <div class="title">⑦ 提示消息</div>
+        <div class="desc">提交后 toast 包含结算类型<br>如「预结算已提交（部分结算）」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 计算公式附录 -->
+  <div class="section">
+    <h2>附录：结算计算公式</h2>
+    <table>
+      <tr><th>项目</th><th>公式</th><th>示例（预结算金额 6000）</th></tr>
+      <tr>
+        <td>增值税及附加</td>
+        <td>预结算金额 × 1%（金额 &gt; 1000 时征收，否则为 0）</td>
+        <td>6000 × 1% = <b>60.00</b></td>
+      </tr>
+      <tr>
+        <td>代扣个税</td>
+        <td>(预结算金额 - 5000) × 0.8 × 3%（≤5000 时为 0）</td>
+        <td>(6000 - 5000) × 0.8 × 3% = <b>24.00</b></td>
+      </tr>
+      <tr>
+        <td>实付金额</td>
+        <td>预结算金额 + 增值税及附加</td>
+        <td>6000 + 60 = <b>6,060.00</b></td>
+      </tr>
+      <tr>
+        <td><span class="highlight">到账金额</span></td>
+        <td><span class="highlight">预结算金额 - 代扣个税</span></td>
+        <td>6000 - 24 = <b>5,976.00</b></td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
